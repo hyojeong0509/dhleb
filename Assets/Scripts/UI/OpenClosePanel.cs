@@ -50,9 +50,8 @@ public class OpenClosePanel : MonoBehaviour
         }
     }
 
-    // 애플리케이션을 종료합니다
-    //- Unity 에디터: 플레이모드를 종료합니다
-    //- 빌드된 앱 (PC/모바일): 프로그램/앱을 종료합니다
+    //Unity 에디터: 플레이모드를 종료합니다
+    //빌드된 앱 (PC/모바일): 프로그램/앱을 종료합니다
     public void QuitApplication()
     {
 #if UNITY_EDITOR
