@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// 씬 간 데이터 전달 및 저장을 담당하는 싱글톤 매니저
-/// </summary>
+// 씬 간 데이터 전달 및 저장을 담당하는 싱글톤 매니저
 public class GameDataManager : MonoBehaviour
 {
     private static GameDataManager _instance;
@@ -36,7 +34,7 @@ public class GameDataManager : MonoBehaviour
     private const string SAVE_KEY_SKIN_COLOR = "SkinColor";
     private const string SAVE_KEY_HAIR_COLOR = "HairColor";
     private const string SAVE_KEY_OUTFIT_COLOR = "OutfitColor";
-    private const string SAVE_KEY_CHARACTER_PRESET = "CharacterPreset";
+    private const string SAVE_KEY_SKIN_TONE_PRESET = "SkinTonePreset";
 
     void Awake()
     {
@@ -60,9 +58,7 @@ public class GameDataManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 커스터마이징 데이터를 저장 (PlayerPrefs 사용)
-    /// </summary>
+    // 커스터마이징 데이터를 저장
     public void SaveCustomization(PlayerCustomizationData data)
     {
         if (data == null)
@@ -90,15 +86,13 @@ public class GameDataManager : MonoBehaviour
         PlayerPrefs.SetFloat(SAVE_KEY_OUTFIT_COLOR + "_B", data.outfitColor.b);
         PlayerPrefs.SetFloat(SAVE_KEY_OUTFIT_COLOR + "_A", data.outfitColor.a);
         
-        PlayerPrefs.SetInt(SAVE_KEY_CHARACTER_PRESET, data.characterPreset);
+        PlayerPrefs.SetInt(SAVE_KEY_SKIN_TONE_PRESET, data.skinTonePreset);
         PlayerPrefs.Save();
 
         Debug.Log($"GameDataManager: 커스터마이징 데이터 저장 완료 - 이름: {data.playerName}");
     }
 
-    /// <summary>
-    /// 저장된 커스터마이징 데이터를 로드
-    /// </summary>
+    // 저장된 커스터마이징 데이터를 로드
     public void LoadCustomization()
     {
         if (!PlayerPrefs.HasKey(SAVE_KEY_PLAYER_NAME))
@@ -129,14 +123,12 @@ public class GameDataManager : MonoBehaviour
         a = PlayerPrefs.GetFloat(SAVE_KEY_OUTFIT_COLOR + "_A", 1f);
         currentCustomization.outfitColor = new Color(r, g, b, a);
         
-        currentCustomization.characterPreset = PlayerPrefs.GetInt(SAVE_KEY_CHARACTER_PRESET, 0);
+        currentCustomization.skinTonePreset = PlayerPrefs.GetInt(SAVE_KEY_SKIN_TONE_PRESET, 1); // 기본값: 1 (보통 톤)
 
         Debug.Log($"GameDataManager: 커스터마이징 데이터 로드 완료 - 이름: {currentCustomization.playerName}");
     }
 
-    /// <summary>
-    /// 저장된 커스터마이징 데이터를 삭제
-    /// </summary>
+    // 저장된 커스터마이징 데이터를 삭제
     public void ClearCustomization()
     {
         PlayerPrefs.DeleteKey(SAVE_KEY_PLAYER_NAME);
@@ -152,16 +144,14 @@ public class GameDataManager : MonoBehaviour
         PlayerPrefs.DeleteKey(SAVE_KEY_OUTFIT_COLOR + "_G");
         PlayerPrefs.DeleteKey(SAVE_KEY_OUTFIT_COLOR + "_B");
         PlayerPrefs.DeleteKey(SAVE_KEY_OUTFIT_COLOR + "_A");
-        PlayerPrefs.DeleteKey(SAVE_KEY_CHARACTER_PRESET);
+        PlayerPrefs.DeleteKey(SAVE_KEY_SKIN_TONE_PRESET);
         PlayerPrefs.Save();
         
         currentCustomization = new PlayerCustomizationData();
         Debug.Log("GameDataManager: 커스터마이징 데이터 삭제 완료");
     }
 
-    /// <summary>
-    /// Game 씬으로 이동 (커스터마이징 적용)
-    /// </summary>
+    // Game 씬으로 이동 (커스터마이징 적용)
     public void LoadGameScene()
     {
         // 커스터마이징 데이터 저장

@@ -7,38 +7,48 @@ using TMPro;
 /// </summary>
 public class CustomizationUI : MonoBehaviour
 {
-    [Header("UI 레퍼런스")]
+    [Header("기본 정보")]
     [Tooltip("플레이어 이름 입력 필드")]
     public TMP_InputField nameInputField;
     
-    [Header("컬러 피커")]
-    [Tooltip("피부색 선택 버튼")]
-    public Button skinColorButton;
-    [Tooltip("머리색 선택 버튼")]
-    public Button hairColorButton;
-    [Tooltip("옷 색상 선택 버튼")]
-    public Button outfitColorButton;
+    [Header("피부 톤 프리셋 버튼")]
+    [Tooltip("밝은 피부 톤 버튼")]
+    public Button lightSkinButton;
+    [Tooltip("보통 피부 톤 버튼")]
+    public Button mediumSkinButton;
+    [Tooltip("어두운 피부 톤 버튼")]
+    public Button darkSkinButton;
+    
+    [Header("추가 프리셋 (선택)")]
+    [Tooltip("창백한 피부 톤 버튼")]
+    public Button paleSkinButton;
+    [Tooltip("그을린 피부 톤 버튼")]
+    public Button tanSkinButton;
+    [Tooltip("짙은 피부 톤 버튼")]
+    public Button deepSkinButton;
     
     [Header("프리뷰")]
-    [Tooltip("커스터마이징 프리뷰 이미지/스프라이트 렌더러")]
+    [Tooltip("커스터마이징 프리뷰 스프라이트 렌더러")]
     public SpriteRenderer previewRenderer;
-    public Image previewImage; // Image 컴포넌트 사용 시
+    [Tooltip("커스터마이징 프리뷰 이미지 (UI)")]
+    public Image previewImage;
+    
+    [Header("선택 표시")]
+    [Tooltip("현재 선택된 버튼을 표시할 이미지들 (선택 테두리 등)")]
+    public Image[] selectionIndicators; // 각 버튼에 대응되는 선택 표시
     
     [Header("액션 버튼")]
     [Tooltip("게임 시작 버튼")]
     public Button startButton;
     [Tooltip("취소 버튼 (옵션)")]
     public Button cancelButton;
-
-    [Header("색상 선택 UI")]
-    [Tooltip("색상 선택 패널")]
-    public GameObject colorPickerPanel;
-    [Tooltip("색상 선택 슬라이더 또는 피커")]
-    public Slider colorR, colorG, colorB;
+    
+    [Header("디버그")]
+    [Tooltip("선택된 피부 톤 정보 표시 텍스트")]
+    public TMP_Text debugText;
 
     private PlayerCustomizationData customizationData;
-    private Color currentEditColor;
-    private System.Action<Color> onColorSelected;
+    private int currentPresetIndex = 1; // 기본값: 보통 톤
 
     void Start()
     {
@@ -57,6 +67,10 @@ public class CustomizationUI : MonoBehaviour
         
         // 버튼 이벤트 연결
         SetupButtons();
+        
+        // 초기 프리뷰 업데이트
+        UpdatePreview();
+        UpdateSelectionIndicator();
     }
 
     void InitializeUI()
@@ -68,44 +82,38 @@ public class CustomizationUI : MonoBehaviour
             nameInputField.onValueChanged.AddListener(OnNameChanged);
         }
 
-        // 색상 버튼 초기화
-        UpdateColorButton(skinColorButton, customizationData.skinColor);
-        UpdateColorButton(hairColorButton, customizationData.hairColor);
-        UpdateColorButton(outfitColorButton, customizationData.outfitColor);
+        // 버튼 색상 설정 (버튼 자체를 해당 피부색으로)
+        SetButtonColor(lightSkinButton, PlayerCustomizationData.SKIN_TONE_LIGHT);
+        SetButtonColor(mediumSkinButton, PlayerCustomizationData.SKIN_TONE_MEDIUM);
+        SetButtonColor(darkSkinButton, PlayerCustomizationData.SKIN_TONE_DARK);
+        SetButtonColor(paleSkinButton, PlayerCustomizationData.SKIN_TONE_PALE);
+        SetButtonColor(tanSkinButton, PlayerCustomizationData.SKIN_TONE_TAN);
+        SetButtonColor(deepSkinButton, PlayerCustomizationData.SKIN_TONE_DEEP);
+        
+        // 현재 선택된 프리셋 설정
+        currentPresetIndex = customizationData.skinTonePreset;
     }
 
     void SetupButtons()
     {
-        // 색상 선택 버튼
-        if (skinColorButton != null)
-        {
-            skinColorButton.onClick.AddListener(() => OpenColorPicker(customizationData.skinColor, 
-                (color) => {
-                    customizationData.skinColor = color;
-                    UpdateColorButton(skinColorButton, color);
-                    UpdatePreview();
-                }));
-        }
+        // 피부 톤 프리셋 버튼
+        if (lightSkinButton != null)
+            lightSkinButton.onClick.AddListener(() => SelectSkinTone(0));
         
-        if (hairColorButton != null)
-        {
-            hairColorButton.onClick.AddListener(() => OpenColorPicker(customizationData.hairColor, 
-                (color) => {
-                    customizationData.hairColor = color;
-                    UpdateColorButton(hairColorButton, color);
-                    UpdatePreview();
-                }));
-        }
+        if (mediumSkinButton != null)
+            mediumSkinButton.onClick.AddListener(() => SelectSkinTone(1));
         
-        if (outfitColorButton != null)
-        {
-            outfitColorButton.onClick.AddListener(() => OpenColorPicker(customizationData.outfitColor, 
-                (color) => {
-                    customizationData.outfitColor = color;
-                    UpdateColorButton(outfitColorButton, color);
-                    UpdatePreview();
-                }));
-        }
+        if (darkSkinButton != null)
+            darkSkinButton.onClick.AddListener(() => SelectSkinTone(2));
+        
+        if (paleSkinButton != null)
+            paleSkinButton.onClick.AddListener(() => SelectSkinTone(3));
+        
+        if (tanSkinButton != null)
+            tanSkinButton.onClick.AddListener(() => SelectSkinTone(4));
+        
+        if (deepSkinButton != null)
+            deepSkinButton.onClick.AddListener(() => SelectSkinTone(5));
 
         // 게임 시작 버튼
         if (startButton != null)
@@ -120,6 +128,22 @@ public class CustomizationUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 피부 톤 선택
+    /// </summary>
+    void SelectSkinTone(int presetIndex)
+    {
+        currentPresetIndex = presetIndex;
+        customizationData.SetSkinToneByPreset(presetIndex);
+        
+        // UI 업데이트
+        UpdatePreview();
+        UpdateSelectionIndicator();
+        UpdateDebugText();
+        
+        Debug.Log($"[CustomizationUI] 피부 톤 선택: {GetPresetName(presetIndex)}");
+    }
+
     void OnNameChanged(string newName)
     {
         if (customizationData != null)
@@ -128,11 +152,13 @@ public class CustomizationUI : MonoBehaviour
         }
     }
 
-    void UpdateColorButton(Button button, Color color)
+    /// <summary>
+    /// 버튼 색상 설정 (버튼을 해당 피부색으로 표시)
+    /// </summary>
+    void SetButtonColor(Button button, Color color)
     {
         if (button != null)
         {
-            // 버튼의 색상 업데이트 (Image 컴포넌트가 있다면)
             Image buttonImage = button.GetComponent<Image>();
             if (buttonImage != null)
             {
@@ -141,105 +167,119 @@ public class CustomizationUI : MonoBehaviour
         }
     }
 
-    void OpenColorPicker(Color currentColor, System.Action<Color> onSelected)
-    {
-        currentEditColor = currentColor;
-        onColorSelected = onSelected;
-
-        // 색상 선택 패널이 있으면 열기
-        if (colorPickerPanel != null)
-        {
-            colorPickerPanel.SetActive(true);
-            
-            // 슬라이더 값 설정
-            if (colorR != null) colorR.value = currentColor.r;
-            if (colorG != null) colorG.value = currentColor.g;
-            if (colorB != null) colorB.value = currentColor.b;
-            
-            // 슬라이더 이벤트 연결
-            if (colorR != null) colorR.onValueChanged.RemoveAllListeners();
-            if (colorG != null) colorG.onValueChanged.RemoveAllListeners();
-            if (colorB != null) colorB.onValueChanged.RemoveAllListeners();
-            
-            if (colorR != null) colorR.onValueChanged.AddListener(OnColorSliderChanged);
-            if (colorG != null) colorG.onValueChanged.AddListener(OnColorSliderChanged);
-            if (colorB != null) colorB.onValueChanged.AddListener(OnColorSliderChanged);
-        }
-        else
-        {
-            // 색상 선택 패널이 없으면 기본 색상 선택 사용 (간단한 방법)
-            // 실제로는 더 복잡한 색상 피커 UI를 구현할 수 있습니다
-            Debug.LogWarning("CustomizationUI: 색상 선택 패널이 설정되지 않았습니다.");
-        }
-    }
-
-    void OnColorSliderChanged(float value)
-    {
-        if (colorR != null && colorG != null && colorB != null)
-        {
-            currentEditColor = new Color(colorR.value, colorG.value, colorB.value, 1f);
-            
-            // 프리뷰 업데이트
-            UpdatePreview();
-        }
-    }
-
-    public void ApplyColor()
-    {
-        if (onColorSelected != null)
-        {
-            onColorSelected(currentEditColor);
-        }
-        
-        if (colorPickerPanel != null)
-        {
-            colorPickerPanel.SetActive(false);
-        }
-    }
-
-    public void CancelColorPicker()
-    {
-        if (colorPickerPanel != null)
-        {
-            colorPickerPanel.SetActive(false);
-        }
-    }
-
+    /// <summary>
+    /// 프리뷰 업데이트
+    /// </summary>
     void UpdatePreview()
     {
-        // 프리뷰 이미지 업데이트 (실제 구현은 프로젝트에 맞게)
+        // SpriteRenderer 프리뷰 (3D 오브젝트)
         if (previewRenderer != null)
         {
-            // SpriteRenderer를 사용한 프리뷰 업데이트
-            // 예: 색상 적용 로직
+            previewRenderer.color = customizationData.skinColor;
         }
         
+        // UI Image 프리뷰
         if (previewImage != null)
         {
-            // Image를 사용한 프리뷰 업데이트
-            // 예: 색상 적용 로직
+            previewImage.color = customizationData.skinColor;
         }
     }
 
+    /// <summary>
+    /// 선택 표시 업데이트 (현재 선택된 버튼 강조)
+    /// </summary>
+    void UpdateSelectionIndicator()
+    {
+        if (selectionIndicators == null || selectionIndicators.Length == 0)
+            return;
+
+        // 모든 인디케이터 비활성화
+        for (int i = 0; i < selectionIndicators.Length; i++)
+        {
+            if (selectionIndicators[i] != null)
+            {
+                selectionIndicators[i].enabled = (i == currentPresetIndex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 디버그 텍스트 업데이트
+    /// </summary>
+    void UpdateDebugText()
+    {
+        if (debugText != null)
+        {
+            Color c = customizationData.skinColor;
+            debugText.text = $"선택: {GetPresetName(currentPresetIndex)}\n" +
+                           $"RGB({c.r:F2}, {c.g:F2}, {c.b:F2})";
+        }
+    }
+
+    /// <summary>
+    /// 프리셋 이름 가져오기
+    /// </summary>
+    string GetPresetName(int preset)
+    {
+        switch (preset)
+        {
+            case 0: return "밝은 톤";
+            case 1: return "보통 톤";
+            case 2: return "어두운 톤";
+            case 3: return "창백한 톤";
+            case 4: return "그을린 톤";
+            case 5: return "짙은 톤";
+            default: return "알 수 없음";
+        }
+    }
+
+    /// <summary>
+    /// 게임 시작 버튼 클릭
+    /// </summary>
     void OnStartGame()
     {
         // 커스터마이징 데이터 저장
         if (GameDataManager.Instance != null)
         {
             GameDataManager.Instance.SaveCustomization(customizationData);
+            
+            Debug.Log($"[CustomizationUI] 커스터마이징 저장 완료!");
+            Debug.Log($"  - 이름: {customizationData.playerName}");
+            Debug.Log($"  - 피부 톤: {GetPresetName(customizationData.skinTonePreset)}");
+            Debug.Log($"  - 색상: RGB({customizationData.skinColor.r:F2}, {customizationData.skinColor.g:F2}, {customizationData.skinColor.b:F2})");
+            
+            // Game 씬으로 이동
             GameDataManager.Instance.LoadGameScene();
         }
         else
         {
-            Debug.LogError("CustomizationUI: GameDataManager를 찾을 수 없습니다!");
+            Debug.LogError("[CustomizationUI] GameDataManager를 찾을 수 없습니다!");
         }
     }
 
+    /// <summary>
+    /// 취소 버튼 클릭
+    /// </summary>
     void OnCancel()
     {
         // 취소 시 Title 씬의 메인 메뉴로 돌아가기
         // 또는 커스터마이징 UI 비활성화
         gameObject.SetActive(false);
+    }
+    
+    /// <summary>
+    /// 테스트용: 모든 프리셋 색상 출력
+    /// </summary>
+    [ContextMenu("Print All Presets")]
+    void PrintAllPresets()
+    {
+        Debug.Log("===== 피부 톤 프리셋 =====");
+        Debug.Log($"0. 밝은 톤: {PlayerCustomizationData.SKIN_TONE_LIGHT}");
+        Debug.Log($"1. 보통 톤: {PlayerCustomizationData.SKIN_TONE_MEDIUM}");
+        Debug.Log($"2. 어두운 톤: {PlayerCustomizationData.SKIN_TONE_DARK}");
+        Debug.Log($"3. 창백한 톤: {PlayerCustomizationData.SKIN_TONE_PALE}");
+        Debug.Log($"4. 그을린 톤: {PlayerCustomizationData.SKIN_TONE_TAN}");
+        Debug.Log($"5. 짙은 톤: {PlayerCustomizationData.SKIN_TONE_DEEP}");
     }
 }
 

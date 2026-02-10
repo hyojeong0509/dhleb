@@ -375,7 +375,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 667691845}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a06612a4d854aca4b8aca0e6c7da602d, type: 3}
   m_Name: 
@@ -390,6 +390,23 @@ MonoBehaviour:
   - {r: 0.82, g: 0.71, b: 0.55, a: 1}
   - {r: 0.72, g: 0.57, b: 0.47, a: 1}
   - {r: 0.45, g: 0.35, b: 0.28, a: 1}
+--- !u!114 &667691852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 667691845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee1c0d9e9aa9da24e88a6b2cbcae92e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skinRenderer: {fileID: 0}
+  hairRenderer: {fileID: 0}
+  outfitRenderer: {fileID: 0}
+  applyOnStart: 1
+  showDebugLogs: 1
 --- !u!1001 &6602896010730007332
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -457,6 +474,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2084460537608537600, guid: 61a4da89a98a13944af29028097e3024, type: 3}
       insertIndex: -1
       addedObject: {fileID: 667691851}
+    - targetCorrespondingSourceObject: {fileID: 2084460537608537600, guid: 61a4da89a98a13944af29028097e3024, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 667691852}
   m_SourcePrefab: {fileID: 100100000, guid: 61a4da89a98a13944af29028097e3024, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
