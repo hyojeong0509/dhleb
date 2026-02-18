@@ -23,6 +23,9 @@ public class GameDataManager : MonoBehaviour
         }
     }
 
+    [Header("현재 세이브 데이터")]
+    public SaveData currentSaveData; // 현재 플레이 중인 슬롯의 전체 데이터
+
     [Header("현재 커스터마이징 데이터")]
     public PlayerCustomizationData currentCustomization;
 
