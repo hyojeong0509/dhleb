@@ -1,10 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Move Settings")]
-    public float moveSpeed = 5f;   // 이동 속도
+    public float moveSpeed = 5f;
+
+    [Header("충돌 설정")]
+    public LayerMask collisionMask;         // Inspector에서 충돌할 레이어 선택
+    private float collisionOffset = 0.05f;  // 충돌 여유 거리
+    private ContactFilter2D contactFilter;  // 충돌 필터
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -34,6 +39,10 @@ public class PlayerMovement : MonoBehaviour
 
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
+
+        // 충돌 필터 설정
+        contactFilter.SetLayerMask(collisionMask);
+        contactFilter.useLayerMask = true;
     }
 
     void Update()
@@ -180,10 +189,36 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        // 실제 이동 
-        Vector2 finalDir = moveDir;
+        if (moveDir == Vector2.zero) return;
 
-        rb.MovePosition(rb.position + finalDir * moveSpeed * Time.fixedDeltaTime);
+        // X, Y 이동량 각각 계산
+        Vector2 xMove = new Vector2(moveDir.x, 0).normalized * moveSpeed * Time.fixedDeltaTime;
+        Vector2 yMove = new Vector2(0, moveDir.y).normalized * moveSpeed * Time.fixedDeltaTime;
+
+        // X, Y 각각 충돌 체크 후 이동 가능 여부 판단
+        bool canMoveX = xMove.sqrMagnitude > 0 && !HasCollision(xMove);
+        bool canMoveY = yMove.sqrMagnitude > 0 && !HasCollision(yMove);
+
+        // 이동 가능한 방향만 합산해서 이동
+        Vector2 finalMove = Vector2.zero;
+        if (canMoveX) finalMove += xMove;
+        if (canMoveY) finalMove += yMove;
+
+        if (finalMove != Vector2.zero)
+            rb.MovePosition(rb.position + finalMove);
+    }
+
+    // 해당 방향으로 이동 시 충돌이 있는지 체크
+    bool HasCollision(Vector2 moveVector)
+    {
+        RaycastHit2D[] hits = new RaycastHit2D[5];
+        int count = rb.Cast(
+            moveVector.normalized,                      // 이동 방향
+            contactFilter,                              // 충돌할 레이어
+            hits,                                       // 결과 저장
+            moveVector.magnitude + collisionOffset      // 체크 거리
+        );
+        return count > 0;
     }
 
 }
