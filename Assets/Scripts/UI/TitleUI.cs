@@ -34,7 +34,6 @@ public class TitleUI : MonoBehaviour
     public Button btnSkinDark;
     public Button btnCreate;
     public Button btnNewCancel;
-    public TMP_Text txtNewGameError; // 입력 오류 메시지
 
     // ================================================================
     // Pn_SlotSelect 요소 (슬롯 3개)
@@ -61,6 +60,7 @@ public class TitleUI : MonoBehaviour
     // ================================================================
     private int selectedSkinPreset = 1; // 기본: 보통 톤
     private int targetSlotIndex = -1;   // 새 게임을 저장할 슬롯 번호
+    private bool isInfoPopup = false;   // true: 단순 알림 / false: 슬롯 삭제 확인
 
     // ================================================================
     // 초기화
@@ -150,16 +150,18 @@ public class TitleUI : MonoBehaviour
         }
         else
         {
-            // 슬롯 꽉 참 → 경고 표시
+            // 슬롯 꽉 참 → 삭제 확인 경고
             int oldestSlot = SaveManager.Instance.GetOldestSlot();
             SaveData oldest = SaveManager.Instance.Load(oldestSlot);
             targetSlotIndex = oldestSlot;
 
             string farmName = oldest != null ? oldest.farmName : "알 수 없음";
-            txtWarning.text = $"저장 슬롯이 가득 찼습니다.\n" +
-                              $"가장 오래된 파일 [ {farmName} ] 이(가) 삭제됩니다." +
-                              $"\n계속하시겠습니까?";
-            pnWarning.SetActive(true);
+            ShowWarningPopup(
+                $"저장 슬롯이 가득 찼습니다.\n" +
+                $"가장 오래된 파일 [ {farmName} ] 이(가) 삭제됩니다.\n" +
+                $"계속하시겠습니까?",
+                isInfo: false
+            );
         }
     }
 
@@ -168,10 +170,6 @@ public class TitleUI : MonoBehaviour
         inputFarmName.text = "";
         inputPlayerName.text = "";
         selectedSkinPreset = 1;
-
-        if (txtNewGameError != null)
-            txtNewGameError.gameObject.SetActive(false);
-
         pnNewGame.SetActive(true);
     }
 
@@ -187,10 +185,10 @@ public class TitleUI : MonoBehaviour
         string farmName   = inputFarmName.text.Trim();
         string playerName = inputPlayerName.text.Trim();
 
-        // 입력값 검증
+        // 입력값 검증 → 빈 칸 있으면 알림 팝업
         if (string.IsNullOrEmpty(farmName) || string.IsNullOrEmpty(playerName))
         {
-            ShowNewGameError("농장 이름과 플레이어 이름을\n모두 입력해주세요.");
+            ShowWarningPopup("농장 이름과 플레이어 이름을\n모두 입력해주세요.", isInfo: true);
             return;
         }
 
@@ -223,12 +221,17 @@ public class TitleUI : MonoBehaviour
             GameSceneManager.Instance.LoadGameScene();
     }
 
-    void ShowNewGameError(string message)
+    /// <summary>
+    /// 경고 팝업 표시
+    /// isInfo: true  → 확인 버튼만 (단순 알림)
+    /// isInfo: false → 확인 + 취소 버튼 (슬롯 삭제 확인)
+    /// </summary>
+    void ShowWarningPopup(string message, bool isInfo)
     {
-        if (txtNewGameError != null)
-            txtNewGameError.text = message;
-        else
-            Debug.LogWarning($"[TitleUI] {message}");
+        isInfoPopup = isInfo;
+        txtWarning.text = message;
+        btnWarningCancel.gameObject.SetActive(!isInfo); // 알림이면 취소 버튼 숨김
+        pnWarning.SetActive(true);
     }
 
     PlayerCustomizationData GetCustomizationFromPreset(int preset)
@@ -243,8 +246,16 @@ public class TitleUI : MonoBehaviour
     // ================================================================
     void OnClickWarningConfirm()
     {
-        SaveManager.Instance.Delete(targetSlotIndex);
         pnWarning.SetActive(false);
+
+        if (isInfoPopup)
+        {
+            // 단순 알림 → 팝업만 닫기
+            return;
+        }
+
+        // 슬롯 삭제 확인 → 삭제 후 새 게임 패널
+        SaveManager.Instance.Delete(targetSlotIndex);
         OpenNewGamePanel();
     }
 

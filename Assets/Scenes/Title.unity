@@ -7625,7 +7625,6 @@ MonoBehaviour:
   btnSkinDark: {fileID: 2091498989}
   btnCreate: {fileID: 216231677}
   btnNewCancel: {fileID: 453713653}
-  txtNewGameError: {fileID: 1870085225}
   txtFarmNames:
   - {fileID: 1457073850}
   - {fileID: 1477238025}
