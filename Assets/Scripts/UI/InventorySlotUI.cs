@@ -25,9 +25,18 @@ public class InventorySlotUI : MonoBehaviour
         if (selectImage == null)
             selectImage = transform.Find("Select")?.GetComponent<Image>();
 
-        // Select 이미지는 기본적으로 비활성화
+        // 못 찾으면 콘솔에 실제 자식 이름 출력
+        if (iconImage == null || selectImage == null || countText == null)
+        {
+            string childNames = "";
+            foreach (Transform child in transform)
+                childNames += $"'{child.name}' ";
+            Debug.LogWarning($"[{gameObject.name}] 자식 오브젝트를 찾지 못했습니다. 실제 자식 이름: {childNames}");
+        }
+
+        // Select GameObject는 기본적으로 비활성화
         if (selectImage != null)
-            selectImage.enabled = false;
+            selectImage.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -76,6 +85,6 @@ public class InventorySlotUI : MonoBehaviour
     public void SetSelected(bool selected)
     {
         if (selectImage != null)
-            selectImage.enabled = selected;
+            selectImage.gameObject.SetActive(selected);
     }
 }
