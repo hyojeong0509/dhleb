@@ -1,7 +1,19 @@
 fileFormatVersion: 2
-guid: e0994fdffaa377341b21680d73f5519f
+guid: cb0671d0764b4344eb6227e1b285d595
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -4321052992992646773
+    second: Sprite-0001-Sheet 2_0
+  - first:
+      213: -6801509586926496105
+    second: Sprite-0001-Sheet 2_1
+  - first:
+      213: -6783023208849985592
+    second: Sprite-0001-Sheet 2_2
+  - first:
+      213: -7409267994624438455
+    second: Sprite-0001-Sheet 2_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -71,8 +83,8 @@ TextureImporter:
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
-    textureCompression: 1
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -93,99 +105,16 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Server
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Extras_7
+      name: Sprite-0001-Sheet 2_0
       rect:
         serializedVersion: 2
-        x: 140
-        y: 92
-        width: 60
-        height: 45
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ac902adba9586f340be7ba441b5c0367
-      internalID: -1902914791
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Extras_0
-      rect:
-        serializedVersion: 2
-        x: 66
-        y: 181
-        width: 60
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8a875ced6815d8340b5c49ab7a66d334
-      internalID: 104820457
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Extras_1
-      rect:
-        serializedVersion: 2
-        x: 5
-        y: 153
-        width: 54
+        x: 0
+        y: 0
+        width: 15
         height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -193,10 +122,76 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 8ef8d86317c0a4f4c8ccfcfdad296ea3
-      internalID: 793374735
+      spriteID: b89e80162398804c0800000000000000
+      internalID: -4321052992992646773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sprite-0001-Sheet 2_1
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 0
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79615de011f2c91a0800000000000000
+      internalID: -6801509586926496105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sprite-0001-Sheet 2_2
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 0
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cf244d545cddd1a0800000000000000
+      internalID: -6783023208849985592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sprite-0001-Sheet 2_3
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 0
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94f4dbec30efc2990800000000000000
+      internalID: -7409267994624438455
       vertices: []
       indices: 
       edges: []
@@ -205,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -215,9 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Extras_0: 104820457
-      Extras_1: 793374735
-      Extras_7: -1902914791
+      Sprite-0001-Sheet 2_0: -4321052992992646773
+      Sprite-0001-Sheet 2_1: -6801509586926496105
+      Sprite-0001-Sheet 2_2: -6783023208849985592
+      Sprite-0001-Sheet 2_3: -7409267994624438455
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

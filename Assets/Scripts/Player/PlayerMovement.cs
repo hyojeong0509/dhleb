@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -191,9 +191,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (moveDir == Vector2.zero) return;
 
-        // X, Y 이동량 각각 계산
-        Vector2 xMove = new Vector2(moveDir.x, 0).normalized * moveSpeed * Time.fixedDeltaTime;
-        Vector2 yMove = new Vector2(0, moveDir.y).normalized * moveSpeed * Time.fixedDeltaTime;
+        // X, Y 이동량 각각 계산 (moveDir은 이미 normalized라 그대로 사용)
+        Vector2 xMove = new Vector2(moveDir.x, 0) * moveSpeed * Time.fixedDeltaTime;
+        Vector2 yMove = new Vector2(0, moveDir.y) * moveSpeed * Time.fixedDeltaTime;
 
         // X, Y 각각 충돌 체크 후 이동 가능 여부 판단
         bool canMoveX = xMove.sqrMagnitude > 0 && !HasCollision(xMove);
