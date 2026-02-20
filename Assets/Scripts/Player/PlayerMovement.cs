@@ -21,6 +21,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 animDir;   // 애니메이션용 방향
     private Vector2 lastMoveDir = Vector2.down; // 마지막 이동 방향
     
+    // 플레이어가 바라보는 4방향 (외부에서 읽기 전용)
+    public Vector2Int FacingDirection { get; private set; } = Vector2Int.down;
+
     // 수직 입력 충돌 처리용 (W/S)
     private bool wasWPressed = false;
     private bool wasSPressed = false;
@@ -133,7 +136,13 @@ public class PlayerMovement : MonoBehaviour
         if (input.sqrMagnitude > 0.01f)
         {
             moveDir = input.normalized;
-            lastMoveDir = moveDir; // 이동 중일 때 마지막 방향 저장
+            lastMoveDir = moveDir;
+
+            // 4방향 facing 갱신 (수평 우선)
+            if (Mathf.Abs(input.x) >= Mathf.Abs(input.y))
+                FacingDirection = input.x > 0 ? Vector2Int.right : Vector2Int.left;
+            else
+                FacingDirection = input.y > 0 ? Vector2Int.up : Vector2Int.down;
         }
         else
         {
