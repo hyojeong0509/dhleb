@@ -26,11 +26,17 @@ public class PlayerAction : MonoBehaviour
 
     void Update()
     {
+        // 인벤토리 열려있으면 하이라이트 숨기고 모든 게임 액션 차단
+        if (InventoryManager.Instance != null && InventoryManager.Instance.IsInventoryOpen)
+        {
+            TileHighlight.Instance?.Hide();
+            return;
+        }
+
         UpdateHighlight();
 
         if (Input.GetMouseButtonDown(0))
         {
-            // 씨앗이면 심기, 도구면 도구 사용
             if (GetEquippedSeed() != null)
                 TryPlantSeed();
             else

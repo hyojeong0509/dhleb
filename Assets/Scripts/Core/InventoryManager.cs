@@ -1,11 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
-/// 인벤토리 전체 관리 (데이터 + 입력 + UI)
-/// - 총 27칸 데이터
-/// - 핫바: 0~8번 슬롯 (9칸)
-/// - 인벤토리 패널: 0~26번 슬롯 (27칸, E키로 토글)
-/// - 핫바와 인벤토리 패널 첫 번째 행은 같은 데이터 공유
+/// 인벤토리 전체 관리 (데이터 + 입력 + UI + 드래그)
 /// </summary>
 public class InventoryManager : MonoBehaviour
 {
@@ -19,48 +16,61 @@ public class InventoryManager : MonoBehaviour
 
     // ── Inspector 연결 ──────────────────────────────────────
     [Header("핫바 슬롯들의 부모 오브젝트")]
-    public Transform hotbarContainer;       // 핫바 슬롯 9개를 담고 있는 부모
+    public Transform hotbarContainer;
 
     [Header("인벤토리 패널 (E키로 열리는 전체 창)")]
     public GameObject inventoryPanel;
 
     [Header("인벤토리 슬롯들의 부모 오브젝트")]
-    public Transform inventoryContainer;    // 인벤토리 슬롯 27개를 담고 있는 부모
+    public Transform inventoryContainer;
 
-    // 자동 수집 (Inspector 노출 불필요)
+    [Header("땅에 버릴 때 생성할 프리팹 (ItemPickup 붙어있는 오브젝트)")]
+    public GameObject droppedItemPrefab;
+
+    [Header("플레이어 트랜스폼 (버리기 위치)")]
+    public Transform playerTransform;
+
+    // 자동 수집
     private InventorySlotUI[] hotbarSlotUIs;
     private InventorySlotUI[] inventorySlotUIs;
 
     // ── 상태 ────────────────────────────────────────────────
     private int activeSlotIndex = 0;
     private bool isInventoryOpen = false;
+    public bool IsInventoryOpen => isInventoryOpen;
+
+    // ── 들고있는 아이템 상태 ─────────────────────────────────
+    private ItemData heldItem = null;
+    private int heldCount = 0;
+    public bool IsHoldingItem => heldItem != null;
 
     // ────────────────────────────────────────────────────────
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // 슬롯 데이터 초기화
         for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
             slots[i] = new InventorySlotData();
 
-        // 컨테이너에서 슬롯 UI 자동 수집
         if (hotbarContainer != null)
+        {
             hotbarSlotUIs = hotbarContainer.GetComponentsInChildren<InventorySlotUI>();
+            for (int i = 0; i < hotbarSlotUIs.Length; i++)
+                hotbarSlotUIs[i].Setup(i);
+        }
 
         if (inventoryContainer != null)
+        {
             inventorySlotUIs = inventoryContainer.GetComponentsInChildren<InventorySlotUI>();
+            for (int i = 0; i < inventorySlotUIs.Length; i++)
+                inventorySlotUIs[i].Setup(i);
+        }
     }
 
     void Start()
     {
-        // 인벤토리 패널은 시작 시 닫기
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
@@ -77,23 +87,42 @@ public class InventoryManager : MonoBehaviour
 
     void HandleInput()
     {
-        // E 키 - 인벤토리 열기/닫기
         if (Input.GetKeyDown(KeyCode.E))
             ToggleInventory();
 
-        // 숫자 키 1~9 - 핫바 슬롯 선택
+        // 인벤토리 열려있을 때는 핫바 단축키 비활성화
+        if (isInventoryOpen) return;
+
         for (int i = 0; i < HOTBAR_COUNT; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                 SetActiveSlot(i);
         }
 
-        // 마우스 휠 - 핫바 슬롯 순환
         float scroll = Input.GetAxisRaw("Mouse ScrollWheel");
         if (scroll > 0f)
             SetActiveSlot((activeSlotIndex - 1 + HOTBAR_COUNT) % HOTBAR_COUNT);
         else if (scroll < 0f)
             SetActiveSlot((activeSlotIndex + 1) % HOTBAR_COUNT);
+    }
+
+    /// <summary>
+    /// 인벤토리 밖 클릭 시 들고있는 아이템 전부 버리기
+    /// LateUpdate에서 처리해 슬롯 클릭(OnPointerClick)보다 나중에 실행되게 함
+    /// </summary>
+    void LateUpdate()
+    {
+        HandleOutsideClick();
+    }
+
+    void HandleOutsideClick()
+    {
+        if (!isInventoryOpen || !IsHoldingItem) return;
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        // UI 위를 클릭하지 않은 경우 = 인벤토리 밖 클릭
+        if (!EventSystem.current.IsPointerOverGameObject())
+            DropHeldItem();
     }
 
     // ── 핫바 슬롯 선택 ──────────────────────────────────────
@@ -102,23 +131,27 @@ public class InventoryManager : MonoBehaviour
     {
         if (index < 0 || index >= HOTBAR_COUNT) return;
 
-        // 이전 슬롯 선택 해제
         hotbarSlotUIs[activeSlotIndex].SetSelected(false);
-
         activeSlotIndex = index;
-
-        // 새 슬롯 선택
         hotbarSlotUIs[activeSlotIndex].SetSelected(true);
     }
 
     public int GetActiveSlotIndex() => activeSlotIndex;
-
     public InventorySlotData GetActiveSlotData() => slots[activeSlotIndex];
+    public InventorySlotData GetSlotData(int index) => (index >= 0 && index < TOTAL_SLOT_COUNT) ? slots[index] : null;
 
     // ── 인벤토리 토글 ───────────────────────────────────────
 
     void ToggleInventory()
     {
+        // 들고있는 아이템이 있으면 원래 자리 / 빈 슬롯으로 반환
+        if (isInventoryOpen && IsHoldingItem)
+            ReturnHeldItem();
+
+        // 닫을 때 툴팁 숨기기
+        if (isInventoryOpen)
+            ItemTooltip.Instance?.Hide();
+
         isInventoryOpen = !isInventoryOpen;
 
         if (inventoryPanel != null)
@@ -126,6 +159,173 @@ public class InventoryManager : MonoBehaviour
 
         if (isInventoryOpen)
             RefreshInventoryUI();
+    }
+
+    // ── 슬롯 클릭 처리 ──────────────────────────────────────
+
+    /// <summary>
+    /// 좌클릭: 아이템 집기 / 놓기 / 스왑
+    /// </summary>
+    public void OnSlotLeftClick(int index)
+    {
+        if (!isInventoryOpen) return;
+
+        if (!IsHoldingItem)
+        {
+            // 슬롯에 아이템 있으면 집기
+            if (!slots[index].IsEmpty)
+                PickUpAll(index);
+        }
+        else
+        {
+            // 빈 슬롯 → 놓기
+            if (slots[index].IsEmpty)
+                PlaceAll(index);
+            // 같은 아이템 → 합치기
+            else if (slots[index].item == heldItem)
+                MergeToSlot(index);
+            // 다른 아이템 → 스왑
+            else
+                SwapWithSlot(index);
+        }
+
+        RefreshAll();
+    }
+
+    /// <summary>
+    /// 우클릭: 아이템 절반 집기 / 1개씩 놓기
+    /// </summary>
+    public void OnSlotRightClick(int index)
+    {
+        if (!isInventoryOpen) return;
+
+        if (!IsHoldingItem)
+        {
+            // 슬롯에 아이템 있으면 절반 집기
+            if (!slots[index].IsEmpty)
+                PickUpHalf(index);
+        }
+        else
+        {
+            // 같은 아이템이거나 빈 슬롯이면 1개 놓기
+            if (slots[index].IsEmpty || slots[index].item == heldItem)
+                PlaceOne(index);
+        }
+
+        RefreshAll();
+    }
+
+    // ── 아이템 집기/놓기 로직 ───────────────────────────────
+
+    void PickUpAll(int index)
+    {
+        heldItem = slots[index].item;
+        heldCount = slots[index].count;
+        slots[index].Clear();
+        CursorItem.Instance?.Show(heldItem, heldCount);
+    }
+
+    void PickUpHalf(int index)
+    {
+        int half = Mathf.CeilToInt(slots[index].count / 2f);
+        heldItem = slots[index].item;
+        heldCount = half;
+        slots[index].count -= half;
+        if (slots[index].count <= 0) slots[index].Clear();
+        CursorItem.Instance?.Show(heldItem, heldCount);
+    }
+
+    void PlaceAll(int index)
+    {
+        slots[index].item = heldItem;
+        slots[index].count = heldCount;
+        ClearHeld();
+    }
+
+    void PlaceOne(int index)
+    {
+        if (slots[index].IsEmpty)
+        {
+            slots[index].item = heldItem;
+            slots[index].count = 0;
+        }
+
+        if (slots[index].count < heldItem.maxStackSize)
+        {
+            slots[index].count++;
+            heldCount--;
+        }
+
+        if (heldCount <= 0)
+            ClearHeld();
+        else
+            CursorItem.Instance?.Show(heldItem, heldCount);
+    }
+
+    void MergeToSlot(int index)
+    {
+        int canAdd = heldItem.maxStackSize - slots[index].count;
+        int add = Mathf.Min(canAdd, heldCount);
+        slots[index].count += add;
+        heldCount -= add;
+
+        if (heldCount <= 0)
+            ClearHeld();
+        else
+            CursorItem.Instance?.Show(heldItem, heldCount);
+    }
+
+    void SwapWithSlot(int index)
+    {
+        ItemData tempItem = slots[index].item;
+        int tempCount = slots[index].count;
+
+        slots[index].item = heldItem;
+        slots[index].count = heldCount;
+
+        heldItem = tempItem;
+        heldCount = tempCount;
+        CursorItem.Instance?.Show(heldItem, heldCount);
+    }
+
+    /// <summary>
+    /// 들고있는 아이템을 빈 슬롯으로 반환 (인벤토리 닫을 때)
+    /// </summary>
+    void ReturnHeldItem()
+    {
+        AddItem(heldItem, heldCount);
+        ClearHeld();
+    }
+
+    /// <summary>
+    /// 들고있는 아이템을 땅에 버리기 (인벤토리 밖 클릭)
+    /// </summary>
+    void DropHeldItem()
+    {
+        if (!IsHoldingItem) return;
+
+        if (droppedItemPrefab != null && playerTransform != null)
+        {
+            Vector3 dropPos = playerTransform.position + (Vector3)Random.insideUnitCircle * 0.5f;
+            GameObject dropped = Instantiate(droppedItemPrefab, dropPos, Quaternion.identity);
+            ItemPickup pickup = dropped.GetComponent<ItemPickup>();
+            if (pickup != null)
+            {
+                pickup.itemData = heldItem;
+                pickup.count = heldCount;
+                pickup.SetupVisual();
+            }
+        }
+
+        ClearHeld();
+        RefreshAll();
+    }
+
+    void ClearHeld()
+    {
+        heldItem = null;
+        heldCount = 0;
+        CursorItem.Instance?.Hide();
     }
 
     // ── UI 갱신 ─────────────────────────────────────────────
@@ -148,33 +348,31 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    // ── 아이템 추가/제거 (향후 사용) ──────────────────────────
+    public void RefreshAll()
+    {
+        RefreshHotbarUI();
+        if (isInventoryOpen)
+            RefreshInventoryUI();
+    }
 
-    /// <summary>
-    /// 아이템 추가. 기존 스택에 합산하고, 빈 슬롯에 배치.
-    /// </summary>
+    // ── 아이템 추가 ─────────────────────────────────────────
+
     public bool AddItem(ItemData item, int count = 1)
     {
-        // 1. 기존 스택 찾기 (같은 아이템 + 여유 있는 슬롯)
+        // 기존 스택에 합산
         for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
         {
-            if (!slots[i].IsEmpty && slots[i].item == item
-                && slots[i].count < item.maxStackSize)
+            if (!slots[i].IsEmpty && slots[i].item == item && slots[i].count < item.maxStackSize)
             {
                 int canAdd = item.maxStackSize - slots[i].count;
                 int add = Mathf.Min(canAdd, count);
                 slots[i].count += add;
                 count -= add;
-
-                if (count <= 0)
-                {
-                    RefreshAll();
-                    return true;
-                }
+                if (count <= 0) { RefreshAll(); return true; }
             }
         }
 
-        // 2. 빈 슬롯 찾기
+        // 빈 슬롯에 배치
         for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
         {
             if (slots[i].IsEmpty)
@@ -182,24 +380,11 @@ public class InventoryManager : MonoBehaviour
                 slots[i].item = item;
                 slots[i].count = Mathf.Min(count, item.maxStackSize);
                 count -= slots[i].count;
-
-                if (count <= 0)
-                {
-                    RefreshAll();
-                    return true;
-                }
+                if (count <= 0) { RefreshAll(); return true; }
             }
         }
 
-        // 인벤토리 가득 참
         RefreshAll();
         return false;
-    }
-
-    void RefreshAll()
-    {
-        RefreshHotbarUI();
-        if (isInventoryOpen)
-            RefreshInventoryUI();
     }
 }
