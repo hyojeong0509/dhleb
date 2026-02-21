@@ -29,7 +29,17 @@ public class PlayerAction : MonoBehaviour
         UpdateHighlight();
 
         if (Input.GetMouseButtonDown(0))
-            TryUseTool();
+        {
+            // 씨앗이면 심기, 도구면 도구 사용
+            if (GetEquippedSeed() != null)
+                TryPlantSeed();
+            else
+                TryUseTool();
+        }
+
+        // 우클릭 - 수확
+        if (Input.GetMouseButtonDown(1))
+            TryHarvest();
     }
 
     /// <summary>
@@ -39,16 +49,40 @@ public class PlayerAction : MonoBehaviour
     {
         if (TileHighlight.Instance == null) return;
 
-        ToolData tool = GetEquippedTool();
-        if (tool == null)
+        Vector3 mousePos = GetMouseWorldPosition();
+
+        // 씨앗을 들고 있을 때 - 갈린 흙/물 준 흙에서만 표시
+        SeedData seed = GetEquippedSeed();
+        if (seed != null)
         {
-            TileHighlight.Instance.Hide();
+            bool isPlantable = IsInRange(mousePos)
+                && (TileManager.Instance.IsTilled(mousePos) || TileManager.Instance.IsWatered(mousePos))
+                && !TileManager.Instance.HasCrop(mousePos);
+
+            if (isPlantable)
+                TileHighlight.Instance.Show(mousePos, true);
+            else
+                TileHighlight.Instance.Hide();
             return;
         }
 
-        Vector3 mousePos = GetMouseWorldPosition();
-        bool isValid = IsInRange(mousePos);
-        TileHighlight.Instance.Show(mousePos, isValid);
+        // 도구를 들고 있을 때 - 범위 내 초록, 범위 밖 빨강
+        ToolData tool = GetEquippedTool();
+        if (tool != null)
+        {
+            bool isValid = IsInRange(mousePos);
+            TileHighlight.Instance.Show(mousePos, isValid);
+            return;
+        }
+
+        // 빈 손 - 다 자란 작물 위에서만 표시
+        if (TileManager.Instance != null && TileManager.Instance.IsFullyGrown(mousePos) && IsInRange(mousePos))
+        {
+            TileHighlight.Instance.Show(mousePos, true);
+            return;
+        }
+
+        TileHighlight.Instance.Hide();
     }
 
     void TryUseTool()
@@ -94,6 +128,40 @@ public class PlayerAction : MonoBehaviour
     }
 
     /// <summary>
+    /// 씨앗 심기
+    /// </summary>
+    void TryPlantSeed()
+    {
+        SeedData seed = GetEquippedSeed();
+        if (seed == null) return;
+        if (TileManager.Instance == null || TimeManager.Instance == null) return;
+
+        Vector3 targetPos = GetMouseWorldPosition();
+        if (!IsInRange(targetPos)) return;
+
+        bool planted = TileManager.Instance.TryPlantSeed(targetPos, seed, TimeManager.Instance.CurrentDay);
+        if (planted)
+        {
+            // 인벤토리에서 씨앗 1개 소모
+            InventorySlotData slotData = InventoryManager.Instance.GetActiveSlotData();
+            slotData.count--;
+            if (slotData.count <= 0) slotData.Clear();
+            InventoryManager.Instance.RefreshHotbarUI();
+        }
+    }
+
+    /// <summary>
+    /// 수확 (F키)
+    /// </summary>
+    void TryHarvest()
+    {
+        if (TileManager.Instance == null) return;
+        Vector3 targetPos = GetMouseWorldPosition();
+        if (!IsInRange(targetPos)) return;
+        TileManager.Instance.TryHarvest(targetPos);
+    }
+
+    /// <summary>
     /// 현재 핫바에 장착된 도구 반환 (없으면 null)
     /// </summary>
     ToolData GetEquippedTool()
@@ -101,6 +169,16 @@ public class PlayerAction : MonoBehaviour
         InventorySlotData slotData = InventoryManager.Instance?.GetActiveSlotData();
         if (slotData == null || slotData.IsEmpty) return null;
         return slotData.item as ToolData;
+    }
+
+    /// <summary>
+    /// 현재 핫바에 장착된 씨앗 반환 (없으면 null)
+    /// </summary>
+    SeedData GetEquippedSeed()
+    {
+        InventorySlotData slotData = InventoryManager.Instance?.GetActiveSlotData();
+        if (slotData == null || slotData.IsEmpty) return null;
+        return slotData.item as SeedData;
     }
 
     /// <summary>
