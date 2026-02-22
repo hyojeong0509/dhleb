@@ -1,17 +1,15 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// TimeManager와 HUD 텍스트 + 시계 바늘 연결
-/// </summary>
+// TimeManager와 HUD 텍스트 + 시계 바늘 연결
 public class HUDTimeDisplay : MonoBehaviour
 {
     [Header("HUD 텍스트")]
-    public TMP_Text txtTime;            // "06:00"
-    public TMP_Text txtDate;            // "Dawn · 1"
+    public TMP_Text txtTime;
+    public TMP_Text txtDate;
 
     [Header("시계 바늘")]
-    public Transform clockHand;         // ClockHand 오브젝트
+    public Transform clockHand;
     public float startAngle = 90f;      // 하루 시작(06:00)일 때 Z 회전값
 
     void Start()
@@ -55,7 +53,7 @@ public class HUDTimeDisplay : MonoBehaviour
         if (txtDate == null) return;
         string seqShort = TimeManager.SequenceNames[TimeManager.Instance.CurrentSequence]
                           .Replace(" Sequence", "");
-        txtDate.text = $"{seqShort} · {TimeManager.Instance.CurrentDay}";
+        txtDate.text = $"{seqShort}, {TimeManager.Instance.CurrentDay}"; // ·
     }
 
     void UpdateClockHand()

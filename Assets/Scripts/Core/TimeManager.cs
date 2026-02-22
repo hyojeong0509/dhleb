@@ -64,13 +64,13 @@ public class TimeManager : MonoBehaviour
     public int CurrentDay      => currentDay;
     public string CurrentSequenceName => SequenceNames[currentSequence];
 
-    /// <summary>현재 시(0~23)</summary>
+    //현재 시(0~23)
     public int CurrentHour => Mathf.FloorToInt(currentGameMinutes / 60f) % 24;
 
-    /// <summary>현재 분(0~59)</summary>
+    //현재 분(0~59)
     public int CurrentMinute => Mathf.FloorToInt(currentGameMinutes % 60f);
 
-    /// <summary>현재 시간을 "HH:MM" 형식 문자열로 반환</summary>
+    //현재 시간을 "HH:MM" 형식 문자열로 반환
     public string CurrentTimeString
     {
         get
@@ -81,7 +81,7 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    /// <summary>하루 진행도 (0.0 = 06:00, 1.0 = 02:00)</summary>
+    // 하루 진행도 (0.0 = 06:00, 1.0 = 02:00)
     public float DayProgress
     {
         get
@@ -150,9 +150,7 @@ public class TimeManager : MonoBehaviour
 
     // ── 하루 종료 / 다음날 ────────────────────────────────
 
-    /// <summary>
-    /// 하루 종료 (시간 초과 or 침대 취침 시 호출)
-    /// </summary>
+    // 하루 종료 (시간 초과 or 침대 취침 시 호출)
     public void EndDay()
     {
         if (!isDayRunning) return;
@@ -161,9 +159,7 @@ public class TimeManager : MonoBehaviour
         AdvanceToNextDay();
     }
 
-    /// <summary>
-    /// 다음날로 진행 (날짜, Sequence, Year 갱신)
-    /// </summary>
+    // 다음날로 진행 (날짜, Sequence, Year 갱신)
     void AdvanceToNextDay()
     {
         currentDay++;
@@ -195,13 +191,9 @@ public class TimeManager : MonoBehaviour
 
     // ── 외부 호출용 ──────────────────────────────────────
 
-    /// <summary>
-    /// 침대에서 잘 때 호출
-    /// </summary>
+    // 침대에서 잘 때 호출
     public void Sleep() => EndDay();
 
-    /// <summary>
-    /// 시간 일시정지 / 재개 (대화, 메뉴 열릴 때 등)
-    /// </summary>
+    // 시간 일시정지 / 재개 (대화, 메뉴 열릴 때 등)
     public void SetPause(bool paused) => isDayRunning = !paused;
 }

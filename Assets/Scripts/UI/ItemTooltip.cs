@@ -1,9 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// 인벤토리 슬롯 마우스 오버 시 아이템 정보 툴팁 표시
-/// </summary>
+// 인벤토리 슬롯 마우스 오버 시 아이템 정보 툴팁 표시
 public class ItemTooltip : MonoBehaviour
 {
     public static ItemTooltip Instance { get; private set; }
@@ -51,7 +49,7 @@ public class ItemTooltip : MonoBehaviour
         // 툴팁 크기 기반으로 오른쪽 하단에 배치
         float w = rt.rect.width;
         float h = rt.rect.height;
-        rt.anchoredPosition = pos + new Vector2(w * 0.5f + 10f, -h * 0.5f - 10f);
+        rt.anchoredPosition = pos + new Vector2(w * 0.5f + 40f, -h * 0.5f - 30f); // (숫자 늘리면 오른쪽으로 더 감, -숫자 늘리면 아래로 더 감)
     }
 
     public void Show(ItemData item)

@@ -7,8 +7,8 @@ using UnityEngine;
 public class CropObject : MonoBehaviour
 {
     private SeedData seedData;
-    private int dayPlanted;         // 심은 날
     private int currentStage;       // 현재 성장 단계
+    private int wateredDays;        // 실제로 물을 준 날 수 (달력 날짜 X)
     private SpriteRenderer sr;
 
     public bool IsFullyGrown => currentStage >= seedData.growthStages.Length - 1;
@@ -25,24 +25,25 @@ public class CropObject : MonoBehaviour
     public void Initialize(SeedData seed, int currentDay)
     {
         seedData = seed;
-        dayPlanted = currentDay;
         currentStage = 0;
+        wateredDays = 0;
         UpdateSprite();
     }
 
     /// <summary>
-    /// 날짜가 지날 때 TimeManager에서 호출
+    /// 물을 준 날에만 호출됨 → 실제 성장 횟수 기반으로 단계 계산
     /// </summary>
     public void OnDayPassed(int currentDay)
     {
         if (IsFullyGrown) return;
 
-        int daysGrown = currentDay - dayPlanted;
+        wateredDays++;  // 물 준 날만 카운트
+
         int totalStages = seedData.growthStages.Length;
 
-        // 성장 진행도에 따라 단계 계산
+        // 물 준 횟수 기반으로 단계 계산 (날짜 차이 X)
         int newStage = Mathf.Min(
-            Mathf.FloorToInt((float)daysGrown / seedData.growthDays * totalStages),
+            Mathf.FloorToInt((float)wateredDays / seedData.growthDays * totalStages),
             totalStages - 1
         );
 
@@ -50,8 +51,9 @@ public class CropObject : MonoBehaviour
         {
             currentStage = newStage;
             UpdateSprite();
-            Debug.Log($"[CropObject] {seedData.itemName} 성장: {currentStage + 1} / {totalStages} 단계");
         }
+
+        Debug.Log($"[CropObject] {seedData.itemName} | 물 준 날: {wateredDays}/{seedData.growthDays} | 단계: {currentStage + 1}/{totalStages}");
     }
 
     /// <summary>
