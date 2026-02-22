@@ -164,13 +164,14 @@ public class PlayerAction : MonoBehaviour
     }
 
     /// <summary>
-    /// 수확 (F키)
+    /// 수확 (우클릭) - 작물 있는 땅에서만 시도
     /// </summary>
     void TryHarvest()
     {
         if (TileManager.Instance == null) return;
         Vector3 targetPos = GetMouseWorldPosition();
         if (!IsInRange(targetPos)) return;
+        if (!TileManager.Instance.HasCrop(targetPos)) return; // 작물 없으면 아무것도 안 함
         TileManager.Instance.TryHarvest(targetPos);
     }
 

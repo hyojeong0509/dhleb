@@ -151,10 +151,7 @@ public class TileManager : MonoBehaviour
         Vector3Int cellPos = farmTilemap.WorldToCell(worldPosition);
 
         if (!crops.TryGetValue(cellPos, out CropObject crop))
-        {
-            Debug.Log("[TileManager] 작물이 없습니다.");
             return false;
-        }
 
         if (!crop.IsFullyGrown)
         {

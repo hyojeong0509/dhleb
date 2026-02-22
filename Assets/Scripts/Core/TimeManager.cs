@@ -20,7 +20,8 @@ public class TimeManager : MonoBehaviour
 
     [Header("디버그")]
     public float timeScale = 1f;            // 시간 배속 (1 = 정상, 10 = 10배속)
-    public KeyCode debugNextDayKey = KeyCode.Tab; // 누르면 즉시 다음날
+    public KeyCode debugNextDayKey = KeyCode.Tab;   // 누르면 즉시 다음날
+    public KeyCode debugFastTimeKey = KeyCode.F2;   // 누르면 10배속 토글 (오버레이 테스트용)
 
     [Header("날짜 설정")]
     public int daysPerSequence = 20;        // 1 Sequence당 일수
@@ -121,6 +122,13 @@ public class TimeManager : MonoBehaviour
         {
             EndDay();
             return;
+        }
+
+        // 디버그: F2 키로 10배속 토글 (오버레이 변화 확인용)
+        if (Input.GetKeyDown(debugFastTimeKey))
+        {
+            timeScale = (timeScale >= 10f) ? 1f : 10f;
+            Debug.Log($"[TimeManager] 시간 배속: {timeScale}x");
         }
 
         // 게임 시간 진행 (timeScale 배속 적용)
