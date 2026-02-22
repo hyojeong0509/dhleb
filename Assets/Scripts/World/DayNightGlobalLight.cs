@@ -16,6 +16,9 @@ public class DayNightGlobalLight : MonoBehaviour
     [Tooltip("낮의 Global Light intensity (1 = 밝음)")]
     [Range(0.5f, 1.5f)] public float dayIntensity = 1f;
 
+    [Tooltip("06:00 새벽 시작 시 밝기 (높을수록 밝음, nightIntensity보다 크게)")]
+    [Range(0.2f, 1f)] public float dawnIntensity = 0.5f;
+
     [Tooltip("밤의 Global Light intensity (0.2 = 어두움)")]
     [Range(0f, 0.5f)] public float nightIntensity = 0.2f;
 
@@ -55,7 +58,7 @@ public class DayNightGlobalLight : MonoBehaviour
     float GetIntensityForProgress(float progress)
     {
         if (progress <= dawnEnd)
-            return Mathf.Lerp(nightIntensity, dayIntensity, progress / dawnEnd);
+            return Mathf.Lerp(dawnIntensity, dayIntensity, progress / dawnEnd);
         if (progress <= noonEnd)
             return dayIntensity;
         if (progress <= nightStart)

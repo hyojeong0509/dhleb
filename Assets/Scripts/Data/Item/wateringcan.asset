@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ToolData
   itemName: "\uBB3C\uBFCC\uB9AC\uAC1C"
   icon: {fileID: -180874604, guid: 9c8b376f2f8842545a9edd6d73625765, type: 3}
-  maxStackSize: 99
+  maxStackSize: 1
   itemType: 1
   description: "\uBB3C\uC744 \uC904 \uC218 \uC788\uC744 \uAC83 \uAC19\uC740 \uB3C4\uAD6C\uB124\uC694."
   toolType: 1

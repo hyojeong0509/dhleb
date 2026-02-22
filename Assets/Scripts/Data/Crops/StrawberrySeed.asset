@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: -28994542, guid: b1de09a395063f14a9583ea26d7d26eb, type: 3}
   maxStackSize: 99
   itemType: 2
-  description: "\uB538\uAE30 \uC528\uC557"
+  description: "\uB538\uAE30 \uC528\uC557 \uC785\uB2C8\uB2E4."
   growthDays: 6
   growthStages:
   - {fileID: -28994542, guid: b1de09a395063f14a9583ea26d7d26eb, type: 3}

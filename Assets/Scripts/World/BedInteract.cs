@@ -22,7 +22,9 @@ public class BedInteract : MonoBehaviour
     [Header("저장 완료 표시")]
     public GameObject saveCompletePanel;
     public TMP_Text saveCompleteText;
-    public float saveCompleteDuration = 2f;
+    public Button btnNext;  // 다음 버튼 (누르면 페이드 후 패널 닫기)
+    public float fadeDuration = 0.4f;
+    public float btnNextEnableDelay = 1f;  // 패널 표시 후 버튼 활성화까지 대기 시간
 
     private bool playerInRange;
     private bool isProcessing;
@@ -46,6 +48,7 @@ public class BedInteract : MonoBehaviour
 
         if (btnYes != null) btnYes.onClick.AddListener(OnConfirmSleep);
         if (btnNo != null) btnNo.onClick.AddListener(OnCancelSleep);
+        if (btnNext != null) btnNext.onClick.AddListener(OnClickNext);
 
         if (popupMessage != null) popupMessage.text = "하루를 마무리 할거니?";
         if (saveCompleteText != null) saveCompleteText.text = "저장했삼";
@@ -85,6 +88,19 @@ public class BedInteract : MonoBehaviour
 
         if (popupPanel != null) popupPanel.SetActive(false);
 
+        // 페이드 아웃 → Sleep/저장/패널 표시 → 페이드 인
+        if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
+        {
+            ScreenFadeManager.Instance.FadeOutIn(DoSleepAndSave, fadeDuration, fadeDuration);
+        }
+        else
+        {
+            DoSleepAndSave();
+        }
+    }
+
+    void DoSleepAndSave()
+    {
         // 1. 하루 종료 (다음날로)
         if (TimeManager.Instance != null)
             TimeManager.Instance.Sleep();
@@ -99,7 +115,6 @@ public class BedInteract : MonoBehaviour
         // 4. 꿈 시퀀스 분기 (Dream-Link)
         if (ShouldPlayDreamSequence())
         {
-            CancelInvoke(nameof(HideSaveComplete));
             StartDreamSequence();
         }
     }
@@ -119,7 +134,34 @@ public class BedInteract : MonoBehaviour
         }
 
         saveCompletePanel.SetActive(true);
-        Invoke(nameof(HideSaveComplete), saveCompleteDuration);
+
+        if (btnNext != null)
+        {
+            btnNext.gameObject.SetActive(false);
+            Invoke(nameof(EnableNextButton), btnNextEnableDelay);
+        }
+        else
+        {
+            Invoke(nameof(HideSaveComplete), 2f);
+        }
+    }
+
+    void EnableNextButton()
+    {
+        if (btnNext != null)
+            btnNext.gameObject.SetActive(true);
+    }
+
+    void OnClickNext()
+    {
+        if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
+        {
+            ScreenFadeManager.Instance.FadeOutIn(HideSaveComplete, fadeDuration, fadeDuration);
+        }
+        else
+        {
+            HideSaveComplete();
+        }
     }
 
     void HideSaveComplete()

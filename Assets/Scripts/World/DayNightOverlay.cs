@@ -13,8 +13,8 @@ public class DayNightOverlay : MonoBehaviour
     [Tooltip("밤에 씌울 어두운 색. R,G,B가 어두울수록 진한 밤. (Alpha는 스크립트가 자동 조절)")]
     public Color nightColor = new Color(0.1f, 0.1f, 0.2f, 0.7f);
 
-    [Tooltip("06:00 직후 새벽의 어두움. 0=밝음, 1=완전 어둠. 보통 0.3~0.5")]
-    [Range(0f, 1f)] public float dawnMinAlpha = 0.4f;
+    [Tooltip("06:00 직후 새벽의 어두움. 0=밝음, 1=완전 어둠. 낮추면 새벽이 밝아짐")]
+    [Range(0f, 1f)] public float dawnMinAlpha = 0.2f;
 
     [Tooltip("24:00~02:00 밤의 최대 어두움. 0=밝음, 1=완전 어둠. 보통 0.6~0.85")]
     [Range(0f, 1f)] public float nightMaxAlpha = 0.75f;
