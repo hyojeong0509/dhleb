@@ -79,6 +79,10 @@ public class PlayerData
     [Header("인벤토리")]
     public InventorySlotSaveData[] inventorySlots;
 
+    [Header("스테미나")]
+    public int currentStamina = 100;
+    public bool wasExhausted;
+
     [Header("커스터마이징")]
     public int skinTonePreset;  // 피부 톤 프리셋 인덱스
     public float skinColorR;

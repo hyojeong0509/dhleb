@@ -5,6 +5,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Move Settings")]
     public float moveSpeed = 5f;
+    [Tooltip("탈진 시 이동속도 배율 (0.5 = 50%)")]
+    public float exhaustedSpeedMultiplier = 0.5f;
 
     [Header("충돌 설정")]
     public LayerMask collisionMask;         // Inspector에서 충돌할 레이어 선택
@@ -200,9 +202,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (moveDir == Vector2.zero) return;
 
+        float speed = moveSpeed;
+        if (StaminaManager.Instance != null && StaminaManager.Instance.IsExhausted)
+            speed *= exhaustedSpeedMultiplier;
+
         // X, Y 이동량 각각 계산 (moveDir은 이미 normalized라 그대로 사용)
-        Vector2 xMove = new Vector2(moveDir.x, 0) * moveSpeed * Time.fixedDeltaTime;
-        Vector2 yMove = new Vector2(0, moveDir.y) * moveSpeed * Time.fixedDeltaTime;
+        Vector2 xMove = new Vector2(moveDir.x, 0) * speed * Time.fixedDeltaTime;
+        Vector2 yMove = new Vector2(0, moveDir.y) * speed * Time.fixedDeltaTime;
 
         // X, Y 각각 충돌 체크 후 이동 가능 여부 판단
         bool canMoveX = xMove.sqrMagnitude > 0 && !HasCollision(xMove);

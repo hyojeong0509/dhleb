@@ -57,6 +57,7 @@ public class SoundManager : MonoBehaviour
     private AudioClip titleBGM;
     private AudioClip gameMainBGM;
     private AudioClip clickSound;
+    private AudioClip itemPickupSound;
 
     // PlayerPrefs 키
     private const string MASTER_VOLUME_KEY = "MasterVolume";
@@ -134,6 +135,13 @@ public class SoundManager : MonoBehaviour
         if (clickSound == null)
         {
             Debug.LogWarning("SoundManager: Resources/Sounds/ClickSound를 찾을 수 없습니다.");
+        }
+
+        // 아이템 획득 효과음 로드
+        itemPickupSound = Resources.Load<AudioClip>("Sounds/ItemPickupSound");
+        if (itemPickupSound == null)
+        {
+            Debug.LogWarning("SoundManager: Resources/Sounds/ItemPickupSound를 찾을 수 없습니다.");
         }
     }
 
@@ -237,6 +245,13 @@ public class SoundManager : MonoBehaviour
         }
 
         PlaySFX(clickSound);
+    }
+
+    // 아이템 획득 효과음 재생
+    public void PlayItemPickupSound()
+    {
+        if (itemPickupSound == null) return;
+        PlaySFX(itemPickupSound);
     }
 
     // 배경음악 정지

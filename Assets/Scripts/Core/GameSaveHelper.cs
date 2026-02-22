@@ -33,6 +33,12 @@ public static class GameSaveHelper
             InventoryManager.Instance.FillSaveData(data.playerData.inventorySlots);
         }
 
+        if (StaminaManager.Instance != null)
+        {
+            data.playerData.currentStamina = StaminaManager.Instance.CurrentStamina;
+            data.playerData.wasExhausted = StaminaManager.Instance.IsExhausted;
+        }
+
         if (TileManager.Instance != null)
             data.farmData = TileManager.Instance.ExportFarmData();
     }
@@ -68,6 +74,15 @@ public static class GameSaveHelper
         // 인벤토리
         if (InventoryManager.Instance != null && data.playerData.inventorySlots != null)
             InventoryManager.Instance.LoadFromSaveData(data.playerData.inventorySlots);
+
+        // 스테미나 (구버전 세이브는 currentStamina가 0일 수 있음 → 최대치로)
+        if (StaminaManager.Instance != null)
+        {
+            int stamina = data.playerData.currentStamina;
+            if (stamina <= 0) stamina = StaminaManager.Instance.MaxStamina;
+            StaminaManager.Instance.SetStamina(stamina);
+            StaminaManager.Instance.SetWasExhausted(data.playerData.wasExhausted);
+        }
 
         // 농장
         if (TileManager.Instance != null && data.farmData != null)

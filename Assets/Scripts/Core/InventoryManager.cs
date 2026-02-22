@@ -293,7 +293,7 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     void ReturnHeldItem()
     {
-        AddItem(heldItem, heldCount);
+        AddItem(heldItem, heldCount, playAcquisitionSound: false);
         ClearHeld();
     }
 
@@ -399,7 +399,7 @@ public class InventoryManager : MonoBehaviour
 
     // ── 아이템 추가 ─────────────────────────────────────────
 
-    public bool AddItem(ItemData item, int count = 1)
+    public bool AddItem(ItemData item, int count = 1, bool playAcquisitionSound = true)
     {
         // 기존 스택에 합산
         for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
@@ -410,7 +410,13 @@ public class InventoryManager : MonoBehaviour
                 int add = Mathf.Min(canAdd, count);
                 slots[i].count += add;
                 count -= add;
-                if (count <= 0) { RefreshAll(); return true; }
+                if (count <= 0)
+                {
+                    RefreshAll();
+                    if (playAcquisitionSound && SoundManager.Instance != null)
+                        SoundManager.Instance.PlayItemPickupSound();
+                    return true;
+                }
             }
         }
 
@@ -422,7 +428,13 @@ public class InventoryManager : MonoBehaviour
                 slots[i].item = item;
                 slots[i].count = Mathf.Min(count, item.maxStackSize);
                 count -= slots[i].count;
-                if (count <= 0) { RefreshAll(); return true; }
+                if (count <= 0)
+                {
+                    RefreshAll();
+                    if (playAcquisitionSound && SoundManager.Instance != null)
+                        SoundManager.Instance.PlayItemPickupSound();
+                    return true;
+                }
             }
         }
 

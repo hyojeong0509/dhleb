@@ -9,6 +9,7 @@ public class PlayerAction : MonoBehaviour
 {
     [Header("도구 설정")]
     public float maxUseDistance = 2.5f; // 최대 사용 거리 (타일 단위)
+    public float highlightViewRange = 5f; // 하이라이트 표시 범위 (이 거리 밖은 표시 안 함)
 
     private PlayerMovement movement;
 
@@ -64,6 +65,13 @@ public class PlayerAction : MonoBehaviour
 
         Vector3 mousePos = GetMouseWorldPosition();
 
+        // 플레이어 중심 5칸 밖이면 하이라이트 숨김
+        if (Vector2.Distance(transform.position, mousePos) > highlightViewRange)
+        {
+            TileHighlight.Instance.Hide();
+            return;
+        }
+
         // 씨앗을 들고 있을 때 - 갈린 흙/물 준 흙에서만 표시
         SeedData seed = GetEquippedSeed();
         if (seed != null)
@@ -79,12 +87,21 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
-        // 도구를 들고 있을 때 - 범위 내 초록, 범위 밖 빨강
+        // 도구를 들고 있을 때 - 범위 내 초록, 범위 밖/탈진 빨강 (집 안에서는 표시 안 함)
         ToolData tool = GetEquippedTool();
         if (tool != null)
         {
-            bool isValid = IsInRange(mousePos);
-            TileHighlight.Instance.Show(mousePos, isValid);
+            if (IndoorArea.IsPlayerIndoor && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
+            {
+                TileHighlight.Instance.Hide();
+            }
+            else
+            {
+                bool inRange = IsInRange(mousePos);
+                bool hasStamina = StaminaManager.Instance == null || StaminaManager.Instance.CanUseStamina(1);
+                bool isValid = inRange && hasStamina;
+                TileHighlight.Instance.Show(mousePos, isValid);
+            }
             return;
         }
 
@@ -124,20 +141,33 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
+        // 스테미나 체크 (괭이, 물뿌리개 - 사전 검사)
+        if ((tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan)
+            && (StaminaManager.Instance == null || !StaminaManager.Instance.CanUseStamina(1)))
+        {
+            Debug.Log("[PlayerAction] 스테미나가 부족합니다.");
+            return;
+        }
+
         Debug.Log($"[PlayerAction] 도구: {tool.toolType} / 타겟 위치: {targetPos}");
 
+        bool consumed = false;
         switch (tool.toolType)
         {
             case ToolType.Hoe:
-                UsHoe(targetPos);
+                consumed = UsHoe(targetPos);
                 break;
             case ToolType.WateringCan:
-                UseWateringCan(targetPos);
+                consumed = UseWateringCan(targetPos);
                 break;
             default:
                 Debug.Log($"[PlayerAction] {tool.toolType} 는 아직 구현되지 않았습니다.");
                 break;
         }
+
+        // 괭이/물뿌리개 사용 성공 시에만 스테미나 소모
+        if (consumed && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
+            StaminaManager.Instance?.UseStamina(1);
     }
 
     /// <summary>
@@ -222,15 +252,15 @@ public class PlayerAction : MonoBehaviour
         return Vector2.Distance(transform.position, targetPos) <= maxUseDistance;
     }
 
-    void UsHoe(Vector3 targetPos)
+    bool UsHoe(Vector3 targetPos)
     {
-        if (TileManager.Instance == null) return;
-        TileManager.Instance.TryTill(targetPos);
+        if (TileManager.Instance == null) return false;
+        return TileManager.Instance.TryTill(targetPos);
     }
 
-    void UseWateringCan(Vector3 targetPos)
+    bool UseWateringCan(Vector3 targetPos)
     {
-        if (TileManager.Instance == null) return;
-        TileManager.Instance.TryWater(targetPos);
+        if (TileManager.Instance == null) return false;
+        return TileManager.Instance.TryWater(targetPos);
     }
 }

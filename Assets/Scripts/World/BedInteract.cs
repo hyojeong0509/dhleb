@@ -105,14 +105,18 @@ public class BedInteract : MonoBehaviour
         if (TimeManager.Instance != null)
             TimeManager.Instance.Sleep();
 
-        // 2. 저장
+        // 2. 스테미나 회복 (정상 100%, 탈진 후 60%)
+        if (StaminaManager.Instance != null)
+            StaminaManager.Instance.RestoreOnSleep();
+
+        // 3. 저장
         if (GameDataManager.Instance != null)
             GameDataManager.Instance.SaveGame();
 
-        // 3. 저장 완료 표시
+        // 4. 저장 완료 표시
         ShowSaveComplete();
 
-        // 4. 꿈 시퀀스 분기 (Dream-Link)
+        // 5. 꿈 시퀀스 분기 (Dream-Link)
         if (ShouldPlayDreamSequence())
         {
             StartDreamSequence();
