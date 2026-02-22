@@ -62,6 +62,7 @@ public class TimeManager : MonoBehaviour
     public int CurrentYear     => currentYear;
     public int CurrentSequence => currentSequence;
     public int CurrentDay      => currentDay;
+    public float CurrentGameMinutes => currentGameMinutes;
     public string CurrentSequenceName => SequenceNames[currentSequence];
 
     //현재 시(0~23)
@@ -196,4 +197,17 @@ public class TimeManager : MonoBehaviour
 
     // 시간 일시정지 / 재개 (대화, 메뉴 열릴 때 등)
     public void SetPause(bool paused) => isDayRunning = !paused;
+
+    /// <summary>
+    /// 저장 데이터에서 시간/날짜 복원
+    /// </summary>
+    public void LoadState(int year, int sequence, int day, float gameMinutes)
+    {
+        currentYear = year;
+        currentSequence = Mathf.Clamp(sequence, 0, sequencesPerYear - 1);
+        currentDay = day;
+        currentGameMinutes = gameMinutes;
+        lastMinute = CurrentMinute;
+        lastHour = CurrentHour;
+    }
 }

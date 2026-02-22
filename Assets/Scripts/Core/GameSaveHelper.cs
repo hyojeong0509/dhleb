@@ -1,0 +1,78 @@
+using UnityEngine;
+
+/// <summary>
+/// 저장/로드 시 게임 상태 수집 및 적용
+/// </summary>
+public static class GameSaveHelper
+{
+    /// <summary>
+    /// 현재 게임 상태를 data에 채움
+    /// </summary>
+    public static void CollectSaveData(SaveData data, Transform playerTransform)
+    {
+        if (data == null) return;
+
+        if (playerTransform != null)
+        {
+            data.playerData.positionX = playerTransform.position.x;
+            data.playerData.positionY = playerTransform.position.y;
+        }
+
+        if (TimeManager.Instance != null)
+        {
+            data.playerData.currentYear = TimeManager.Instance.CurrentYear;
+            data.playerData.currentSequence = TimeManager.Instance.CurrentSequence;
+            data.playerData.currentDay = TimeManager.Instance.CurrentDay;
+            data.playerData.gameMinutes = TimeManager.Instance.CurrentGameMinutes;
+        }
+
+        if (InventoryManager.Instance != null)
+        {
+            if (data.playerData.inventorySlots == null || data.playerData.inventorySlots.Length != 27)
+                data.playerData.inventorySlots = new InventorySlotSaveData[27];
+            InventoryManager.Instance.FillSaveData(data.playerData.inventorySlots);
+        }
+
+        if (TileManager.Instance != null)
+            data.farmData = TileManager.Instance.ExportFarmData();
+    }
+
+    /// <summary>
+    /// 저장 데이터를 게임에 적용 (로드 시)
+    /// </summary>
+    public static void ApplyLoadData(SaveData data, Transform playerTransform)
+    {
+        if (data == null || data.playerData == null) return;
+
+        // 플레이어 위치
+        if (playerTransform != null)
+        {
+            playerTransform.position = new Vector3(
+                data.playerData.positionX,
+                data.playerData.positionY,
+                playerTransform.position.z
+            );
+        }
+
+        // 시간/날짜
+        if (TimeManager.Instance != null)
+        {
+            TimeManager.Instance.LoadState(
+                data.playerData.currentYear,
+                data.playerData.currentSequence,
+                data.playerData.currentDay,
+                data.playerData.gameMinutes
+            );
+        }
+
+        // 인벤토리
+        if (InventoryManager.Instance != null && data.playerData.inventorySlots != null)
+            InventoryManager.Instance.LoadFromSaveData(data.playerData.inventorySlots);
+
+        // 농장
+        if (TileManager.Instance != null && data.farmData != null)
+            TileManager.Instance.LoadFarmData(data.farmData);
+
+        Debug.Log("[GameSaveHelper] 로드 적용 완료");
+    }
+}

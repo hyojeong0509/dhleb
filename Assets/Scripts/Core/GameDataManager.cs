@@ -26,6 +26,9 @@ public class GameDataManager : MonoBehaviour
     [Header("현재 세이브 데이터")]
     public SaveData currentSaveData; // 현재 플레이 중인 슬롯의 전체 데이터
 
+    [Header("플레이어 (저장 시 위치 수집용, 비우면 자동 탐색)")]
+    public Transform playerTransform;
+
     [Header("현재 커스터마이징 데이터")]
     public PlayerCustomizationData currentCustomization;
 
@@ -152,6 +155,26 @@ public class GameDataManager : MonoBehaviour
         
         currentCustomization = new PlayerCustomizationData();
         Debug.Log("GameDataManager: 커스터마이징 데이터 삭제 완료");
+    }
+
+    /// <summary>
+    /// 현재 게임 상태 저장 (침대 등에서 호출)
+    /// </summary>
+    public void SaveGame()
+    {
+        if (currentSaveData == null)
+        {
+            Debug.LogWarning("[GameDataManager] currentSaveData가 없습니다.");
+            return;
+        }
+
+        Transform player = playerTransform != null ? playerTransform : GameObject.FindGameObjectWithTag("Player")?.transform;
+        GameSaveHelper.CollectSaveData(currentSaveData, player);
+
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.Save(currentSaveData);
+
+        Debug.Log("[GameDataManager] 게임 저장 완료");
     }
 
     // Game 씬으로 이동 (커스터마이징 적용)

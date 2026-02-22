@@ -355,6 +355,48 @@ public class InventoryManager : MonoBehaviour
             RefreshInventoryUI();
     }
 
+    // ── 저장용 데이터 수집 ────────────────────────────────────
+
+    /// <summary>
+    /// 인벤토리 데이터를 저장용 배열에 채움
+    /// </summary>
+    public void FillSaveData(InventorySlotSaveData[] arr)
+    {
+        if (arr == null || arr.Length < TOTAL_SLOT_COUNT) return;
+
+        for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
+        {
+            if (slots[i].IsEmpty)
+                arr[i] = new InventorySlotSaveData { itemName = "", count = 0 };
+            else
+                arr[i] = new InventorySlotSaveData { itemName = slots[i].item.itemName, count = slots[i].count };
+        }
+    }
+
+    /// <summary>
+    /// 저장 데이터에서 인벤토리 복원
+    /// </summary>
+    public void LoadFromSaveData(InventorySlotSaveData[] arr)
+    {
+        if (arr == null) return;
+
+        for (int i = 0; i < TOTAL_SLOT_COUNT && i < arr.Length; i++)
+        {
+            slots[i].Clear();
+
+            if (string.IsNullOrEmpty(arr[i].itemName) || arr[i].count <= 0) continue;
+
+            ItemData item = ItemDatabase.Instance?.GetItemByName(arr[i].itemName);
+            if (item != null)
+            {
+                slots[i].item = item;
+                slots[i].count = arr[i].count;
+            }
+        }
+
+        RefreshAll();
+    }
+
     // ── 아이템 추가 ─────────────────────────────────────────
 
     public bool AddItem(ItemData item, int count = 1)

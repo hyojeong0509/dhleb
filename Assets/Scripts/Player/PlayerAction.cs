@@ -33,6 +33,13 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
+        // ESC 메뉴, 침대 팝업 등 UI 패널 열려있으면 입력 차단
+        if (GameInputBlocker.IsBlocked)
+        {
+            TileHighlight.Instance?.Hide();
+            return;
+        }
+
         UpdateHighlight();
 
         if (Input.GetMouseButtonDown(0))

@@ -11,8 +11,10 @@ public class CropObject : MonoBehaviour
     private int wateredDays;        // 실제로 물을 준 날 수 (달력 날짜 X)
     private SpriteRenderer sr;
 
-    public bool IsFullyGrown => currentStage >= seedData.growthStages.Length - 1;
+    public bool IsFullyGrown => seedData != null && currentStage >= seedData.growthStages.Length - 1;
     public SeedData SeedData => seedData;
+    public int WateredDays => wateredDays;
+    public int CurrentStage => currentStage;
 
     void Awake()
     {
@@ -27,6 +29,17 @@ public class CropObject : MonoBehaviour
         seedData = seed;
         currentStage = 0;
         wateredDays = 0;
+        UpdateSprite();
+    }
+
+    /// <summary>
+    /// 저장 데이터에서 복원 (로드 시)
+    /// </summary>
+    public void LoadFromSave(SeedData seed, int savedWateredDays, int savedStage)
+    {
+        seedData = seed;
+        wateredDays = savedWateredDays;
+        currentStage = Mathf.Min(savedStage, seed.growthStages.Length - 1);
         UpdateSprite();
     }
 

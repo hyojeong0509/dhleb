@@ -209,4 +209,116 @@ public class TileManager : MonoBehaviour
         waterOverlayTilemap.ClearAllTiles();
         Debug.Log("[TileManager] 물 오버레이 초기화 완료");
     }
+
+    // ── 저장용 데이터 수집 ────────────────────────────────────
+
+    /// <summary>
+    /// 현재 농장 상태를 FarmData로 내보냄
+    /// </summary>
+    public FarmData ExportFarmData()
+    {
+        var data = new FarmData();
+
+        // 갈린 흙 타일
+        if (farmTilemap != null && tilledSoilTile != null)
+        {
+            foreach (var pos in farmTilemap.cellBounds.allPositionsWithin)
+            {
+                if (farmTilemap.GetTile(pos) == tilledSoilTile)
+                    data.tilledCells.Add(ToCellSaveData(pos));
+            }
+        }
+
+        // 물 준 흙 타일
+        if (waterOverlayTilemap != null && wateredOverlayTile != null)
+        {
+            foreach (var pos in waterOverlayTilemap.cellBounds.allPositionsWithin)
+            {
+                if (waterOverlayTilemap.GetTile(pos) == wateredOverlayTile)
+                    data.wateredCells.Add(ToCellSaveData(pos));
+            }
+        }
+
+        // 작물
+        foreach (var kvp in crops)
+        {
+            if (kvp.Value == null) continue;
+
+            var crop = kvp.Value;
+            data.crops.Add(new CropSaveData
+            {
+                cellX = kvp.Key.x,
+                cellY = kvp.Key.y,
+                cellZ = kvp.Key.z,
+                seedItemName = crop.SeedData.itemName,
+                wateredDays = crop.WateredDays,
+                currentStage = crop.CurrentStage
+            });
+        }
+
+        return data;
+    }
+
+    static CellSaveData ToCellSaveData(Vector3Int v)
+    {
+        return new CellSaveData { x = v.x, y = v.y, z = v.z };
+    }
+
+    /// <summary>
+    /// 저장 데이터에서 농장 상태 복원
+    /// </summary>
+    public void LoadFarmData(FarmData data)
+    {
+        if (data == null) return;
+
+        // 기존 타일/작물 제거
+        farmTilemap?.ClearAllTiles();
+        waterOverlayTilemap?.ClearAllTiles();
+        foreach (var crop in crops.Values)
+        {
+            if (crop != null) Destroy(crop.gameObject);
+        }
+        crops.Clear();
+
+        // 갈린 흙 복원
+        if (farmTilemap != null && tilledSoilTile != null)
+        {
+            foreach (var cell in data.tilledCells)
+            {
+                var pos = new Vector3Int(cell.x, cell.y, cell.z);
+                farmTilemap.SetTile(pos, tilledSoilTile);
+            }
+        }
+
+        // 물 준 흙 복원
+        if (waterOverlayTilemap != null && wateredOverlayTile != null)
+        {
+            foreach (var cell in data.wateredCells)
+            {
+                var pos = new Vector3Int(cell.x, cell.y, cell.z);
+                waterOverlayTilemap.SetTile(pos, wateredOverlayTile);
+            }
+        }
+
+        // 작물 복원
+        if (cropPrefab != null && ItemDatabase.Instance != null)
+        {
+            foreach (var c in data.crops)
+            {
+                var seed = ItemDatabase.Instance.GetItemByName(c.seedItemName) as SeedData;
+                if (seed == null) continue;
+
+                var cellPos = new Vector3Int(c.cellX, c.cellY, c.cellZ);
+                var spawnPos = farmTilemap.GetCellCenterWorld(cellPos);
+
+                GameObject cropGo = Instantiate(cropPrefab, spawnPos, Quaternion.identity);
+                CropObject crop = cropGo.GetComponent<CropObject>();
+                crop.LoadFromSave(seed, c.wateredDays, c.currentStage);
+
+                crops[cellPos] = crop;
+            }
+        }
+
+        Debug.Log($"[TileManager] 농장 복원 완료: 갈린흙 {data.tilledCells.Count}, 물 {data.wateredCells.Count}, 작물 {data.crops.Count}");
+    }
 }
