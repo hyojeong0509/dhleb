@@ -3,10 +3,10 @@ using System;
 
 /// <summary>
 /// 게임 내 시간/날짜 관리
-/// - 1년 = 6 Sequence
-/// - 1 Sequence = 20일
-/// - 하루 = 06:00 ~ 02:00 (다음날)
-/// - 실제 15분 = 게임 하루
+/// - 1년 = 3 Sequence (Lumae, Velum, Fracta)
+/// - 1 Sequence = 28일
+/// - 하루 = 06:00 ~ 06:00 (다음날)
+/// - 실제 18분 = 게임 하루
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
@@ -15,8 +15,8 @@ public class TimeManager : MonoBehaviour
     // ── 설정 (Inspector에서 조정 가능) ─────────────────────
     [Header("하루 시간 설정")]
     public int dayStartHour = 6;            // 하루 시작 (06:00)
-    public int dayEndHour = 26;             // 하루 종료 (02:00 = 26:00으로 표현)
-    public float realSecondsPerDay = 900f;  // 실제 몇 초 = 게임 하루 (900초 = 15분)
+    public int dayEndHour = 30;             // 하루 종료 (06:00 다음날 = 30:00)
+    public float realSecondsPerDay = 1080f; // 실제 몇 초 = 게임 하루 (1080초 = 18분)
 
     [Header("디버그")]
     public float timeScale = 1f;            // 시간 배속 (1 = 정상, 10 = 10배속)
@@ -24,18 +24,15 @@ public class TimeManager : MonoBehaviour
     public KeyCode debugFastTimeKey = KeyCode.F2;   // 누르면 10배속 토글 (오버레이 테스트용)
 
     [Header("날짜 설정")]
-    public int daysPerSequence = 20;        // 1 Sequence당 일수
-    public int sequencesPerYear = 6;        // 1년당 Sequence 수
+    public int daysPerSequence = 28;        // 1 Sequence당 일수
+    public int sequencesPerYear = 3;        // 1년당 Sequence 수
 
-    // ── Sequence 이름 ────────────────────────────────────
+    // ── Sequence 이름 (계절 느낌) ───────────────────────────
     public static readonly string[] SequenceNames =
     {
-        "Dawn Sequence",
-        "Bloom Sequence",
-        "Flux Sequence",
-        "Veil Sequence",
-        "Rift Sequence",
-        "Echo Sequence"
+        "Lumae",   // 봄 - 농사 위주, NPC 우호적
+        "Velum",   // 여름 - 농사/탐험 병행
+        "Fracta"   // 겨울 - 전투/모험 위주, 작물 한정
     };
 
     // ── 현재 시간 상태 ────────────────────────────────────
@@ -51,7 +48,8 @@ public class TimeManager : MonoBehaviour
     public event Action OnHourChanged;          // 1시간마다
     public event Action OnDayChanged;           // 날짜 바뀔 때
     public event Action OnSequenceChanged;      // Sequence 바뀔 때
-    public event Action OnDayEnd;               // 하루 종료 (02:00)
+    public event Action OnDayEnd;               // 하루 종료 (침대 Sleep 시)
+    public event Action OnSixAMReached;         // 06:00 도달 (잠 안 잔 채) → 시퀀스 시작
 
     // ── 내부 계산용 ───────────────────────────────────────
     private float gameMinutesPerRealSecond;
@@ -83,7 +81,14 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    // 하루 진행도 (0.0 = 06:00, 1.0 = 02:00)
+    // 02:00~05:50 구간인지 (빨간 시간 표시용)
+    public bool IsLateNightHours =>
+        currentGameMinutes >= 26f * 60f && currentGameMinutes < 30f * 60f - 10f;
+
+    // 01:30 도달 여부 (알림용, 25.5시 = 다음날 01:30)
+    public bool IsPast0130 => currentGameMinutes >= 25.5f * 60f;
+
+    // 하루 진행도 (0.0 = 06:00, 1.0 = 06:00 다음날)
     public float DayProgress
     {
         get
@@ -104,8 +109,14 @@ public class TimeManager : MonoBehaviour
         // 하루 시작 시간(분)으로 초기화
         currentGameMinutes = dayStartHour * 60f;
 
+        // 구버전: dayEndHour 26(02:00) → 30(06:00)으로 보정
+        if (dayEndHour == 26)
+        {
+            dayEndHour = 30;
+            Debug.Log("[TimeManager] dayEndHour 26→30 보정 (06:00에 이벤트)");
+        }
+
         // 실제 1초당 흘러야 할 게임 분 계산
-        // 예: (26-6)*60 / 900 = 1200/900 = 1.333 게임분/초
         int totalGameMinutes = (dayEndHour - dayStartHour) * 60;
         gameMinutesPerRealSecond = totalGameMinutes / realSecondsPerDay;
 
@@ -152,39 +163,50 @@ public class TimeManager : MonoBehaviour
             OnHourChanged?.Invoke();
         }
 
-        // 하루 종료 체크 (dayEndHour:00 도달 시)
+        // 06:00 도달 시 (잠 안 잔 채) → 시퀀스 시작 (바닥 엎어짐 → 이벤트)
         if (currentGameMinutes >= dayEndHour * 60f)
-            EndDay();
+        {
+            TriggerSixAMSequence();
+            return;
+        }
     }
 
     // ── 하루 종료 / 다음날 ────────────────────────────────
 
-    // 하루 종료 (시간 초과 or 침대 취침 시 호출)
+    // 06:00 도달 (잠 안 잔 채) - 시퀀스 매니저가 처리 후 AdvanceToNextDay 호출
+    void TriggerSixAMSequence()
+    {
+        if (!isDayRunning) return;
+        isDayRunning = false;
+        OnSixAMReached?.Invoke();
+    }
+
+    // 침대에서 잘 때 호출 (즉시 다음날로)
     public void EndDay()
     {
         if (!isDayRunning) return;
         isDayRunning = false;
         OnDayEnd?.Invoke();
-        AdvanceToNextDay();
+        AdvanceToNextDay(1);
     }
 
-    // 다음날로 진행 (날짜, Sequence, Year 갱신)
-    void AdvanceToNextDay()
+    // 다음날로 진행 (날짜, Sequence, Year 갱신) - 외부에서 호출 가능
+    public void AdvanceToNextDay(int days = 1)
     {
-        currentDay++;
-
-        if (currentDay > daysPerSequence)
+        for (int i = 0; i < days; i++)
         {
-            currentDay = 1;
-            currentSequence++;
-
-            if (currentSequence >= sequencesPerYear)
+            currentDay++;
+            if (currentDay > daysPerSequence)
             {
-                currentSequence = 0;
-                currentYear++;
+                currentDay = 1;
+                currentSequence++;
+                if (currentSequence >= sequencesPerYear)
+                {
+                    currentSequence = 0;
+                    currentYear++;
+                }
+                OnSequenceChanged?.Invoke();
             }
-
-            OnSequenceChanged?.Invoke();
         }
 
         // 시간 초기화
@@ -206,9 +228,7 @@ public class TimeManager : MonoBehaviour
     // 시간 일시정지 / 재개 (대화, 메뉴 열릴 때 등)
     public void SetPause(bool paused) => isDayRunning = !paused;
 
-    /// <summary>
-    /// 저장 데이터에서 시간/날짜 복원
-    /// </summary>
+    // 저장 데이터에서 시간/날짜 복원
     public void LoadState(int year, int sequence, int day, float gameMinutes)
     {
         currentYear = year;

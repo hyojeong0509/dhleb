@@ -8,10 +8,21 @@ public class GameSceneInitializer : MonoBehaviour
 {
     void Start()
     {
+        // 06:00 시퀀스 매니저 (씬에 없으면 자동 생성)
+        if (FindObjectOfType<DayEndSequenceManager>() == null)
+        {
+            var go = new GameObject("DayEndSequenceManager");
+            go.AddComponent<DayEndSequenceManager>();
+        }
+
+        // 플레이어에 FallHandler (없으면 추가)
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null && player.GetComponent<PlayerFallHandler>() == null)
+            player.AddComponent<PlayerFallHandler>();
+
         if (GameDataManager.Instance == null || GameDataManager.Instance.currentSaveData == null)
             return;
 
-        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        GameSaveHelper.ApplyLoadData(GameDataManager.Instance.currentSaveData, player);
+        GameSaveHelper.ApplyLoadData(GameDataManager.Instance.currentSaveData, player?.transform);
     }
 }

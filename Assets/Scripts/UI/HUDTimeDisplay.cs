@@ -8,6 +8,10 @@ public class HUDTimeDisplay : MonoBehaviour
     public TMP_Text txtTime;
     public TMP_Text txtDate;
 
+    [Header("시간 색상")]
+    public Color normalColor = Color.black;   // 평소 색상
+    public Color lateNightColor = Color.red;  // 02:00~05:50 빨간 시간
+
     [Header("시계 바늘")]
     public Transform clockHand;
     public float startAngle = 90f;      // 하루 시작(06:00)일 때 Z 회전값
@@ -36,6 +40,9 @@ public class HUDTimeDisplay : MonoBehaviour
     void Update()
     {
         UpdateClockHand();
+        // 매 프레임 시간 색상 갱신 (02:00~05:50 진입 시)
+        if (txtTime != null && TimeManager.Instance != null)
+            txtTime.color = TimeManager.Instance.IsLateNightHours ? lateNightColor : normalColor;
     }
 
     void UpdateTime()
@@ -51,9 +58,8 @@ public class HUDTimeDisplay : MonoBehaviour
     void UpdateDate()
     {
         if (txtDate == null) return;
-        string seqShort = TimeManager.SequenceNames[TimeManager.Instance.CurrentSequence]
-                          .Replace(" Sequence", "");
-        txtDate.text = $"{seqShort}, {TimeManager.Instance.CurrentDay}"; // ·
+        string seqName = TimeManager.SequenceNames[TimeManager.Instance.CurrentSequence];
+        txtDate.text = $"{seqName}, {TimeManager.Instance.CurrentDay}";
     }
 
     void UpdateClockHand()

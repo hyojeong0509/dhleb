@@ -72,7 +72,7 @@ public class PlayerData
 
     [Header("시간/날짜")]
     public int currentYear;     // 년
-    public int currentSequence; // 시퀀스 (0=Dawn ~ 5=Echo)
+    public int currentSequence; // 시퀀스 (0=Lumae, 1=Velum, 2=Fracta)
     public int currentDay;      // 일
     public float gameMinutes;   // 하루 내 시간 (분)
 
@@ -82,6 +82,9 @@ public class PlayerData
     [Header("스테미나")]
     public int currentStamina = 100;
     public bool wasExhausted;
+
+    [Header("골드")]
+    public int gold;
 
     [Header("커스터마이징")]
     public int skinTonePreset;  // 피부 톤 프리셋 인덱스

@@ -84,18 +84,23 @@ public class StaminaManager : MonoBehaviour
 
     /// <summary>
     /// Sleep 시 회복 (침대에서 호출)
+    /// currentGameMinutes: TimeManager.CurrentGameMinutes (26:00=02:00, 30:00=06:00)
+    /// 02:00 이전: 100%, 03:00까지: 60%, 04:00까지: 40%, 05:00~05:59: 20%
     /// </summary>
-    public void RestoreOnSleep()
+    public void RestoreOnSleep(float currentGameMinutes)
     {
-        if (wasExhausted)
-        {
-            currentStamina = Mathf.Min(maxStamina, exhaustedRecoveryAmount);
-            wasExhausted = false;
-        }
-        else
-        {
-            currentStamina = maxStamina;
-        }
+        float recoveryPercent;
+        if (currentGameMinutes < 26f * 60f)      // 02:00 이전
+            recoveryPercent = 1f;
+        else if (currentGameMinutes < 27f * 60f) // 03:00까지
+            recoveryPercent = 0.6f;
+        else if (currentGameMinutes < 28f * 60f) // 04:00까지
+            recoveryPercent = 0.4f;
+        else                                     // 05:00~05:59
+            recoveryPercent = 0.2f;
+
+        currentStamina = Mathf.RoundToInt(maxStamina * recoveryPercent);
+        wasExhausted = false;
         OnStaminaChanged?.Invoke();
     }
 

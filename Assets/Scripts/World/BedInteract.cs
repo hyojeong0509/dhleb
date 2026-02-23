@@ -101,22 +101,25 @@ public class BedInteract : MonoBehaviour
 
     void DoSleepAndSave()
     {
-        // 1. 하루 종료 (다음날로)
+        // 1. Sleep 전 현재 시각 저장 (Sleep()이 날짜를 바꾸므로)
+        float sleepTime = TimeManager.Instance != null ? TimeManager.Instance.CurrentGameMinutes : 0f;
+
+        // 2. 하루 종료 (다음날로)
         if (TimeManager.Instance != null)
             TimeManager.Instance.Sleep();
 
-        // 2. 스테미나 회복 (정상 100%, 탈진 후 60%)
+        // 3. 스테미나 회복 (시각별: 02:00 이전 100%, 03:00까지 60%, 04:00까지 40%, 05:00~ 20%)
         if (StaminaManager.Instance != null)
-            StaminaManager.Instance.RestoreOnSleep();
+            StaminaManager.Instance.RestoreOnSleep(sleepTime);
 
-        // 3. 저장
+        // 4. 저장
         if (GameDataManager.Instance != null)
             GameDataManager.Instance.SaveGame();
 
-        // 4. 저장 완료 표시
+        // 5. 저장 완료 표시
         ShowSaveComplete();
 
-        // 5. 꿈 시퀀스 분기 (Dream-Link)
+        // 6. 꿈 시퀀스 분기 (Dream-Link)
         if (ShouldPlayDreamSequence())
         {
             StartDreamSequence();

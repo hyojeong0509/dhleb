@@ -39,6 +39,9 @@ public static class GameSaveHelper
             data.playerData.wasExhausted = StaminaManager.Instance.IsExhausted;
         }
 
+        if (GoldManager.Instance != null)
+            data.playerData.gold = GoldManager.Instance.CurrentGold;
+
         if (TileManager.Instance != null)
             data.farmData = TileManager.Instance.ExportFarmData();
     }
@@ -83,6 +86,10 @@ public static class GameSaveHelper
             StaminaManager.Instance.SetStamina(stamina);
             StaminaManager.Instance.SetWasExhausted(data.playerData.wasExhausted);
         }
+
+        // 골드
+        if (GoldManager.Instance != null)
+            GoldManager.Instance.SetGold(data.playerData.gold);
 
         // 농장
         if (TileManager.Instance != null && data.farmData != null)
