@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Game 씬 로드 시 저장 데이터 적용
@@ -8,6 +9,53 @@ public class GameSceneInitializer : MonoBehaviour
 {
     void Start()
     {
+        // GameProgressManager (스토리/호감도/이벤트 플래그)
+        if (GameProgressManager.Instance == null)
+        {
+            var go = new GameObject("GameProgressManager");
+            go.AddComponent<GameProgressManager>();
+        }
+
+        // DialogueManager (대화 시스템)
+        if (DialogueManager.Instance == null)
+        {
+            var go = new GameObject("DialogueManager");
+            go.AddComponent<DialogueManager>();
+        }
+
+        // EventManager (조건별 대화/이벤트)
+        if (EventManager.Instance == null)
+        {
+            var go = new GameObject("EventManager");
+            go.AddComponent<EventManager>();
+        }
+
+        // CutsceneManager (컷신 재생)
+        if (CutsceneManager.Instance == null)
+        {
+            var go = new GameObject("CutsceneManager");
+            go.AddComponent<CutsceneManager>();
+        }
+
+        // QuestManager (퀘스트)
+        if (QuestManager.Instance == null)
+        {
+            var go = new GameObject("QuestManager");
+            go.AddComponent<QuestManager>();
+        }
+
+        // DialogueTestTrigger (T키 테스트 - DialogueUI 없으면 Canvas에 추가)
+        if (FindObjectOfType<DialogueTestTrigger>() == null)
+        {
+            var canvas = FindObjectOfType<Canvas>();
+            if (canvas != null)
+            {
+                var triggerGo = new GameObject("DialogueTestTrigger");
+                triggerGo.transform.SetParent(canvas.transform, false);
+                triggerGo.AddComponent<DialogueTestTrigger>();
+            }
+        }
+
         // 06:00 시퀀스 매니저 (씬에 없으면 자동 생성)
         if (FindObjectOfType<DayEndSequenceManager>() == null)
         {
@@ -25,9 +73,29 @@ public class GameSceneInitializer : MonoBehaviour
                 player.AddComponent<PlayerToolAnimator>();
         }
 
-        if (GameDataManager.Instance == null || GameDataManager.Instance.currentSaveData == null)
+        if (GameDataManager.Instance != null && GameDataManager.Instance.currentSaveData != null)
+            GameSaveHelper.ApplyLoadData(GameDataManager.Instance.currentSaveData, player?.transform);
+
+        // 눈 뜨는 컷신 (한 번도 안 봤으면)
+        TryPlayWakeUpCutscene();
+    }
+
+    void TryPlayWakeUpCutscene()
+    {
+        if (GameProgressManager.Instance == null || GameProgressManager.Instance.HasFlag("saw_wake_up"))
             return;
 
-        GameSaveHelper.ApplyLoadData(GameDataManager.Instance.currentSaveData, player?.transform);
+        var cutscene = Resources.Load<CutsceneData>("Cutscene/Cutscene_WakeUp");
+        if (cutscene == null || CutsceneManager.Instance == null)
+            return;
+
+        var cam = Camera.main;
+        if (cam != null && cam.orthographic)
+        {
+            CutsceneManager.WakeUpDefaultOrthoSize = cam.orthographicSize;
+            cam.orthographicSize = 2f;
+        }
+
+        CutsceneManager.Instance.Play(cutscene);
     }
 }

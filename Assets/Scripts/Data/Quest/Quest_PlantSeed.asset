@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e54bd079fdd2be8479386bd9bdc3bebd, type: 3}
+  m_Name: Quest_PlantSeed
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: quest_plant_seed
+  title: "\uC528\uC557 \uC2EC\uAE30"
+  description: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uC8FC\uB294 \uC528\uC557\uC744 \uBC18\uB4E4\uC5D0 \uC2EC\uC5B4\uBD04\uC2DC\uB2E4."
+  objectives:
+  - type: 2
+    targetId: 
+    requiredCount: 1
+  rewards:
+    gold: 0
+    npcAffections: []
+    completionDialogue: {fileID: 0}
+  advanceStoryOnComplete: 1
+  prerequisiteQuestIds: []
+  prerequisiteStoryProgress: -1
+  prerequisiteFlags: []

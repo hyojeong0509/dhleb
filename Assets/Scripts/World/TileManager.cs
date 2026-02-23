@@ -72,6 +72,7 @@ public class TileManager : MonoBehaviour
 
         // 밭 레이어에 갈린 흙 배치
         farmTilemap.SetTile(cellPos, tilledSoilTile);
+        QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.TillSoil, "", 1);
         Debug.Log($"[TileManager] 땅을 갈았습니다: {cellPos}");
         return true;
     }
@@ -97,6 +98,7 @@ public class TileManager : MonoBehaviour
 
         // 오버레이 레이어에 물 준 타일 배치
         waterOverlayTilemap.SetTile(cellPos, wateredOverlayTile);
+        QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.WaterSoil, "", 1);
         Debug.Log($"[TileManager] 물을 주었습니다: {cellPos}");
         return true;
     }
@@ -141,6 +143,7 @@ public class TileManager : MonoBehaviour
         crop.Initialize(seed, currentDay);
 
         crops[cellPos] = crop;
+        QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.PlantSeed, seed.itemName, 1);
         Debug.Log($"[TileManager] {seed.itemName} 심기 완료: {cellPos}");
         return true;
     }
@@ -159,8 +162,10 @@ public class TileManager : MonoBehaviour
             return false;
         }
 
+        string cropName = crop.SeedData != null ? crop.SeedData.itemName : "";
         crop.Harvest();
         crops.Remove(cellPos);
+        QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.Harvest, cropName, 1);
         return true;
     }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 // 침대 상호작용
 // 흐름: 침대 접근 → "하루 마무리?" 팝업 → [예] → Sleep → 저장 → 정산 표시 → (꿈 시퀀스 분기) → 다음날
@@ -23,6 +24,10 @@ public class BedInteract : MonoBehaviour
     public Button btnNext;
     public float fadeDuration = 0.4f;
     public float btnNextEnableDelay = 1f;
+
+    [Header("첫날 스토리")]
+    [Tooltip("첫날 잠 시 재생할 대화 (튜토리얼 중)")]
+    public DialogueData firstDaySleepDialogue;
 
     private bool playerInRange;
     private bool isProcessing;
@@ -99,8 +104,14 @@ public class BedInteract : MonoBehaviour
 
     void DoSleepAndSave()
     {
+        StartCoroutine(DoSleepAndSaveRoutine());
+    }
+
+    IEnumerator DoSleepAndSaveRoutine()
+    {
         // 1. Sleep 전 현재 시각 저장 (Sleep()이 날짜를 바꾸므로)
         float sleepTime = TimeManager.Instance != null ? TimeManager.Instance.CurrentGameMinutes : 0f;
+        int dayBeforeSleep = TimeManager.Instance != null ? TimeManager.Instance.CurrentDay : 1;
 
         // 2. 하루 종료 (다음날로)
         if (TimeManager.Instance != null)
@@ -110,14 +121,27 @@ public class BedInteract : MonoBehaviour
         if (StaminaManager.Instance != null)
             StaminaManager.Instance.RestoreOnSleep(sleepTime);
 
-        // 4. 저장
+        // 4. 첫날 잠 시 "스트레스" 대화 (저장 전)
+        if (dayBeforeSleep == 1 && firstDaySleepDialogue != null
+            && GameProgressManager.Instance != null && GameProgressManager.Instance.IsBeforeTutorialEnd)
+        {
+            if (DialogueManager.Instance != null)
+            {
+                bool done = false;
+                DialogueManager.Instance.Play(firstDaySleepDialogue, () => done = true);
+                while (!done)
+                    yield return null;
+            }
+        }
+
+        // 5. 저장
         if (GameDataManager.Instance != null)
             GameDataManager.Instance.SaveGame();
 
-        // 5. 저장 완료 표시
+        // 6. 저장 완료 표시
         ShowSaveComplete();
 
-        // 6. 꿈 시퀀스 분기 (Dream-Link)
+        // 7. 꿈 시퀀스 분기 (Dream-Link)
         if (ShouldPlayDreamSequence())
         {
             StartDreamSequence();

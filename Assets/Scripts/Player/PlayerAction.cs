@@ -36,6 +36,18 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
+        // 대화/컷신 중이면 도구/씨앗/수확 차단
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
+        {
+            TileHighlight.Instance?.Hide();
+            return;
+        }
+        if (CutsceneManager.Instance != null && CutsceneManager.Instance.IsPlaying)
+        {
+            TileHighlight.Instance?.Hide();
+            return;
+        }
+
         // ESC 메뉴, 침대 팝업 등 UI 패널 열려있으면 입력 차단
         if (GameInputBlocker.IsBlocked)
         {
@@ -47,6 +59,8 @@ public class PlayerAction : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (TryInteractNPC())
+                return;
             if (GetEquippedSeed() != null)
                 TryPlantSeed();
             else
@@ -113,6 +127,24 @@ public class PlayerAction : MonoBehaviour
         }
 
         TileHighlight.Instance.Hide();
+    }
+
+    bool TryInteractNPC()
+    {
+        Vector3 mouseWorld = Camera.main != null ? Camera.main.ScreenToWorldPoint(Input.mousePosition) : Vector3.zero;
+        mouseWorld.z = 0f;
+
+        var hits = Physics2D.OverlapPointAll(mouseWorld);
+        foreach (var h in hits)
+        {
+            var npc = h.GetComponentInParent<NPCInteract>();
+            if (npc != null && npc.IsPlayerInRange())
+            {
+                npc.Interact();
+                return true;
+            }
+        }
+        return false;
     }
 
     void TryUseTool()

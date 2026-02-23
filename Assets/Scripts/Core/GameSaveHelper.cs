@@ -44,6 +44,22 @@ public static class GameSaveHelper
 
         if (TileManager.Instance != null)
             data.farmData = TileManager.Instance.ExportFarmData();
+
+        // 스토리/호감도/이벤트 플래그
+        if (GameProgressManager.Instance != null)
+        {
+            if (data.gameProgressData == null)
+                data.gameProgressData = new GameProgressData();
+            GameProgressManager.Instance.FillSaveData(data.gameProgressData);
+        }
+
+        // 퀘스트
+        if (QuestManager.Instance != null && data.gameProgressData != null)
+        {
+            if (data.gameProgressData.questData == null)
+                data.gameProgressData.questData = new QuestSaveData();
+            QuestManager.Instance.FillSaveData(data.gameProgressData.questData);
+        }
     }
 
     /// <summary>
@@ -94,6 +110,17 @@ public static class GameSaveHelper
         // 농장
         if (TileManager.Instance != null && data.farmData != null)
             TileManager.Instance.LoadFarmData(data.farmData);
+
+        // 스토리/호감도/이벤트 플래그 (구버전 호환: gameProgressData 없으면 기본값)
+        if (GameProgressManager.Instance != null)
+        {
+            var progressData = data.gameProgressData ?? new GameProgressData();
+            GameProgressManager.Instance.LoadFromSaveData(progressData);
+        }
+
+        // 퀘스트
+        if (QuestManager.Instance != null && data.gameProgressData?.questData != null)
+            QuestManager.Instance.LoadFromSaveData(data.gameProgressData.questData);
 
         Debug.Log("[GameSaveHelper] 로드 적용 완료");
     }

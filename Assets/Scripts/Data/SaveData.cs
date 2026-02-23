@@ -21,6 +21,27 @@ public class CellSaveData
 }
 
 // ============================================================
+// 퀘스트 진행 저장용
+// ============================================================
+[System.Serializable]
+public class QuestSaveData
+{
+    public string activeQuestId;
+    public List<int> activeQuestProgress = new List<int>();
+    public List<string> completedQuestIds = new List<string>();
+}
+
+// ============================================================
+// NPC 호감도 저장용 (JsonUtility 직렬화용)
+// ============================================================
+[System.Serializable]
+public class NpcAffectionSaveData
+{
+    public string npcId;
+    public int affection;
+}
+
+// ============================================================
 // 작물 저장용
 // ============================================================
 [System.Serializable]
@@ -48,11 +69,37 @@ public class SaveData
     [Header("하위 데이터")]
     public PlayerData playerData;
     public FarmData farmData;
+    public GameProgressData gameProgressData;
 
     public SaveData()
     {
         playerData = new PlayerData();
         farmData = new FarmData();
+        gameProgressData = new GameProgressData();
+    }
+}
+
+// ============================================================
+// 스토리/퀘스트/이벤트 진행도 (퀘스트, 대화, 컷신 시스템용)
+// ============================================================
+[System.Serializable]
+public class GameProgressData
+{
+    [Tooltip("메인 스토리 진행도 (0=첫날 시작, 7=튜토리얼 끝 등)")]
+    public int storyProgress;
+
+    [Tooltip("NPC별 호감도 (npcId → affection)")]
+    public List<NpcAffectionSaveData> npcAffections = new List<NpcAffectionSaveData>();
+
+    [Tooltip("발생한 이벤트 플래그 (first_dream, met_friendly_npc 등)")]
+    public List<string> eventFlags = new List<string>();
+
+    [Header("퀘스트")]
+    public QuestSaveData questData = new QuestSaveData();
+
+    public GameProgressData()
+    {
+        storyProgress = 0;
     }
 }
 

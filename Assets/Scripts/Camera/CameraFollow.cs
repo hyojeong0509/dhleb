@@ -29,6 +29,9 @@ public class CameraFollow : MonoBehaviour
 
     private Vector3 velocity = Vector3.zero;
 
+    [Tooltip("true면 플레이어 추적 중단 (컷신용)")]
+    public bool pauseFollow;
+
     void Start()
     {
         // 타겟이 설정되지 않았으면 플레이어 찾기
@@ -52,7 +55,7 @@ public class CameraFollow : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (target == null)
+        if (pauseFollow || target == null)
             return;
 
         // 목표 위치 계산

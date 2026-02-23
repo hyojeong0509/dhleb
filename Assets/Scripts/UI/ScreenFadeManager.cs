@@ -71,6 +71,42 @@ public class ScreenFadeManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 오버레이 알파 즉시 설정 (0=투명, 1=완전 검정)
+    /// </summary>
+    public void SetOverlayAlpha(float alpha)
+    {
+        if (canvasGroup != null)
+            canvasGroup.alpha = Mathf.Clamp01(alpha);
+    }
+
+    /// <summary>
+    /// 검은 화면에서 시작해서 페이드 인 (눈 뜨는 연출 등)
+    /// </summary>
+    public void FadeInFromBlack(float duration = -1f, System.Action onComplete = null)
+    {
+        if (isFading) return;
+        float dur = duration > 0 ? duration : defaultFadeDuration;
+        StartCoroutine(FadeInFromBlackRoutine(dur, onComplete));
+    }
+
+    IEnumerator FadeInFromBlackRoutine(float duration, System.Action onComplete)
+    {
+        isFading = true;
+        canvasGroup.alpha = 1f;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.unscaledDeltaTime / duration;
+            canvasGroup.alpha = 1f - Mathf.Clamp01(t);
+            yield return null;
+        }
+        canvasGroup.alpha = 0f;
+        isFading = false;
+        onComplete?.Invoke();
+    }
+
+    /// <summary>
     /// 페이드 아웃 → 콜백 → 페이드 인 (스타듀밸리 스타일)
     /// </summary>
     public void FadeOutIn(System.Action onMid, float fadeOutDuration = -1f, float fadeInDuration = -1f)

@@ -52,6 +52,15 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // 컷신 중에는 이동 불가
+        if (CutsceneManager.Instance != null && CutsceneManager.Instance.IsPlaying)
+        {
+            input = Vector2.zero;
+            moveDir = Vector2.zero;
+            anim.SetFloat("Speed", 0f);
+            return;
+        }
+
         // 도구 사용 중에는 이동 불가
         if (PlayerToolAnimator.IsUsingTool)
         {
@@ -243,6 +252,31 @@ public class PlayerMovement : MonoBehaviour
             moveVector.magnitude + collisionOffset      // 체크 거리
         );
         return count > 0;
+    }
+
+    /// <summary>
+    /// 컷신 등에서 플레이어가 바라보는 방향 설정 (왼쪽/오른쪽)
+    /// 애니메이션 파라미터와 flipX 모두 설정.
+    /// </summary>
+    public void SetFacingLeft(bool left)
+    {
+        if (sr != null)
+            sr.flipX = left;
+        if (anim != null)
+        {
+            anim.SetFloat("MoveX", 1f);
+            anim.SetFloat("MoveY", 0f);
+            anim.SetFloat("Speed", 0f);
+        }
+    }
+
+    /// <summary>
+    /// 컷신 등에서 플레이어를 지정 방향/거리만큼 밀어냄.
+    /// </summary>
+    public void PushBack(Vector2 offset)
+    {
+        if (rb == null) return;
+        rb.MovePosition(rb.position + offset);
     }
 
 }
