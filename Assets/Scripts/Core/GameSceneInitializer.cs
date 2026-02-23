@@ -15,10 +15,15 @@ public class GameSceneInitializer : MonoBehaviour
             go.AddComponent<DayEndSequenceManager>();
         }
 
-        // 플레이어에 FallHandler (없으면 추가)
+        // 플레이어에 FallHandler, ToolAnimator (없으면 추가)
         var player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null && player.GetComponent<PlayerFallHandler>() == null)
-            player.AddComponent<PlayerFallHandler>();
+        if (player != null)
+        {
+            if (player.GetComponent<PlayerFallHandler>() == null)
+                player.AddComponent<PlayerFallHandler>();
+            if (player.GetComponent<PlayerToolAnimator>() == null)
+                player.AddComponent<PlayerToolAnimator>();
+        }
 
         if (GameDataManager.Instance == null || GameDataManager.Instance.currentSaveData == null)
             return;

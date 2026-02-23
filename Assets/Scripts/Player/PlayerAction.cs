@@ -1,10 +1,8 @@
 using UnityEngine;
 
-/// <summary>
-/// 플레이어 도구 사용 처리
-/// - 좌클릭: 핫바의 현재 도구 사용
-/// - 마우스 위치 기준으로 타일 선택
-/// </summary>
+// 플레이어 도구 사용 처리
+// - 좌클릭: 핫바의 현재 도구 사용
+// - 마우스 위치 기준으로 타일 선택
 public class PlayerAction : MonoBehaviour
 {
     [Header("도구 설정")]
@@ -12,6 +10,7 @@ public class PlayerAction : MonoBehaviour
     public float highlightViewRange = 5f; // 하이라이트 표시 범위 (이 거리 밖은 표시 안 함)
 
     private PlayerMovement movement;
+    private PlayerToolAnimator toolAnimator;
 
     void Awake()
     {
@@ -20,6 +19,9 @@ public class PlayerAction : MonoBehaviour
 
     void Start()
     {
+        // ToolAnimator는 GameSceneInitializer가 Start에서 추가할 수 있으므로 여기서 참조
+        toolAnimator = GetComponent<PlayerToolAnimator>();
+
         // TileHighlight에 타일맵 참조 전달
         if (TileHighlight.Instance != null && TileManager.Instance != null)
             TileHighlight.Instance.Init(TileManager.Instance.farmTilemap);
@@ -56,9 +58,7 @@ public class PlayerAction : MonoBehaviour
             TryHarvest();
     }
 
-    /// <summary>
-    /// 매 프레임 하이라이트 위치와 색상 갱신
-    /// </summary>
+    // 매 프레임 하이라이트 위치와 색상 갱신
     void UpdateHighlight()
     {
         if (TileHighlight.Instance == null) return;
@@ -165,14 +165,18 @@ public class PlayerAction : MonoBehaviour
                 break;
         }
 
-        // 괭이/물뿌리개 사용 성공 시에만 스테미나 소모
-        if (consumed && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
-            StaminaManager.Instance?.UseStamina(1);
+        if (consumed)
+        {
+            // 도구 사용 애니메이션 (마우스 방향)
+            if (toolAnimator != null)
+                toolAnimator.PlayToolUse(targetPos);
+
+            if (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan)
+                StaminaManager.Instance?.UseStamina(1);
+        }
     }
 
-    /// <summary>
-    /// 씨앗 심기
-    /// </summary>
+    // 씨앗 심기
     void TryPlantSeed()
     {
         SeedData seed = GetEquippedSeed();
@@ -193,9 +197,7 @@ public class PlayerAction : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 수확 (우클릭) - 작물 있는 땅에서만 시도
-    /// </summary>
+    // 수확 (우클릭) - 작물 있는 땅에서만 시도
     void TryHarvest()
     {
         if (TileManager.Instance == null) return;
@@ -205,9 +207,7 @@ public class PlayerAction : MonoBehaviour
         TileManager.Instance.TryHarvest(targetPos);
     }
 
-    /// <summary>
-    /// 현재 핫바에 장착된 도구 반환 (없으면 null)
-    /// </summary>
+    // 현재 핫바에 장착된 도구 반환 (없으면 null)
     ToolData GetEquippedTool()
     {
         InventorySlotData slotData = InventoryManager.Instance?.GetActiveSlotData();
@@ -215,9 +215,7 @@ public class PlayerAction : MonoBehaviour
         return slotData.item as ToolData;
     }
 
-    /// <summary>
-    /// 현재 핫바에 장착된 씨앗 반환 (없으면 null)
-    /// </summary>
+    // 현재 핫바에 장착된 씨앗 반환 (없으면 null)
     SeedData GetEquippedSeed()
     {
         InventorySlotData slotData = InventoryManager.Instance?.GetActiveSlotData();
@@ -225,9 +223,7 @@ public class PlayerAction : MonoBehaviour
         return slotData.item as SeedData;
     }
 
-    /// <summary>
-    /// 마우스가 가리키는 타일의 중심 좌표 반환 (타일 격자에 스냅)
-    /// </summary>
+    // 마우스가 가리키는 타일의 중심 좌표 반환 (타일 격자에 스냅)
     Vector3 GetMouseWorldPosition()
     {
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -244,9 +240,7 @@ public class PlayerAction : MonoBehaviour
         return mouseWorld;
     }
 
-    /// <summary>
-    /// 플레이어와 대상 위치 사이의 거리가 범위 내인지 확인
-    /// </summary>
+    // 플레이어와 대상 위치 사이의 거리가 범위 내인지 확인
     bool IsInRange(Vector3 targetPos)
     {
         return Vector2.Distance(transform.position, targetPos) <= maxUseDistance;

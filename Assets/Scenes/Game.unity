@@ -45032,7 +45032,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475633115}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -45265,6 +45265,7 @@ GameObject:
   - component: {fileID: 499462609}
   - component: {fileID: 499462610}
   - component: {fileID: 499462611}
+  - component: {fileID: 499462612}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -45411,8 +45412,21 @@ MonoBehaviour:
   btnNext: {fileID: 1197258220}
   fallDisplayDuration: 1.5
   fadeDuration: 0.5
+  eventDisplayDuration: 1.5
   hospitalCost: 1000
   event1StaminaRecovery: 10
+--- !u!114 &499462612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499462603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16d60534d68855f4d98342180eb41dee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoldManager
 --- !u!1 &500647288
 GameObject:
   m_ObjectHideFlags: 0
@@ -45936,7 +45950,7 @@ GameObject:
   - component: {fileID: 535366340}
   - component: {fileID: 535366341}
   m_Layer: 0
-  m_Name: Computer
+  m_Name: Triones
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -72828,7 +72842,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642748284}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0

@@ -1,18 +1,16 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// 게임 내 시간/날짜 관리
-/// - 1년 = 3 Sequence (Lumae, Velum, Fracta)
-/// - 1 Sequence = 28일
-/// - 하루 = 06:00 ~ 06:00 (다음날)
-/// - 실제 18분 = 게임 하루
-/// </summary>
+// 게임 내 시간/날짜 관리
+// - 1년 = 3 Sequence (Lumae, Velum, Fracta)
+// - 1 Sequence = 28일
+// - 하루 = 06:00 ~ 06:00 (다음날)
+// - 실제 18분 = 게임 하루
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }
 
-    // ── 설정 (Inspector에서 조정 가능) ─────────────────────
+    // ── 설정  ──────────────────────────────────────────────
     [Header("하루 시간 설정")]
     public int dayStartHour = 6;            // 하루 시작 (06:00)
     public int dayEndHour = 30;             // 하루 종료 (06:00 다음날 = 30:00)
@@ -21,13 +19,13 @@ public class TimeManager : MonoBehaviour
     [Header("디버그")]
     public float timeScale = 1f;            // 시간 배속 (1 = 정상, 10 = 10배속)
     public KeyCode debugNextDayKey = KeyCode.Tab;   // 누르면 즉시 다음날
-    public KeyCode debugFastTimeKey = KeyCode.F2;   // 누르면 10배속 토글 (오버레이 테스트용)
+    public KeyCode debugFastTimeKey = KeyCode.F2;   // 누르면 10배속 토글
 
     [Header("날짜 설정")]
     public int daysPerSequence = 28;        // 1 Sequence당 일수
     public int sequencesPerYear = 3;        // 1년당 Sequence 수
 
-    // ── Sequence 이름 (계절 느낌) ───────────────────────────
+    // ── Sequence 이름 ────────────────────────────────────
     public static readonly string[] SequenceNames =
     {
         "Lumae",   // 봄 - 농사 위주, NPC 우호적
@@ -81,7 +79,7 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    // 02:00~05:50 구간인지 (빨간 시간 표시용)
+    // 02:00 ~ 05:50 구간인지 (빨간 시간 표시용)
     public bool IsLateNightHours =>
         currentGameMinutes >= 26f * 60f && currentGameMinutes < 30f * 60f - 10f;
 

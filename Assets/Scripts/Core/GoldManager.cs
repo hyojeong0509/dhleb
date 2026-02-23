@@ -1,9 +1,7 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// 골드(화폐) 관리
-/// </summary>
+// 골드 관리
 public class GoldManager : MonoBehaviour
 {
     public static GoldManager Instance
@@ -41,9 +39,7 @@ public class GoldManager : MonoBehaviour
         _instance = this;
     }
 
-    /// <summary>
-    /// 골드 추가
-    /// </summary>
+    // 골드 추가
     public void AddGold(int amount)
     {
         if (amount <= 0) return;
@@ -51,10 +47,9 @@ public class GoldManager : MonoBehaviour
         OnGoldChanged?.Invoke();
     }
 
-    /// <summary>
-    /// 골드 사용 (지불 가능 여부 확인)
-    /// </summary>
-    /// <returns>지불 성공 여부</returns>
+
+    // 골드 사용
+    // <returns>지불 성공 여부</returns>
     public bool SpendGold(int amount)
     {
         if (amount <= 0) return true;
@@ -65,14 +60,10 @@ public class GoldManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// 지불 가능 여부
-    /// </summary>
+    // 지불 가능 여부
     public bool CanAfford(int amount) => currentGold >= amount;
 
-    /// <summary>
-    /// 강제 차감 (부족해도 0까지 차감, 응급실 비용 등)
-    /// </summary>
+    // 강제 차감 (부족해도 0까지 차감, 응급실 비용 등 추후 설정 예정 )
     public void ForceSpend(int amount)
     {
         if (amount <= 0) return;
@@ -80,9 +71,7 @@ public class GoldManager : MonoBehaviour
         OnGoldChanged?.Invoke();
     }
 
-    /// <summary>
-    /// 외부에서 값 설정 (로드 시)
-    /// </summary>
+    // 외부에서 값 설정 (로드 시)
     public void SetGold(int amount)
     {
         currentGold = Mathf.Max(0, amount);

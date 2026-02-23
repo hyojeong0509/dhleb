@@ -2,11 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 침대 상호작용
-/// 흐름: 침대 접근 → "하루 마무리?" 팝업 → [예] → Sleep → 저장 → 정산 표시 → (꿈 시퀀스 분기) → 다음날
-/// 꿈 시스템(Dream-Link)은 ShouldPlayDreamSequence()에서 분기. 확장 시 여기만 수정.
-/// </summary>
+// 침대 상호작용
+// 흐름: 침대 접근 → "하루 마무리?" 팝업 → [예] → Sleep → 저장 → 정산 표시 → (꿈 시퀀스 분기) → 다음날
+// 꿈 시스템(Dream-Link)은 ShouldPlayDreamSequence()에서 분기. 확장 시 여기만 수정.
 [RequireComponent(typeof(Collider2D))]
 public class BedInteract : MonoBehaviour
 {
@@ -22,9 +20,9 @@ public class BedInteract : MonoBehaviour
     [Header("저장 완료 표시")]
     public GameObject saveCompletePanel;
     public TMP_Text saveCompleteText;
-    public Button btnNext;  // 다음 버튼 (누르면 페이드 후 패널 닫기)
+    public Button btnNext;
     public float fadeDuration = 0.4f;
-    public float btnNextEnableDelay = 1f;  // 패널 표시 후 버튼 활성화까지 대기 시간
+    public float btnNextEnableDelay = 1f;
 
     private bool playerInRange;
     private bool isProcessing;
