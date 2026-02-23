@@ -79,9 +79,9 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    // 02:00 ~ 05:50 구간인지 (빨간 시간 표시용)
+    // 02:00 ~ 06:00 구간인지 (빨간 시간 표시용)
     public bool IsLateNightHours =>
-        currentGameMinutes >= 26f * 60f && currentGameMinutes < 30f * 60f - 10f;
+        currentGameMinutes >= 26f * 60f && currentGameMinutes < 30f * 60f;
 
     // 01:30 도달 여부 (알림용, 25.5시 = 다음날 01:30)
     public bool IsPast0130 => currentGameMinutes >= 25.5f * 60f;

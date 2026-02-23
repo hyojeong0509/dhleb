@@ -52,6 +52,15 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // 도구 사용 중에는 이동 불가
+        if (PlayerToolAnimator.IsUsingTool)
+        {
+            input = Vector2.zero;
+            moveDir = Vector2.zero;
+            anim.SetFloat("Speed", 0f);
+            return;
+        }
+
         // 수평 입력 개별 처리 (A/D 충돌 방지)
         bool aPressed = Input.GetKey(KeyCode.A);
         bool dPressed = Input.GetKey(KeyCode.D);

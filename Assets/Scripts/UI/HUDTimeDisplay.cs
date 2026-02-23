@@ -10,7 +10,7 @@ public class HUDTimeDisplay : MonoBehaviour
 
     [Header("시간 색상")]
     public Color normalColor = Color.black;   // 평소 색상
-    public Color lateNightColor = Color.red;  // 02:00~05:50 빨간 시간
+    public Color lateNightColor = Color.red;  // 02:00~06:00 빨간 시간
 
     [Header("시계 바늘")]
     public Transform clockHand;
@@ -40,7 +40,7 @@ public class HUDTimeDisplay : MonoBehaviour
     void Update()
     {
         UpdateClockHand();
-        // 매 프레임 시간 색상 갱신 (02:00~05:50 진입 시)
+        // 매 프레임 시간 색상 갱신 (02:00~06:00 구간)
         if (txtTime != null && TimeManager.Instance != null)
             txtTime.color = TimeManager.Instance.IsLateNightHours ? lateNightColor : normalColor;
     }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// 도구 사용 시 마우스 방향에 맞는 애니메이션 재생
@@ -10,6 +11,17 @@ public class PlayerToolAnimator : MonoBehaviour
 {
     [Tooltip("디버그: Console에 트리거 로그 출력")]
     public bool debugLog;
+
+    [Tooltip("애니메이션 길이를 가져오지 못할 때 사용할 폴백 잠금 시간 (초)")]
+    public float toolUseLockDurationFallback = 1.1f;
+
+    public static bool IsUsingTool { get; private set; }
+
+    private static readonly int[] ToolStateHashes = {
+        Animator.StringToHash("Interaction_Down"),
+        Animator.StringToHash("Interaction_Up"),
+        Animator.StringToHash("Interaction_Right")
+    };
 
     private Animator anim;
     private SpriteRenderer sr;
@@ -54,8 +66,41 @@ public class PlayerToolAnimator : MonoBehaviour
         anim.SetInteger("ToolDirection", toolDir);
         anim.SetTrigger("UseTool");
 
+        StartCoroutine(LockMovementDuringToolUse());
+
         if (debugLog)
             Debug.Log($"[PlayerToolAnimator] UseTool 트리거, ToolDirection={toolDir}");
+    }
+
+    IEnumerator LockMovementDuringToolUse()
+    {
+        IsUsingTool = true;
+
+        // 트랜지션 완료 후 도구 상태 진입 대기 (최대 15프레임)
+        for (int i = 0; i < 15; i++)
+        {
+            yield return null;
+            if (IsToolState(anim.GetCurrentAnimatorStateInfo(0))) break;
+        }
+
+        // 도구 애니메이션이 끝날 때까지 대기 (상태에서 벗어날 때까지)
+        float timeout = toolUseLockDurationFallback;
+        float elapsed = 0f;
+        while (IsToolState(anim.GetCurrentAnimatorStateInfo(0)) && elapsed < timeout)
+        {
+            yield return null;
+            elapsed += Time.deltaTime;
+        }
+
+        IsUsingTool = false;
+    }
+
+    bool IsToolState(AnimatorStateInfo stateInfo)
+    {
+        int hash = stateInfo.shortNameHash;
+        foreach (int h in ToolStateHashes)
+            if (hash == h) return true;
+        return false;
     }
 
     bool HasParam(string name)
