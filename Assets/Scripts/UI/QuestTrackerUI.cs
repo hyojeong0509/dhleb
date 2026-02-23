@@ -57,7 +57,7 @@ public class QuestTrackerUI : MonoBehaviour
             for (int i = 0; i < quest.objectives.Count; i++)
             {
                 var obj = quest.objectives[i];
-                int current = QuestManager.Instance.GetObjectiveProgress(i);
+                int current = QuestManager.Instance.GetObjectiveProgress(quest.questId, i);
                 int required = obj.requiredCount;
                 string target = string.IsNullOrEmpty(obj.targetId) ? "" : $" ({obj.targetId})";
                 string typeStr = GetObjectiveTypeName(obj.type);

@@ -24,10 +24,21 @@ public class CellSaveData
 // 퀘스트 진행 저장용
 // ============================================================
 [System.Serializable]
+public class QuestProgressEntry
+{
+    public string questId;
+    public List<int> progress = new List<int>();
+}
+
+[System.Serializable]
 public class QuestSaveData
 {
+    [Tooltip("구버전 호환용")]
     public string activeQuestId;
+    [Tooltip("구버전 호환용. 비어있지 않으면 activeQuestIds[0]으로 로드")]
     public List<int> activeQuestProgress = new List<int>();
+    public List<string> activeQuestIds = new List<string>();
+    public List<QuestProgressEntry> activeQuestProgressList = new List<QuestProgressEntry>();
     public List<string> completedQuestIds = new List<string>();
 }
 

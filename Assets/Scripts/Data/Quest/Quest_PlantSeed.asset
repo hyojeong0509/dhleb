@@ -13,15 +13,17 @@ MonoBehaviour:
   m_Name: Quest_PlantSeed
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
   questId: quest_plant_seed
-  title: "\uC528\uC557 \uC2EC\uAE30"
-  description: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uC8FC\uB294 \uC528\uC557\uC744 \uBC18\uB4E4\uC5D0 \uC2EC\uC5B4\uBD04\uC2DC\uB2E4."
+  title: "\uB538\uAE30 \uC528\uC557 \uC2EC\uAE30"
+  description: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uC900 \uC528\uC557\uC744 \uB545\uC744
+    \uD30C\uACE0 \uC2EC\uC5B4\uBD05\uC2DC\uB2E4."
   objectives:
   - type: 2
     targetId: 
-    requiredCount: 1
+    requiredCount: 5
   rewards:
-    gold: 0
+    gold: 500
     npcAffections: []
+    items: []
     completionDialogue: {fileID: 0}
   advanceStoryOnComplete: 1
   prerequisiteQuestIds: []

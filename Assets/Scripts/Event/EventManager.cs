@@ -13,6 +13,10 @@ public class EventManager : MonoBehaviour
     [Tooltip("또는 EventRegistry 에셋 직접 지정")]
     public EventRegistry registry;
 
+    // 대화 종료 시 아이템 지급용 (대화가 끝나면 GiveItemsOnDialogueEnd 호출)
+    private EventData pendingGiveItemsEvent;
+    private DialogueData pendingGiveItemsDialogue;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -34,6 +38,29 @@ public class EventManager : MonoBehaviour
             if (reg != null && reg.events != null)
                 events.AddRange(reg.events);
         }
+
+        StartCoroutine(SubscribeWhenReady());
+    }
+
+    System.Collections.IEnumerator SubscribeWhenReady()
+    {
+        while (DialogueManager.Instance == null)
+            yield return null;
+        DialogueManager.Instance.OnDialogueEnded += OnDialogueEnded;
+    }
+
+    void OnDestroy()
+    {
+        if (DialogueManager.Instance != null)
+            DialogueManager.Instance.OnDialogueEnded -= OnDialogueEnded;
+    }
+
+    void OnDialogueEnded(DialogueData data)
+    {
+        if (pendingGiveItemsEvent == null || pendingGiveItemsDialogue != data) return;
+        pendingGiveItemsEvent.OnDialogueEnded();
+        pendingGiveItemsEvent = null;
+        pendingGiveItemsDialogue = null;
     }
 
     // NPC와 상호작용 시 재생할 대화 반환.
@@ -42,6 +69,9 @@ public class EventManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(npcId) || events == null) return null;
 
+        pendingGiveItemsEvent = null;
+        pendingGiveItemsDialogue = null;
+
         foreach (var evt in events)
         {
             if (evt == null || evt.dialogue == null) continue;
@@ -49,6 +79,11 @@ public class EventManager : MonoBehaviour
             if (!evt.AreConditionsMet()) continue;
 
             evt.MarkAsDone();
+            if (evt.HasGiveItemsOnDone)
+            {
+                pendingGiveItemsEvent = evt;
+                pendingGiveItemsDialogue = evt.dialogue;
+            }
             return evt.dialogue;
         }
         return null;

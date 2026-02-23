@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 퀘스트 진행 관리. 수락/완료, 목표 진행도 갱신.
+/// 퀘스트 진행 관리. 수락/완료, 목표 진행도 갱신. 다중 활성 퀘스트 지원.
 /// </summary>
 public class QuestManager : MonoBehaviour
 {
@@ -15,8 +15,8 @@ public class QuestManager : MonoBehaviour
     [Tooltip("또는 QuestRegistry 에셋 직접 지정")]
     public QuestRegistry registry;
 
-    private string activeQuestId;
-    private List<int> activeQuestProgress = new List<int>();
+    private List<string> activeQuestIds = new List<string>();
+    private Dictionary<string, List<int>> activeQuestProgress = new Dictionary<string, List<int>>();
     private HashSet<string> completedQuestIds = new HashSet<string>();
 
     public event Action<QuestData> OnQuestAccepted;
@@ -51,10 +51,12 @@ public class QuestManager : MonoBehaviour
         var data = GetQuestData(questId);
         if (data == null || !data.CanAccept()) return false;
 
-        activeQuestId = questId;
-        activeQuestProgress.Clear();
+        if (activeQuestIds.Contains(questId)) return false;
+
+        activeQuestIds.Add(questId);
+        activeQuestProgress[questId] = new List<int>();
         for (int i = 0; i < data.objectives.Count; i++)
-            activeQuestProgress.Add(0);
+            activeQuestProgress[questId].Add(0);
 
         OnQuestAccepted?.Invoke(data);
         return true;
@@ -63,31 +65,29 @@ public class QuestManager : MonoBehaviour
     /// <summary>목표 진행 알림 (TileManager, NPCInteract 등에서 호출)</summary>
     public void NotifyObjectiveProgress(QuestObjectiveType type, string targetId = "", int amount = 1)
     {
-        if (string.IsNullOrEmpty(activeQuestId)) return;
-
-        var data = GetQuestData(activeQuestId);
-        if (data == null || data.objectives == null) return;
-
-        for (int i = 0; i < data.objectives.Count; i++)
+        foreach (var questId in new List<string>(activeQuestIds))
         {
-            var obj = data.objectives[i];
-            if (obj.type != type) continue;
+            var data = GetQuestData(questId);
+            if (data == null || data.objectives == null) continue;
 
-            // targetId 매칭 (비어있으면 타입만, 있으면 일치해야 함)
-            if (!string.IsNullOrEmpty(obj.targetId) && !string.IsNullOrEmpty(targetId)
-                && !string.Equals(obj.targetId, targetId, StringComparison.OrdinalIgnoreCase))
-                continue;
+            for (int i = 0; i < data.objectives.Count; i++)
+            {
+                var obj = data.objectives[i];
+                if (obj.type != type) continue;
 
-            int idx = Mathf.Min(i, activeQuestProgress.Count - 1);
-            if (idx < 0) continue;
+                if (!string.IsNullOrEmpty(obj.targetId) && !string.IsNullOrEmpty(targetId)
+                    && !string.Equals(obj.targetId, targetId, StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-            int prev = activeQuestProgress[idx];
-            int next = Mathf.Min(prev + amount, obj.requiredCount);
-            activeQuestProgress[idx] = next;
+                if (!activeQuestProgress.TryGetValue(questId, out var progress)) continue;
+                int idx = Mathf.Min(i, progress.Count - 1);
+                if (idx < 0) continue;
 
-            if (IsAllObjectivesComplete())
-                CompleteQuest();
-            break;
+                int prev = progress[idx];
+                int next = Mathf.Min(prev + amount, obj.requiredCount);
+                progress[idx] = next;
+                break;
+            }
         }
     }
 
@@ -97,20 +97,20 @@ public class QuestManager : MonoBehaviour
         NotifyObjectiveProgress(QuestObjectiveType.SetFlag, flagName, 1);
     }
 
-    /// <summary>퀘스트 완료 처리</summary>
-    void CompleteQuest()
+    void CompleteQuest(string questId)
     {
-        if (string.IsNullOrEmpty(activeQuestId)) return;
+        if (string.IsNullOrEmpty(questId) || !activeQuestIds.Contains(questId)) return;
 
-        var data = GetQuestData(activeQuestId);
+        var data = GetQuestData(questId);
         if (data == null) return;
 
-        completedQuestIds.Add(activeQuestId);
+        activeQuestIds.Remove(questId);
+        activeQuestProgress.Remove(questId);
+        completedQuestIds.Add(questId);
 
         if (data.advanceStoryOnComplete > 0 && GameProgressManager.Instance != null)
             GameProgressManager.Instance.AdvanceStoryProgress(data.advanceStoryOnComplete);
 
-        // 보상 지급
         if (data.rewards != null)
         {
             if (data.rewards.gold > 0 && GoldManager.Instance != null)
@@ -127,48 +127,76 @@ public class QuestManager : MonoBehaviour
                 }
             }
 
+            if (data.rewards.items != null && InventoryManager.Instance != null && ItemDatabase.Instance != null)
+            {
+                foreach (var entry in data.rewards.items)
+                {
+                    if (string.IsNullOrEmpty(entry.itemName) || entry.count <= 0) continue;
+                    var item = ItemDatabase.Instance.GetItemByName(entry.itemName);
+                    if (item != null)
+                        InventoryManager.Instance.AddItem(item, entry.count);
+                }
+            }
+
             if (data.rewards.completionDialogue != null && DialogueManager.Instance != null)
                 DialogueManager.Instance.Play(data.rewards.completionDialogue);
         }
 
         OnQuestCompleted?.Invoke(data);
-
-        activeQuestId = null;
-        activeQuestProgress.Clear();
     }
 
-    bool IsAllObjectivesComplete()
+    bool IsAllObjectivesComplete(string questId)
     {
-        if (string.IsNullOrEmpty(activeQuestId)) return false;
-        var data = GetQuestData(activeQuestId);
+        if (string.IsNullOrEmpty(questId) || !activeQuestProgress.TryGetValue(questId, out var progress))
+            return false;
+        var data = GetQuestData(questId);
         if (data == null || data.objectives == null) return false;
 
         for (int i = 0; i < data.objectives.Count; i++)
         {
-            int current = i < activeQuestProgress.Count ? activeQuestProgress[i] : 0;
-            int required = data.objectives[i].requiredCount;
-            if (current < required) return false;
+            int current = i < progress.Count ? progress[i] : 0;
+            if (current < data.objectives[i].requiredCount) return false;
         }
         return true;
     }
 
+    /// <summary>활성 퀘스트 목록 (퀘스트 개수만큼 UI 생성용)</summary>
+    public List<QuestData> GetActiveQuests()
+    {
+        var list = new List<QuestData>();
+        foreach (var id in activeQuestIds)
+        {
+            var q = GetQuestData(id);
+            if (q != null) list.Add(q);
+        }
+        return list;
+    }
+
+    /// <summary>단일 활성 퀘스트 (QuestTrackerUI 호환용)</summary>
     public QuestData GetActiveQuest()
     {
-        return GetQuestData(activeQuestId);
+        return activeQuestIds.Count > 0 ? GetQuestData(activeQuestIds[0]) : null;
     }
 
-    public string ActiveQuestId => activeQuestId;
-
-    /// <summary>현재 목표별 진행도 (0~requiredCount)</summary>
-    public int GetObjectiveProgress(int objectiveIndex)
+    /// <summary>특정 퀘스트 목표 진행도</summary>
+    public int GetObjectiveProgress(string questId, int objectiveIndex)
     {
-        if (objectiveIndex < 0 || objectiveIndex >= activeQuestProgress.Count)
-            return 0;
-        return activeQuestProgress[objectiveIndex];
+        if (!activeQuestProgress.TryGetValue(questId, out var progress)) return 0;
+        if (objectiveIndex < 0 || objectiveIndex >= progress.Count) return 0;
+        return progress[objectiveIndex];
     }
 
-    public bool IsQuestActive(string questId) => activeQuestId == questId;
+    public bool IsQuestActive(string questId) => activeQuestIds.Contains(questId);
     public bool IsQuestCompleted(string questId) => completedQuestIds.Contains(questId);
+
+    public bool IsReadyToClaim(string questId) => IsAllObjectivesComplete(questId);
+
+    /// <summary>보상 수령 (UI RewardAccept 버튼에서 호출)</summary>
+    public void ClaimReward(string questId)
+    {
+        if (string.IsNullOrEmpty(questId) || !IsReadyToClaim(questId)) return;
+        CompleteQuest(questId);
+    }
 
     public QuestData GetQuestData(string questId)
     {
@@ -185,12 +213,48 @@ public class QuestManager : MonoBehaviour
     {
         if (data == null) return;
 
-        activeQuestId = data.activeQuestId ?? "";
+        activeQuestIds.Clear();
         activeQuestProgress.Clear();
-        if (data.activeQuestProgress != null)
-            activeQuestProgress.AddRange(data.activeQuestProgress);
-
         completedQuestIds.Clear();
+
+        // 구버전 호환
+        if (!string.IsNullOrEmpty(data.activeQuestId) && (data.activeQuestIds == null || data.activeQuestIds.Count == 0))
+        {
+            activeQuestIds.Add(data.activeQuestId);
+            if (data.activeQuestProgress != null && data.activeQuestProgress.Count > 0)
+            {
+                var entry = new QuestProgressEntry { questId = data.activeQuestId, progress = new List<int>(data.activeQuestProgress) };
+                activeQuestProgress[data.activeQuestId] = entry.progress;
+            }
+            else
+            {
+                var q = GetQuestData(data.activeQuestId);
+                if (q != null)
+                {
+                    var progress = new List<int>();
+                    for (int i = 0; i < q.objectives.Count; i++) progress.Add(0);
+                    activeQuestProgress[data.activeQuestId] = progress;
+                }
+            }
+        }
+        else if (data.activeQuestIds != null && data.activeQuestProgressList != null)
+        {
+            for (int i = 0; i < data.activeQuestIds.Count; i++)
+            {
+                var id = data.activeQuestIds[i];
+                activeQuestIds.Add(id);
+                if (i < data.activeQuestProgressList.Count && data.activeQuestProgressList[i].questId == id)
+                    activeQuestProgress[id] = new List<int>(data.activeQuestProgressList[i].progress);
+                else
+                {
+                    var q = GetQuestData(id);
+                    var progress = new List<int>();
+                    if (q != null) for (int j = 0; j < q.objectives.Count; j++) progress.Add(0);
+                    activeQuestProgress[id] = progress;
+                }
+            }
+        }
+
         if (data.completedQuestIds != null)
             foreach (var id in data.completedQuestIds)
                 if (!string.IsNullOrEmpty(id))
@@ -201,8 +265,14 @@ public class QuestManager : MonoBehaviour
     {
         if (data == null) return;
 
-        data.activeQuestId = activeQuestId ?? "";
-        data.activeQuestProgress = new List<int>(activeQuestProgress);
+        data.activeQuestId = activeQuestIds.Count > 0 ? activeQuestIds[0] : "";
+        data.activeQuestIds = new List<string>(activeQuestIds);
+        data.activeQuestProgressList.Clear();
+        foreach (var id in activeQuestIds)
+        {
+            if (activeQuestProgress.TryGetValue(id, out var progress))
+                data.activeQuestProgressList.Add(new QuestProgressEntry { questId = id, progress = new List<int>(progress) });
+        }
         data.completedQuestIds = new List<string>(completedQuestIds);
     }
 }

@@ -15,8 +15,6 @@ MonoBehaviour:
   actions:
   - type: 1
     waitDuration: 2
-  - type: 8
-    triggerName: WakeUp
   - type: 3
     zoomedInSize: 2
     zoomOutDuration: 1.5

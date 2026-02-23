@@ -37,6 +37,8 @@ public class QuestRewardData
     public int gold;
     [Tooltip("NPC 호감도 (npcId:amount 형식, 여러 개 가능)")]
     public string[] npcAffections;
+    [Tooltip("아이템 보상 (itemName, count)")]
+    public GiveItemEntry[] items;
     [Tooltip("완료 시 재생할 대화 (선택)")]
     public DialogueData completionDialogue;
 }

@@ -53,11 +53,15 @@ public class CutsceneManager : MonoBehaviour
         if (TimeManager.Instance != null)
             TimeManager.Instance.SetPause(true);
 
+        // Time.timeScale은 건드리지 않음 (0이면 Animator가 멈추므로, 1 유지로 애니메이션 재생)
+        float prevTimeScale = Time.timeScale;
+        Time.timeScale = 1f;
+
         var player = GameObject.FindGameObjectWithTag("Player");
         Animator playerAnim = player != null ? player.GetComponent<Animator>() : null;
         var prevUpdateMode = playerAnim != null ? playerAnim.updateMode : AnimatorUpdateMode.Normal;
         if (playerAnim != null)
-            playerAnim.updateMode = AnimatorUpdateMode.UnscaledTime;
+            playerAnim.updateMode = AnimatorUpdateMode.Normal; // timeScale 1이므로 Normal로 충분
 
         OnCutsceneStarted?.Invoke(data);
 
@@ -70,6 +74,7 @@ public class CutsceneManager : MonoBehaviour
         IsPlaying = false;
         if (playerAnim != null)
             playerAnim.updateMode = prevUpdateMode;
+        Time.timeScale = prevTimeScale;
         if (TimeManager.Instance != null)
             TimeManager.Instance.SetPause(false);
 
