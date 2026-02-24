@@ -90,13 +90,13 @@ public class GameSceneInitializer : MonoBehaviour
             return;
 
         // 카메라 줌 전에 WakeUp 트리거 → 줌인되기 전부터 애니메이션 시작
-        //var player = GameObject.FindGameObjectWithTag("Player");
-        //if (player != null)
-        //{
-        //    var anim = player.GetComponent<Animator>();
-        //    if (anim != null)
-        //        anim.SetTrigger("WakeUp");
-        //}
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            var anim = player.GetComponent<Animator>();
+            if (anim != null)
+                anim.SetTrigger("WakeUp");
+        }
 
         var cam = Camera.main;
         if (cam != null && cam.orthographic)
