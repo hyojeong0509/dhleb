@@ -9,11 +9,15 @@ public class PlayerMovement : MonoBehaviour
     public float exhaustedSpeedMultiplier = 0.5f;
 
     [Header("충돌 설정")]
-    public LayerMask collisionMask;         // Inspector에서 충돌할 레이어 선택
+    public LayerMask collisionMask;         // 벽 등 장애물 레이어
+    [Tooltip("NPC 레이어 (겹침 방지, 비우면 NPC 충돌 무시)")]
+    public LayerMask npcLayer;
     private float collisionOffset = 0.05f;  // 충돌 여유 거리
     private ContactFilter2D contactFilter;  // 충돌 필터
+    private ContactFilter2D npcContactFilter; // NPC 충돌 필터
 
     private Rigidbody2D rb;
+    private Collider2D col;
     private SpriteRenderer sr;
     private Animator anim;
 
@@ -39,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
@@ -48,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
         // 충돌 필터 설정
         contactFilter.SetLayerMask(collisionMask);
         contactFilter.useLayerMask = true;
+        npcContactFilter.SetLayerMask(npcLayer);
+        npcContactFilter.useLayerMask = npcLayer != 0;
     }
 
     void Update()
@@ -241,17 +248,31 @@ public class PlayerMovement : MonoBehaviour
             rb.MovePosition(rb.position + finalMove);
     }
 
-    // 해당 방향으로 이동 시 충돌이 있는지 체크
+    // 해당 방향으로 이동 시 충돌이 있는지 체크 (벽 + NPC)
     bool HasCollision(Vector2 moveVector)
     {
+        if (col == null) col = GetComponent<Collider2D>();
+        float dist = moveVector.magnitude + collisionOffset;
+        Vector2 dir = moveVector.normalized;
+
+        // 벽 등 (rb.Cast)
         RaycastHit2D[] hits = new RaycastHit2D[5];
-        int count = rb.Cast(
-            moveVector.normalized,                      // 이동 방향
-            contactFilter,                              // 충돌할 레이어
-            hits,                                       // 결과 저장
-            moveVector.magnitude + collisionOffset      // 체크 거리
-        );
-        return count > 0;
+        int count = rb.Cast(dir, contactFilter, hits, dist);
+        if (count > 0) return true;
+
+        // NPC (겹침 방지) - Physics2D.BoxCast 사용 (rb.Cast가 NPC에서 안 될 수 있음)
+        if (npcLayer != 0 && col != null)
+        {
+            Vector2 halfSize = col.bounds.size * 0.5f;
+            halfSize.x = Mathf.Max(halfSize.x, 0.1f);
+            halfSize.y = Mathf.Max(halfSize.y, 0.1f);
+
+            RaycastHit2D hit = Physics2D.BoxCast(rb.position, halfSize, 0f, dir, dist, npcLayer);
+            if (hit.collider != null && hit.collider != col)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

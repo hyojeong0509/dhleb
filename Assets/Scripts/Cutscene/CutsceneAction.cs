@@ -21,6 +21,8 @@ public enum CutsceneActionType
     AddAffection,   // NPC 호감도 추가
     NpcGroupMove,   // NPC 여러 명이 동시에 목표 위치로 걸어감
     NpcGroupReturnToStart, // NpcGroupMove로 온 NPC들을 원래 자리로 돌려보냄
+    ShowNotification, // 하단 팝업 표시 (호감도 +5 등)
+    AcceptQuest,    // 퀘스트 수락
     Custom          // (확장용)
 }
 
@@ -108,4 +110,14 @@ public class CutsceneAction
     public float npcReturnDuration = 0f;
     [Tooltip("복귀 시간 배율 (1=동일, 1.5=1.5배 느리게, 2=2배 느리게)")]
     public float npcReturnDurationMultiplier = 1f;
+
+    [Header("ShowNotification")]
+    [Tooltip("팝업에 표시할 텍스트 (예: 호감도 +5)")]
+    public string notificationText = "호감도 +5";
+    [Tooltip("표시 시간 (0이면 기본 2.5초)")]
+    public float notificationDuration = 2.5f;
+
+    [Header("AcceptQuest")]
+    [Tooltip("수락할 퀘스트 ID")]
+    public string questId;
 }

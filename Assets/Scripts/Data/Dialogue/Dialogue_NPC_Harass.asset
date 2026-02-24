@@ -45,7 +45,7 @@ MonoBehaviour:
   - nodeId: 5
     speakerName: ???
     text: "\uC6B0\uB9AC\uB4E4\uC740 \uADF8\uB7F0 \uAC70 \uBAA8\uB974\uB294\uB370?
-      \uB2F9\uC7A5 \uC5EC\uAE30\uC11C \uB098\uAC00\uB77C.  \uB2E4\uC2DC\uB294 \uB208\uC5D0
+      \uB2F9\uC7A5 \uC5EC\uAE30\uC11C \uB098\uAC00.  \uB2E4\uC2DC\uB294 \uB208\uC5D0
       \uB744\uC9C0 \uB9C8. "
     nextNodeId: 6
     choices: []

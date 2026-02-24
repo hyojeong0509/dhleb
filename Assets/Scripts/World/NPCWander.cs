@@ -8,6 +8,9 @@ using UnityEngine;
 public class NPCWander : MonoBehaviour
 {
     [Header("배회 설정")]
+    [Tooltip("체크 시 배회, 해제 시 제자리에 고정")]
+    public bool enableWandering = true;
+
     [Tooltip("시작 위치 기준 반경 (1 = 1타일)")]
     public float wanderRadius = 1f;
 
@@ -24,11 +27,15 @@ public class NPCWander : MonoBehaviour
     [Tooltip("NPC 레이어 (겹침 방지용, 비어있으면 NPCWander 있는 오브젝트만 검사)")]
     public LayerMask npcLayer;
 
+    [Tooltip("플레이어 레이어 (겹침 방지, 비우면 무시)")]
+    public LayerMask playerLayer;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Animator anim;
     private ContactFilter2D contactFilter;
     private ContactFilter2D npcContactFilter;
+    private ContactFilter2D playerContactFilter;
 
     private Vector2 homePosition;
     private Vector2 targetPosition;
@@ -48,6 +55,8 @@ public class NPCWander : MonoBehaviour
         contactFilter.useLayerMask = collisionMask != 0;
         npcContactFilter.SetLayerMask(npcLayer);
         npcContactFilter.useLayerMask = npcLayer != 0;
+        playerContactFilter.SetLayerMask(playerLayer);
+        playerContactFilter.useLayerMask = playerLayer != 0;
     }
 
     void Start()
@@ -58,6 +67,12 @@ public class NPCWander : MonoBehaviour
 
     void Update()
     {
+        if (!enableWandering)
+        {
+            SetAnimSpeed(0f);
+            return;
+        }
+
         if (isMoving)
         {
             float dist = Vector2.Distance(transform.position, targetPosition);
@@ -83,7 +98,7 @@ public class NPCWander : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isMoving) return;
+        if (!enableWandering || !isMoving) return;
 
         Vector2 dir = (targetPosition - (Vector2)transform.position).normalized;
 
@@ -155,7 +170,15 @@ public class NPCWander : MonoBehaviour
                 if (other != null && other != this) return true; // 다른 NPC면 충돌
             }
         }
-        else
+
+        // 플레이어 (겹침 방지)
+        if (playerLayer != 0)
+        {
+            int c = rb.Cast(dir, playerContactFilter, hits, dist);
+            if (c > 0) return true;
+        }
+
+        if (npcLayer == 0)
         {
             // npcLayer 비어있으면 NPCWander 있는 오브젝트 수동 검사
             var allHits = Physics2D.RaycastAll(rb.position, dir, dist);

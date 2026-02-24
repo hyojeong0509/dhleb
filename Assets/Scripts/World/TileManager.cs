@@ -146,12 +146,19 @@ public class TileManager : MonoBehaviour
         QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.PlantSeed, seed.itemName, 1);
         Debug.Log($"[TileManager] {seed.itemName} 심기 완료: {cellPos}");
 
-        // 첫 씨앗 심기 시 NPC 행패 컷신
+        // 첫 씨앗 심기 시 NPC 행패 컷신 → 종료 후 우호 NPC 컷신
         if (GameProgressManager.Instance != null && !GameProgressManager.Instance.HasFlag("planted_first_seed"))
         {
             var cutscene = Resources.Load<CutsceneData>("Cutscene/Cutscene_NPC_Harass");
             if (cutscene != null && CutsceneManager.Instance != null)
-                CutsceneManager.Instance.Play(cutscene);
+            {
+                CutsceneManager.Instance.Play(cutscene, () =>
+                {
+                    var friendly = Resources.Load<CutsceneData>("Cutscene/Cutscene_FriendlyNPC");
+                    if (friendly != null)
+                        CutsceneManager.Instance.Play(friendly);
+                });
+            }
         }
 
         return true;

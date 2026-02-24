@@ -157,6 +157,16 @@ public class CutsceneManager : MonoBehaviour
                 yield return RunNpcGroupReturnToStart(action);
                 break;
 
+            case CutsceneActionType.ShowNotification:
+                if (NotificationPopupManager.Instance != null && !string.IsNullOrEmpty(action.notificationText))
+                    NotificationPopupManager.Instance.Show(action.notificationText, action.notificationDuration > 0 ? action.notificationDuration : 2.5f);
+                break;
+
+            case CutsceneActionType.AcceptQuest:
+                if (!string.IsNullOrEmpty(action.questId) && QuestManager.Instance != null)
+                    QuestManager.Instance.AcceptQuest(action.questId);
+                break;
+
             default:
                 break;
         }
