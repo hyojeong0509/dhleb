@@ -68,11 +68,13 @@ public class NPCInteract : MonoBehaviour
             deactivateOnInteract.SetActive(false);
 
         string npcId = npcData != null ? npcData.npcId : "";
+        string npcDisplayName = (npcData != null && !string.IsNullOrEmpty(npcData.displayName))
+            ? npcData.displayName : gameObject.name;
         DialogueManager.Instance.Play(dialogue, () =>
         {
             if (!string.IsNullOrEmpty(npcId))
                 QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.TalkToNpc, npcId, 1);
-        });
+        }, npcDisplayName, npcId);
     }
 
     public bool IsPlayerInRange()

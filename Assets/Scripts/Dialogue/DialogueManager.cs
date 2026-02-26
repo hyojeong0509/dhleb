@@ -30,10 +30,17 @@ public class DialogueManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>현재 대화의 NPC 표시 이름 ({npc} 치환용)</summary>
+    public string CurrentNpcDisplayName { get; private set; }
+    /// <summary>현재 대화의 NPC ID (초상화 로드용)</summary>
+    public string CurrentNpcIdForPortrait { get; private set; }
+
     /// <summary>
     /// 대화 시작. 완료 시 onComplete 호출.
     /// </summary>
-    public void Play(DialogueData data, Action onComplete = null)
+    /// <param name="npcDisplayName">{npc} 표시 시 사용할 이름 (NPCInteract 등에서 전달)</param>
+    /// <param name="npcIdForPortrait">{npc} 초상화 로드 시 사용할 npcId</param>
+    public void Play(DialogueData data, Action onComplete = null, string npcDisplayName = null, string npcIdForPortrait = null)
     {
         if (data == null || data.nodes == null || data.nodes.Count == 0)
         {
@@ -49,6 +56,8 @@ public class DialogueManager : MonoBehaviour
 
         currentData = data;
         onCompleteCallback = onComplete;
+        CurrentNpcDisplayName = npcDisplayName;
+        CurrentNpcIdForPortrait = npcIdForPortrait;
         IsPlaying = true;
 
         if (TimeManager.Instance != null)
@@ -92,6 +101,8 @@ public class DialogueManager : MonoBehaviour
         var data = currentData;
         currentData = null;
         currentNode = null;
+        CurrentNpcDisplayName = null;
+        CurrentNpcIdForPortrait = null;
 
         if (TimeManager.Instance != null)
             TimeManager.Instance.SetPause(false);

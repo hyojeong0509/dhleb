@@ -248,6 +248,8 @@ public class DialogueUI : MonoBehaviour
     {
         if (string.IsNullOrEmpty(raw)) return "";
         if (raw == "{Player}" || raw == "{PlayerName}") return "Player";
+        if (raw == "{npc}" && DialogueManager.Instance != null && !string.IsNullOrEmpty(DialogueManager.Instance.CurrentNpcIdForPortrait))
+            return DialogueManager.Instance.CurrentNpcIdForPortrait;
         return raw;
     }
 
@@ -260,6 +262,12 @@ public class DialogueUI : MonoBehaviour
             if (GameDataManager.Instance?.currentSaveData?.playerData != null)
                 return GameDataManager.Instance.currentSaveData.playerData.playerName;
             return "나";
+        }
+        if (raw == "{npc}")
+        {
+            if (DialogueManager.Instance != null && !string.IsNullOrEmpty(DialogueManager.Instance.CurrentNpcDisplayName))
+                return DialogueManager.Instance.CurrentNpcDisplayName;
+            return "???";
         }
         return raw;
     }
