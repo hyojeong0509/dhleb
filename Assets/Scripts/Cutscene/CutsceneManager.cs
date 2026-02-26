@@ -14,7 +14,7 @@ public class CutsceneManager : MonoBehaviour
     [Tooltip("NPC 레이어 (컷신 종료 시 플레이어-NPC 겹침 해소, 비우면 보정 안 함)")]
     public LayerMask npcLayerForOverlapResolve;
 
-    /// <summary>NpcGroupMove 시 저장한 NPC별 시작 위치 (NpcGroupReturnToStart에서 사용)</summary>
+    // <summary>NpcGroupMove 시 저장한 NPC별 시작 위치 (NpcGroupReturnToStart에서 사용)
     static Dictionary<string, Vector3> _npcStartPositions = new Dictionary<string, Vector3>();
     // 마지막 NpcGroupMove의 이동 시간 (NpcGroupReturnToStart에서 npcReturnDuration 0일 때 사용)
     static float _lastNpcMoveDuration = 2f;
@@ -598,6 +598,8 @@ public class CutsceneManager : MonoBehaviour
 
         float elapsed = 0f;
         var cam = Camera.main;
+        var completed = new HashSet<int>();
+
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
@@ -605,6 +607,8 @@ public class CutsceneManager : MonoBehaviour
 
             for (int i = 0; i < npcs.Count; i++)
             {
+                if (completed.Contains(i)) continue;
+
                 var (tr, target, rb, sr, anim, _) = npcs[i];
                 Vector3 start = startPositions[i];
                 target.z = start.z;
@@ -622,6 +626,7 @@ public class CutsceneManager : MonoBehaviour
                     else tr.position = target;
                     startPositions[i] = target;
                     if (anim != null) SetAnimSpeed(anim, 0f);
+                    completed.Add(i);
                     continue;
                 }
 
@@ -632,6 +637,8 @@ public class CutsceneManager : MonoBehaviour
                 }
                 if (anim != null) SetAnimSpeed(anim, 1f);
             }
+
+            if (completed.Count == npcs.Count) break;
             yield return null;
         }
 

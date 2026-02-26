@@ -54,6 +54,8 @@ public class LateNightNotification : MonoBehaviour
 
     void Show()
     {
+        if (popupText != null)
+            popupText.text = "시간이 늦어지고있어요";
         if (popupPanel != null)
         {
             popupPanel.SetActive(true);
