@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1dc53d308ee57a45a4ef25daa7ff832, type: 3}
+  m_Name: Cutscene_NPC_Mob_AfterHouse
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
+  actions:
+  - type: 13
+    dialogue: {fileID: 0}
+    waitDuration: 1
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds:
+    - harass_1
+    - harass_2
+    - harass_3
+    npcTargetPositions:
+    - {x: 1, y: 0, z: 0}
+    - {x: -1.5, y: -0.5, z: 0}
+    - {x: 1.5, y: -1, z: 0}
+    usePlayerPositionAsOrigin: 1
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 1
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+  - type: 0
+    dialogue: {fileID: 11400000, guid: db6f4ca4e3bb1cd4f99739636af3daac, type: 2}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+  - type: 17
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+  - type: 18
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 34.5, y: 2, z: 0}

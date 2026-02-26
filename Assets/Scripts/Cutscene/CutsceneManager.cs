@@ -9,6 +9,8 @@ public class CutsceneManager : MonoBehaviour
     public static CutsceneManager Instance { get; private set; }
 
     public bool IsPlaying { get; private set; }
+    /// <summary>PlayerMoveOffScreen 등 플레이어 애니메이션 제어 중이면 true</summary>
+    public bool IsControllingPlayerAnimation { get; private set; }
 
     [Header("컷신 종료 시 보정")]
     [Tooltip("NPC 레이어 (컷신 종료 시 플레이어-NPC 겹침 해소, 비우면 보정 안 함)")]
@@ -205,6 +207,14 @@ public class CutsceneManager : MonoBehaviour
             case CutsceneActionType.AcceptQuest:
                 if (!string.IsNullOrEmpty(action.questId) && QuestManager.Instance != null)
                     QuestManager.Instance.AcceptQuest(action.questId);
+                break;
+
+            case CutsceneActionType.PlayerMoveOffScreen:
+                yield return RunPlayerMoveOffScreen(action);
+                break;
+
+            case CutsceneActionType.TeleportPlayer:
+                RunTeleportPlayer(action);
                 break;
 
             default:
@@ -655,6 +665,56 @@ public class CutsceneManager : MonoBehaviour
         {
             if (wander != null) wander.enabled = true;
         }
+        yield return new WaitForSecondsRealtime(1f);
+    }
+
+    IEnumerator RunPlayerMoveOffScreen(CutsceneAction action)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) yield break;
+
+        var rb = player.GetComponent<Rigidbody2D>();
+        var anim = player.GetComponent<Animator>();
+        var pm = player.GetComponent<PlayerMovement>();
+        float moveSpeed = pm != null ? pm.moveSpeed : 5f;
+
+        var cam = Camera.main;
+        var camFollow = cam != null ? cam.GetComponent<CameraFollow>() : null;
+        if (camFollow != null) camFollow.pauseFollow = true;
+
+        IsControllingPlayerAnimation = true;
+        if (anim != null)
+        {
+            anim.SetFloat("MoveX", 0f);
+            anim.SetFloat("MoveY", -1f);
+            anim.SetFloat("Speed", 1f);
+        }
+
+        while (cam != null && cam.orthographic && IsInCameraView(cam, player.transform.position))
+        {
+            float step = moveSpeed * Time.fixedDeltaTime;
+            Vector3 pos = player.transform.position;
+            pos.y -= step;
+            if (rb != null) rb.MovePosition(pos);
+            else player.transform.position = pos;
+            yield return new WaitForFixedUpdate();
+        }
+        IsControllingPlayerAnimation = false;
+        if (anim != null) anim.SetFloat("Speed", 0f);
+        if (camFollow != null) camFollow.pauseFollow = false;
+        yield return new WaitForSecondsRealtime(1f);
+    }
+
+    void RunTeleportPlayer(CutsceneAction action)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        var rb = player.GetComponent<Rigidbody2D>();
+        Vector3 pos = action.teleportPosition;
+        pos.z = player.transform.position.z;
+        if (rb != null) rb.MovePosition(pos);
+        else player.transform.position = pos;
     }
 
     static bool IsInCameraView(Camera cam, Vector3 worldPos)

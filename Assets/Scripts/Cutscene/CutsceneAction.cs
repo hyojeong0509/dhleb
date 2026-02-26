@@ -33,6 +33,8 @@ public enum CutsceneActionType
     NpcGroupReturnToStart, // NpcGroupMove로 온 NPC들을 원래 자리로 돌려보냄
     ShowNotification, // 하단 팝업 표시 (호감도 +5 등)
     AcceptQuest,    // 퀘스트 수락
+    PlayerMoveOffScreen, // 플레이어가 카메라 밖 왼쪽으로 걸어가며 사라짐
+    TeleportPlayer, // 플레이어를 지정 좌표로 텔레포트
     Custom          // (확장용)
 }
 
@@ -134,4 +136,14 @@ public class CutsceneAction
     [Header("AcceptQuest")]
     [Tooltip("수락할 퀘스트 ID")]
     public string questId;
+
+    [Header("PlayerMoveOffScreen")]
+    [Tooltip("밑으로 걸어가는 시간")]
+    public float playerWalkOffDuration = 2f;
+    [Tooltip("카메라 밑 밖으로 얼마나 나갈지 (월드 단위)")]
+    public float playerWalkOffMargin = 3f;
+
+    [Header("TeleportPlayer")]
+    [Tooltip("텔레포트할 월드 좌표 (Inspector에서 설정)")]
+    public Vector3 teleportPosition;
 }

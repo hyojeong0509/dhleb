@@ -13,4 +13,17 @@ MonoBehaviour:
   m_Name: Dialogue_FriendlyNPC_InHouse
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   startNodeId: start
-  nodes: []
+  nodes:
+  - nodeId: start
+    speakerName: '{PlayerNale}'
+    hideSpeakerName: 0
+    text: "\uD14C\uC2A4\uD2B8 \uB300\uD654\uC5D0\uC694"
+    nextNodeId: 1
+    choices: []
+  - nodeId: 1
+    speakerName: Neria
+    hideSpeakerName: 0
+    text: "\uC774\uAC74 \uB124\uB9AC\uC544\uC758 \uD14C\uC2A4\uD2B8 \uB300\uD654\uB78D\uB2C8\uB2E4.
+      (\uC774\uAC8C \uB05D)"
+    nextNodeId: 
+    choices: []

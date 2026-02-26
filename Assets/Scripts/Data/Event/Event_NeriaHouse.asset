@@ -19,7 +19,7 @@ MonoBehaviour:
   - visited_friendly_npc_house
   eventFlagsBlock: []
   affectionMin: -1
-  setFlagWhenDone: 
+  setFlagWhenDone: talked_friendly_npc_in_house
   advanceStoryOnDone: 0
   giveQuestIdOnDone: 
   giveItemsOnDone: []

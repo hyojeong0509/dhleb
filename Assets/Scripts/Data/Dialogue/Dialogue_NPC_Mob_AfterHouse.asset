@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7054b6327caa2174da691ccb29d07b69, type: 3}
+  m_Name: Dialogue_NPC_Mob_AfterHouse
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  startNodeId: start
+  nodes:
+  - nodeId: start
+    speakerName: harass_2
+    hideSpeakerName: 1
+    text: "\uB9C8\uC744\uAE4C\uC9C0 \uB4E4\uC5B4\uC628\uAC70\uC57C? \uC88B\uC740
+      \uB9D0\uB85C \uD560 \uB54C \uB098\uAC00\uB77C\uACE0 \uD588\uC9C0?"
+    nextNodeId: 
+    choices:
+    - text: "\uC65C \uB098\uD55C\uD14C \uC774\uB7EC\uB294\uAC70\uC57C?"
+      nextNodeId: choice1
+    - text: "\uC54C\uACA0\uC5B4. \uAC04\uB2E4\uACE0 \uAC00."
+      nextNodeId: choice2
+  - nodeId: choice1
+    speakerName: harass_1
+    hideSpeakerName: 1
+    text: "\uADF8\uC57C \uB10C \uC6B0\uB9AC \uC885\uC871\uC774 \uC544\uB2C8\uB2C8\uAE4C.
+      \uC6B0\uB9AC \uD589\uC131\uC5D0 \uC788\uC744 \uC218 \uC5C6\uB294 \uC0DD\uBA85\uCCB4\uB77C\uACE0.
+      \t"
+    nextNodeId: choice1_end
+    choices: []
+  - nodeId: choice1_end
+    speakerName: "\uB098"
+    hideSpeakerName: 0
+    text: "(\uC544\uBB34\uB798\uB3C4 \uAC19\uC740 \uC885\uC871\uC774 \uC544\uB2C8\uB77C\uACE0
+      \uD558\uB294 \uAC78 \uBCF4\uB2C8 \uB354 \uC774\uC0C1 \uB9D0\uC774 \uD1B5\uD558\uC9C0
+      \uC54A\uC744 \uAC83 \uAC19\uB2E4. \uC77C\uB2E8 \uC9D1\uC73C\uB85C \uAC00\uC790.)"
+    nextNodeId: 
+    choices: []
+  - nodeId: choice2
+    speakerName: "\uB098"
+    hideSpeakerName: 0
+    text: " (\uB2E4\uC9DC\uACE0\uC9DC \uC774\uB7F0\uB300\uC6B0\uB97C \uBC1B\uB2E4\uB2C8.
+      \uC5B4\uCA0C\uB4E0 \uC774 \uC774\uC0C1 \uB9D0\uC774 \uD1B5\uD558\uC9C0 \uC54A\uC744
+      \uAC83 \uAC19\uB2E4. \uC77C\uB2E8 \uC9D1\uC73C\uB85C \uAC00\uC790.)"
+    nextNodeId: 
+    choices: []

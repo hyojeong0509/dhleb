@@ -104,7 +104,7 @@ public class DialogueUI : MonoBehaviour
             if (typewriterDelay > 0)
             {
                 isTyping = true;
-                typewriterRoutine = StartCoroutine(TypewriterEffect(node.text));
+                typewriterRoutine = StartCoroutine(TypewriterEffect(node.text, node));
             }
             else
             {
@@ -121,18 +121,14 @@ public class DialogueUI : MonoBehaviour
         if (node.HasChoices)
         {
             if (btnNext != null) btnNext.gameObject.SetActive(false);
-            if (choiceContainer != null)
-            {
-                foreach (var choice in node.choices)
-                {
-                    var btn = CreateChoiceButton(choice);
-                    if (btn != null) btn.transform.SetParent(choiceContainer, false);
-                }
-            }
+            if (choiceContainer != null) choiceContainer.gameObject.SetActive(false);
+            if (typewriterDelay <= 0 || string.IsNullOrEmpty(node.text))
+                ShowChoicesForNode(node);
         }
         else
         {
             if (btnNext != null) btnNext.gameObject.SetActive(true);
+            if (choiceContainer != null) choiceContainer.gameObject.SetActive(false);
         }
     }
 
@@ -150,7 +146,7 @@ public class DialogueUI : MonoBehaviour
         DialogueManager.Instance.Advance(node.nextNodeId);
     }
 
-    IEnumerator TypewriterEffect(string fullText)
+    IEnumerator TypewriterEffect(string fullText, DialogueNode node)
     {
         for (int i = 0; i <= fullText.Length; i++)
         {
@@ -161,18 +157,36 @@ public class DialogueUI : MonoBehaviour
         }
         isTyping = false;
         typewriterRoutine = null;
+        if (node != null && node.HasChoices)
+            ShowChoicesForNode(node);
+    }
+
+    void ShowChoicesForNode(DialogueNode node)
+    {
+        if (node == null || !node.HasChoices || choiceContainer == null) return;
+        if (DialogueManager.Instance == null || DialogueManager.Instance.CurrentNode != node) return;
+        choiceContainer.gameObject.SetActive(true);
+        foreach (var choice in node.choices)
+        {
+            var btn = CreateChoiceButton(choice);
+            if (btn != null)
+                btn.transform.SetParent(choiceContainer, false);
+        }
     }
 
     void SkipTypewriter()
     {
+        var node = DialogueManager.Instance?.CurrentNode;
         if (typewriterRoutine != null)
         {
             StopCoroutine(typewriterRoutine);
             typewriterRoutine = null;
         }
-        if (txtDialogue != null && DialogueManager.Instance != null && DialogueManager.Instance.CurrentNode != null)
-            txtDialogue.text = DialogueManager.Instance.CurrentNode.text;
+        if (txtDialogue != null && node != null)
+            txtDialogue.text = node.text;
         isTyping = false;
+        if (node != null && node.HasChoices)
+            ShowChoicesForNode(node);
     }
 
     /// <summary>Resources에서 초상화 로드 후 imgPortrait에 표시</summary>
@@ -261,33 +275,13 @@ public class DialogueUI : MonoBehaviour
 
     Button CreateChoiceButton(DialogueChoice choice)
     {
-        GameObject go;
-        if (choiceButtonPrefab != null)
+        if (choiceButtonPrefab == null)
         {
-            go = Instantiate(choiceButtonPrefab);
-        }
-        else
-        {
-            go = new GameObject("ChoiceButton");
-            var rect = go.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(400, 36);
-            var img = go.AddComponent<Image>();
-            img.color = new Color(0.25f, 0.25f, 0.3f, 0.95f);
-            go.AddComponent<Button>();
-
-            var child = new GameObject("Text");
-            child.transform.SetParent(go.transform, false);
-            var childRect = child.AddComponent<RectTransform>();
-            childRect.anchorMin = Vector2.zero;
-            childRect.anchorMax = Vector2.one;
-            childRect.offsetMin = new Vector2(12, 4);
-            childRect.offsetMax = new Vector2(-12, -4);
-            var tmp = child.AddComponent<TextMeshProUGUI>();
-            tmp.text = choice.text;
-            tmp.fontSize = 16;
-            tmp.alignment = TextAlignmentOptions.Left;
+            Debug.LogWarning("[DialogueUI] Choice Button Prefab이 할당되지 않았습니다. Inspector에서 할당해주세요.");
+            return null;
         }
 
+        var go = Instantiate(choiceButtonPrefab);
         var button = go.GetComponent<Button>();
         if (button == null) button = go.AddComponent<Button>();
 
@@ -305,6 +299,7 @@ public class DialogueUI : MonoBehaviour
         if (choiceContainer == null) return;
         for (int i = choiceContainer.childCount - 1; i >= 0; i--)
             Destroy(choiceContainer.GetChild(i).gameObject);
+        choiceContainer.gameObject.SetActive(false);
     }
 
     void Show()

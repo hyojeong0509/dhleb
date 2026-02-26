@@ -64,7 +64,8 @@ public class PlayerMovement : MonoBehaviour
         {
             input = Vector2.zero;
             moveDir = Vector2.zero;
-            anim.SetFloat("Speed", 0f);
+            if (!CutsceneManager.Instance.IsControllingPlayerAnimation)
+                anim.SetFloat("Speed", 0f);
             return;
         }
 

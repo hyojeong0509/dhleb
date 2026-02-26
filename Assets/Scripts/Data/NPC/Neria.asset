@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCData
   npcId: friendly_npc
   displayName: 
-  defaultDialogue: {fileID: 0}
+  defaultDialogue: {fileID: 11400000, guid: 6346e3b87bfd9064cb0d351ce17563ff, type: 2}
