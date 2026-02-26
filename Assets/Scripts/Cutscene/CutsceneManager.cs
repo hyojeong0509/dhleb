@@ -3,19 +3,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// 컷신 재생. 시간 정지, 플레이어 입력 차단.
-/// </summary>
+// 컷신 재생. 시간 정지, 플레이어 입력 차단.
 public class CutsceneManager : MonoBehaviour
 {
     public static CutsceneManager Instance { get; private set; }
 
     public bool IsPlaying { get; private set; }
 
+    [Header("컷신 종료 시 보정")]
+    [Tooltip("NPC 레이어 (컷신 종료 시 플레이어-NPC 겹침 해소, 비우면 보정 안 함)")]
+    public LayerMask npcLayerForOverlapResolve;
+
     /// <summary>NpcGroupMove 시 저장한 NPC별 시작 위치 (NpcGroupReturnToStart에서 사용)</summary>
     static Dictionary<string, Vector3> _npcStartPositions = new Dictionary<string, Vector3>();
-    /// <summary>마지막 NpcGroupMove의 이동 시간 (NpcGroupReturnToStart에서 npcReturnDuration 0일 때 사용)</summary>
+    // 마지막 NpcGroupMove의 이동 시간 (NpcGroupReturnToStart에서 npcReturnDuration 0일 때 사용)
     static float _lastNpcMoveDuration = 2f;
+    // 마지막 NpcGroupMove의 최대 이동 거리 (복귀 시 거리 비례 시간 계산용)
+    static float _lastNpcMoveMaxDistance = 1f;
 
     void Awake()
     {
@@ -59,7 +63,6 @@ public class CutsceneManager : MonoBehaviour
         if (TimeManager.Instance != null)
             TimeManager.Instance.SetPause(true);
 
-        // Time.timeScale은 건드리지 않음 (0이면 Animator가 멈추므로, 1 유지로 애니메이션 재생)
         float prevTimeScale = Time.timeScale;
         Time.timeScale = 1f;
 
@@ -67,7 +70,7 @@ public class CutsceneManager : MonoBehaviour
         Animator playerAnim = player != null ? player.GetComponent<Animator>() : null;
         var prevUpdateMode = playerAnim != null ? playerAnim.updateMode : AnimatorUpdateMode.Normal;
         if (playerAnim != null)
-            playerAnim.updateMode = AnimatorUpdateMode.Normal; // timeScale 1이므로 Normal로 충분
+            playerAnim.updateMode = AnimatorUpdateMode.Normal;
 
         OnCutsceneStarted?.Invoke(data);
 
@@ -85,7 +88,44 @@ public class CutsceneManager : MonoBehaviour
             TimeManager.Instance.SetPause(false);
 
         OnCutsceneEnded?.Invoke(data);
+        ResolvePlayerNPCOverlap();
         onComplete?.Invoke();
+    }
+
+    /// <summary>컷신 종료 시 플레이어-NPC 겹침 해소 (끼임 방지)</summary>
+    void ResolvePlayerNPCOverlap()
+    {
+        if (npcLayerForOverlapResolve == 0) return;
+
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        var playerCol = player.GetComponent<Collider2D>();
+        if (playerCol == null) return;
+
+        const int maxIterations = 5;
+        for (int i = 0; i < maxIterations; i++)
+        {
+            var hits = Physics2D.OverlapCircleAll(player.transform.position, 0.6f, npcLayerForOverlapResolve);
+            Vector2 totalPush = Vector2.zero;
+
+            foreach (var npcCol in hits)
+            {
+                if (npcCol.gameObject == player) continue;
+
+                var dist = playerCol.Distance(npcCol);
+                if (dist.distance < -0.01f)
+                    totalPush += (Vector2)dist.normal * (-dist.distance);
+            }
+
+            if (totalPush.sqrMagnitude < 0.0001f) break;
+
+            var rb = player.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.MovePosition(rb.position + totalPush);
+            else
+                player.transform.position += (Vector3)totalPush;
+        }
     }
 
     IEnumerator ExecuteAction(CutsceneAction action)
@@ -172,7 +212,7 @@ public class CutsceneManager : MonoBehaviour
         }
     }
 
-    /// <summary>눈 뜨는 컷신 전에 저장해둔 기본 orthographicSize</summary>
+    // 눈 뜨는 컷신 전에 저장해둔 기본 orthographicSize
     public static float WakeUpDefaultOrthoSize { get; set; }
 
     IEnumerator RunPlayerLook(bool lookLeft, float duration)
@@ -419,16 +459,30 @@ public class CutsceneManager : MonoBehaviour
             if (wander != null) wander.enabled = false;
         }
 
-        // 걷기 애니메이션 + 이동 (병렬)
-        var startPositions = new List<Vector3>();
+        // 원래 위치 저장
         _npcStartPositions.Clear();
-        for (int i = 0; i < npcs.Count; i++)
+        for (int i = 0; i < npcs.Count && i < action.npcIds.Count; i++)
+            _npcStartPositions[action.npcIds[i]] = npcs[i].tr.position;
+
+        // 카메라 밖에서 소환 옵션: NPC를 화면 밖으로 텔레포트
+        var startPositions = new List<Vector3>();
+        if (action.npcSpawnAtCameraEdge != NpcSpawnEdge.None)
         {
-            var (tr, _, _, _, _, _) = npcs[i];
-            Vector3 pos = tr.position;
-            startPositions.Add(pos);
-            if (i < action.npcIds.Count)
-                _npcStartPositions[action.npcIds[i]] = pos;
+            Vector3 spawnPos = GetOffScreenSpawnPosition(action.npcSpawnAtCameraEdge, action.npcSpawnMargin);
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                var (tr, target, rb, sr, anim, _) = npcs[i];
+                Vector3 pos = spawnPos;
+                pos.z = tr.position.z;
+                if (rb != null) rb.MovePosition(pos);
+                else tr.position = pos;
+                startPositions.Add(pos);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < npcs.Count; i++)
+                startPositions.Add(npcs[i].tr.position);
         }
 
         float elapsed = 0f;
@@ -469,6 +523,15 @@ public class CutsceneManager : MonoBehaviour
             if (anim != null) SetAnimSpeed(anim, 0f);
         }
 
+        // 복귀 시 거리 비례 시간 계산용: 등장 이동 거리 저장
+        float maxDist = 0f;
+        for (int i = 0; i < npcs.Count; i++)
+        {
+            float d = Vector3.Distance(startPositions[i], npcs[i].target);
+            if (d > maxDist) maxDist = d;
+        }
+        _lastNpcMoveMaxDistance = Mathf.Max(0.1f, maxDist);
+
         if (npcs.Count > 0)
             yield return new WaitForSecondsRealtime(0.2f);
 
@@ -506,9 +569,19 @@ public class CutsceneManager : MonoBehaviour
         }
         if (npcs.Count == 0) yield break;
 
+        // 복귀 거리 (현재 위치 → 원래 위치)
+        float maxReturnDist = 0f;
+        foreach (var (tr, target, _, _, _, _) in npcs)
+        {
+            float d = Vector3.Distance(tr.position, target);
+            if (d > maxReturnDist) maxReturnDist = d;
+        }
+
         float baseDuration = action.npcReturnDuration > 0 ? action.npcReturnDuration : _lastNpcMoveDuration;
-        float mult = action.npcReturnDurationMultiplier > 0.01f ? action.npcReturnDurationMultiplier : 2f; // 기본 2배
-        float duration = Mathf.Max(4f, baseDuration * mult); // 최소 4초
+        float mult = action.npcReturnDurationMultiplier > 0.01f ? action.npcReturnDurationMultiplier : 2f;
+        // 거리 비례: 복귀 거리가 등장 거리보다 길면 시간도 비례해서 증가 (같은 걷기 속도 유지)
+        float distScale = maxReturnDist / _lastNpcMoveMaxDistance;
+        float duration = Mathf.Max(4f, baseDuration * mult * Mathf.Max(1f, distScale));
 
         foreach (var (_, _, _, _, _, wander) in npcs)
         {
@@ -524,6 +597,7 @@ public class CutsceneManager : MonoBehaviour
         }
 
         float elapsed = 0f;
+        var cam = Camera.main;
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
@@ -540,6 +614,16 @@ public class CutsceneManager : MonoBehaviour
                     rb.MovePosition(pos);
                 else
                     tr.position = pos;
+
+                if (cam != null && cam.orthographic && !IsInCameraView(cam, pos))
+                {
+                    target.z = tr.position.z;
+                    if (rb != null) rb.MovePosition(target);
+                    else tr.position = target;
+                    startPositions[i] = target;
+                    if (anim != null) SetAnimSpeed(anim, 0f);
+                    continue;
+                }
 
                 if (sr != null)
                 {
@@ -564,6 +648,36 @@ public class CutsceneManager : MonoBehaviour
         {
             if (wander != null) wander.enabled = true;
         }
+    }
+
+    static bool IsInCameraView(Camera cam, Vector3 worldPos)
+    {
+        if (cam == null || !cam.orthographic) return true;
+        float halfH = cam.orthographicSize;
+        float halfW = halfH * cam.aspect;
+        float cx = cam.transform.position.x;
+        float cy = cam.transform.position.y;
+        return worldPos.x >= cx - halfW && worldPos.x <= cx + halfW
+            && worldPos.y >= cy - halfH && worldPos.y <= cy + halfH;
+    }
+
+    // 카메라 화면 밖 소환 위치 (플레이어 Y 기준)
+    static Vector3 GetOffScreenSpawnPosition(NpcSpawnEdge edge, float margin)
+    {
+        var cam = Camera.main;
+        var player = GameObject.FindGameObjectWithTag("Player");
+        float y = player != null ? player.transform.position.y : (cam != null ? cam.transform.position.y : 0f);
+
+        if (cam == null || !cam.orthographic)
+            return new Vector3(edge == NpcSpawnEdge.Left ? -10f : 10f, y, 0f);
+
+        float halfHeight = cam.orthographicSize;
+        float halfWidth = halfHeight * cam.aspect;
+        float x = edge == NpcSpawnEdge.Left
+            ? cam.transform.position.x - halfWidth - margin
+            : cam.transform.position.x + halfWidth + margin;
+
+        return new Vector3(x, y, 0f);
     }
 
     static void SetAnimSpeed(Animator anim, float speed)

@@ -15,35 +15,41 @@ MonoBehaviour:
   startNodeId: start
   nodes:
   - nodeId: start
-    speakerName: ???
+    speakerName: harass_1
+    hideSpeakerName: 1
     text: "\uB108 \uBB50\uC57C? "
     nextNodeId: 1
     choices: []
   - nodeId: 1
-    speakerName: ???
+    speakerName: harass_2
+    hideSpeakerName: 1
     text: "\uC5B8\uC81C\uBD80\uD130 \uC5EC\uAE30\uC5D0 \uC228\uC5B4\uB4E4\uC5C8\uB0D0,
       \uC678\uBD80\uC778 \uB140\uC11D"
     nextNodeId: 2
     choices: []
   - nodeId: 2
-    speakerName: ???
+    speakerName: harass_3
+    hideSpeakerName: 1
     text: "\uC5EC\uAE30\uC5D0 \uC528\uC557 \uC2EC\uC5B4\uB3C4 \uB41C\uB2E4\uACE0
       \uB204\uAC00 \uD5C8\uB77D\uC744\uD588\uC5B4? "
     nextNodeId: 3
     choices: []
   - nodeId: 3
     speakerName: '{PlayerName}'
+    hideSpeakerName: 0
     text: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uD558\uB77C\uACE0 \uD588\uB294\uB370..?"
     nextNodeId: 4
     choices: []
   - nodeId: 4
-    speakerName: ???
+    speakerName: harass_3
+    hideSpeakerName: 1
     text: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uBB54\uB370? \uB09C \uADF8\uB7F0\uAC70
       \uBAB0\uB77C"
     nextNodeId: 5
     choices: []
   - nodeId: 5
-    speakerName: ???
+    speakerName: harass_2
+    hideSpeakerName: 1
     text: "\uC6B0\uB9AC\uB4E4\uC740 \uADF8\uB7F0 \uAC70 \uBAA8\uB974\uB294\uB370?
       \uB2F9\uC7A5 \uC5EC\uAE30\uC11C \uB098\uAC00.  \uB2E4\uC2DC\uB294 \uB208\uC5D0
       \uB744\uC9C0 \uB9C8. "

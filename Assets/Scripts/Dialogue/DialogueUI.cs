@@ -17,17 +17,28 @@ public class DialogueUI : MonoBehaviour
     public GameObject panel;
     public TMP_Text txtSpeaker;
     public TMP_Text txtDialogue;
+    [Tooltip("발화자 초상화 (플레이어 제외 NPC용, Resources/Portraits에서 로드)")]
+    public Image imgPortrait;
     public Button btnNext;           // 선택지 없을 때 "다음" 버튼
     public Button btnClose;          // 닫기 버튼 (누르면 dialogueBoxToHide 비활성화)
     public GameObject dialogueBoxToHide; // CloseBtn 누르면 비활성화할 오브젝트 (예: DialogueBox)
     public Transform choiceContainer; // 선택지 부모 (자식으로 Button 생성)
     public GameObject choiceButtonPrefab; // 선택지 버튼 프리팹 (없으면 기본 Button 생성)
 
+    [Header("초상화 (Resources 로드)")]
+    [Tooltip("Resources 폴더 내 경로 (예: Portraits). 시작 시 이 경로의 이미지를 전부 로드 (파일명=speakerName)")]
+    public string portraitFolder = "Portraits";
+    [Tooltip("로드 실패 시 콘솔에 경로 출력 (원인 확인용)")]
+    public bool logPortraitLoadFail;
+
+    private System.Collections.Generic.Dictionary<string, Sprite> _portraitCache = new System.Collections.Generic.Dictionary<string, Sprite>();
     private Coroutine typewriterRoutine;
     private bool isTyping;
 
     void Start()
     {
+        CachePortraits();
+
         if (DialogueManager.Instance == null) return;
 
         DialogueManager.Instance.OnDialogueStarted += OnDialogueStarted;
@@ -57,7 +68,7 @@ public class DialogueUI : MonoBehaviour
         Show();
     }
 
-    void OnDialogueEnded(DialogueData _)
+    void OnDialogueEnded(DialogueData _, bool __)
     {
         Hide();
     }
@@ -77,9 +88,11 @@ public class DialogueUI : MonoBehaviour
 
     void UpdateNodeDisplay(DialogueNode node)
     {
-        string speaker = GetDisplaySpeakerName(node.speakerName);
+        string speaker = node.hideSpeakerName ? "???" : GetDisplaySpeakerName(node.speakerName);
         if (txtSpeaker != null)
             txtSpeaker.text = speaker;
+
+        UpdatePortrait(node.speakerName);
 
         if (typewriterRoutine != null)
             StopCoroutine(typewriterRoutine);
@@ -162,6 +175,68 @@ public class DialogueUI : MonoBehaviour
         isTyping = false;
     }
 
+    /// <summary>Resources에서 초상화 로드 후 imgPortrait에 표시</summary>
+    void UpdatePortrait(string speakerName)
+    {
+        if (imgPortrait == null) return;
+
+        string resourceName = GetPortraitResourceName(speakerName);
+        if (string.IsNullOrEmpty(resourceName))
+        {
+            imgPortrait.gameObject.SetActive(false);
+            return;
+        }
+
+        string path = string.IsNullOrEmpty(portraitFolder)
+            ? resourceName
+            : $"{portraitFolder}/{resourceName}";
+        var sprite = GetCachedPortrait(resourceName);
+        if (sprite == null)
+            sprite = Resources.Load<Sprite>(path);
+        if (sprite != null)
+        {
+            imgPortrait.sprite = sprite;
+            imgPortrait.gameObject.SetActive(true);
+        }
+        else
+        {
+            if (logPortraitLoadFail)
+                Debug.LogWarning($"[DialogueUI] 초상화 로드 실패: speakerName=\"{speakerName}\" → Resources/{path} (imgPortrait 할당, Portrait Folder, Texture Type=Sprite 확인)");
+            imgPortrait.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>시작 시 portraitFolder에서 이미지 전부 로드 (파일명=키)</summary>
+    void CachePortraits()
+    {
+        _portraitCache.Clear();
+        if (string.IsNullOrEmpty(portraitFolder)) return;
+
+        var sprites = Resources.LoadAll<Sprite>(portraitFolder);
+        foreach (var s in sprites)
+        {
+            if (s == null) continue;
+            var key = s.texture != null ? s.texture.name : s.name;
+            if (string.IsNullOrEmpty(key)) key = s.name;
+            if (!string.IsNullOrEmpty(key) && !_portraitCache.ContainsKey(key))
+                _portraitCache[key] = s;
+        }
+    }
+
+    Sprite GetCachedPortrait(string resourceName)
+    {
+        if (string.IsNullOrEmpty(resourceName)) return null;
+        return _portraitCache != null && _portraitCache.TryGetValue(resourceName, out var s) ? s : null;
+    }
+
+    /// <summary>speakerName = 파일명 (Resources 로드용)</summary>
+    string GetPortraitResourceName(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return "";
+        if (raw == "{Player}" || raw == "{PlayerName}") return "Player";
+        return raw;
+    }
+
     /// <summary>발화자 이름 (플레이어는 저장된 이름으로 치환)</summary>
     string GetDisplaySpeakerName(string raw)
     {
@@ -181,7 +256,7 @@ public class DialogueUI : MonoBehaviour
             dialogueBoxToHide.SetActive(false);
 
         if (DialogueManager.Instance != null)
-            DialogueManager.Instance.EndDialogue();
+            DialogueManager.Instance.EndDialogue(completed: false);
     }
 
     Button CreateChoiceButton(DialogueChoice choice)
@@ -257,9 +332,4 @@ public class DialogueUI : MonoBehaviour
         ClearChoices();
     }
 
-    void Update()
-    {
-        if (isTyping && Input.GetMouseButtonDown(0))
-            SkipTypewriter();
-    }
 }

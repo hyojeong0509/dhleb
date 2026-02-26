@@ -2,6 +2,16 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
+/// NPC 소환 위치 (카메라 가장자리)
+/// </summary>
+public enum NpcSpawnEdge
+{
+    None,   // 기존 위치에서 시작
+    Left,   // 카메라 왼쪽 밖에서 등장
+    Right   // 카메라 오른쪽 밖에서 등장
+}
+
+/// <summary>
 /// 컷신 액션 타입
 /// </summary>
 public enum CutsceneActionType
@@ -102,6 +112,10 @@ public class CutsceneAction
     public bool usePlayerPositionAsOrigin = false;
     [Tooltip("걷는 데 걸리는 시간")]
     public float npcMoveDuration = 2f;
+    [Tooltip("NPC를 카메라 밖에서 소환 후 다가오게 함 (각 NPC 고정 위치와 무관)")]
+    public NpcSpawnEdge npcSpawnAtCameraEdge = NpcSpawnEdge.None;
+    [Tooltip("카메라 가장자리에서 얼마나 밖으로 소환할지 (월드 단위)")]
+    public float npcSpawnMargin = 2f;
 
     [Header("NpcGroupReturnToStart")]
     [Tooltip("돌아갈 NPC ID (NpcGroupMove에서 사용한 것과 동일, 비우면 마지막 NpcGroupMove의 NPC 전원)")]

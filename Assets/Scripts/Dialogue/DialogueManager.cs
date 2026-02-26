@@ -11,7 +11,8 @@ public class DialogueManager : MonoBehaviour
     public bool IsPlaying { get; private set; }
 
     public event Action<DialogueData> OnDialogueStarted;
-    public event Action<DialogueData> OnDialogueEnded;
+    /// <param name="completed">true=정상 완료(마지막 노드까지), false=닫기 버튼 등으로 중단</param>
+    public event Action<DialogueData, bool> OnDialogueEnded;
     public event Action<DialogueNode> OnNodeDisplayed;
 
     private DialogueData currentData;
@@ -81,9 +82,9 @@ public class DialogueManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 현재 대화 강제 종료
+    /// 대화 종료. completed=true면 정상 완료(아이템 지급 등), false면 중단(닫기 버튼 등으로)
     /// </summary>
-    public void EndDialogue()
+    public void EndDialogue(bool completed = true)
     {
         if (!IsPlaying) return;
 
@@ -99,7 +100,7 @@ public class DialogueManager : MonoBehaviour
         foreach (var ui in all)
             ui.HidePanel();
 
-        OnDialogueEnded?.Invoke(data);
+        OnDialogueEnded?.Invoke(data, completed);
         onCompleteCallback?.Invoke();
         onCompleteCallback = null;
     }

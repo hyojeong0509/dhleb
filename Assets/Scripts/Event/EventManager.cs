@@ -55,9 +55,16 @@ public class EventManager : MonoBehaviour
             DialogueManager.Instance.OnDialogueEnded -= OnDialogueEnded;
     }
 
-    void OnDialogueEnded(DialogueData data)
+    void OnDialogueEnded(DialogueData data, bool completed)
     {
         if (pendingGiveItemsEvent == null || pendingGiveItemsDialogue != data) return;
+        if (!completed)
+        {
+            pendingGiveItemsEvent = null;
+            pendingGiveItemsDialogue = null;
+            return; // 닫기 버튼 등으로 중단 시 아이템/퀘스트 지급 안 함
+        }
+        pendingGiveItemsEvent.MarkAsDone(); // 대화 완료 시에만 플래그/스토리 설정
         pendingGiveItemsEvent.OnDialogueEnded();
         pendingGiveItemsEvent = null;
         pendingGiveItemsDialogue = null;
@@ -78,7 +85,9 @@ public class EventManager : MonoBehaviour
             if (evt.npcId != npcId) continue;
             if (!evt.AreConditionsMet()) continue;
 
-            evt.MarkAsDone();
+            // giveItemsOnDone 있으면 대화 완료 시 MarkAsDone (닫기 후 재시도 가능)
+            if (!evt.HasGiveItemsOnDone)
+                evt.MarkAsDone();
             if (evt.HasGiveItemsOnDone)
             {
                 pendingGiveItemsEvent = evt;

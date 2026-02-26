@@ -16,17 +16,20 @@ MonoBehaviour:
   nodes:
   - nodeId: start
     speakerName: '{PlayerName}'
+    hideSpeakerName: 0
     text: "\uC5EC\uAE34 \uC5B4\uB514\uC57C? \uB108\uB294 \uB204\uAD6C\uACE0?"
     nextNodeId: node2
     choices: []
   - nodeId: node2
-    speakerName: "\uD2B8\uB9AC\uC624\uB124\uC2A4"
+    speakerName: Triones
+    hideSpeakerName: 0
     text: "\uC5EC\uAE30\uB294 \uB8E8\uBA58\uC2DC\uC544 \uD589\uC131\uC774\uACE0,
       \uB098\uB294 AI \uC778\uACF5\uBE44\uC11C \uD2B8\uB9AC\uC624\uB124\uC2A4\uC57C."
     nextNodeId: node3
     choices: []
   - nodeId: node3
-    speakerName: "\uD2B8\uB9AC\uC624\uB124\uC2A4"
+    speakerName: Triones
+    hideSpeakerName: 0
     text: "\uC77C\uB2E8 \uB18D\uC0AC\uBD80\uD130 \uC2DC\uC791\uD574\uBD10. \uB18D\uAE30\uAD6C\uC640
       \uC528\uC557\uC744 \uC904\uD14C\uB2C8 \uC528\uC557\uBD80\uD130 \uC2EC\uC5B4\uBD10."
     nextNodeId: 

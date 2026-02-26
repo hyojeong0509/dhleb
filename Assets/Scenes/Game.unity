@@ -46284,6 +46284,7 @@ GameObject:
   - component: {fileID: 499462613}
   - component: {fileID: 499462614}
   - component: {fileID: 499462615}
+  - component: {fileID: 499462616}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -46488,6 +46489,21 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b2c3d4e5f6789012345678abcdef0123, type: 2}
   - {fileID: 11400000, guid: b3c4d5e6f7890123456789abcdef0124, type: 2}
   registry: {fileID: 0}
+--- !u!114 &499462616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499462603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ebf1de78b70c6488513667b363be09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneManager
+  npcLayerForOverlapResolve:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &500647288
 GameObject:
   m_ObjectHideFlags: 0
@@ -74630,7 +74646,7 @@ Transform:
   m_GameObject: {fileID: 1160937017}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.5, y: -8.9, z: 0}
+  m_LocalPosition: {x: -5.28, y: -9.97, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -84077,11 +84093,14 @@ MonoBehaviour:
   panel: {fileID: 1756549209}
   txtSpeaker: {fileID: 809976303}
   txtDialogue: {fileID: 1983636127}
+  imgPortrait: {fileID: 0}
   btnNext: {fileID: 1761808423}
   btnClose: {fileID: 467628161}
   dialogueBoxToHide: {fileID: 1102380536}
   choiceContainer: {fileID: 1623770571}
   choiceButtonPrefab: {fileID: 4324283069584085885, guid: 39bc595e90f74df45807d016282b58f9, type: 3}
+  portraitFolder: Portraits
+  portraitMappings: []
 --- !u!114 &1756549213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -84928,7 +84947,7 @@ Transform:
   m_GameObject: {fileID: 1801660544}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.6, y: 2, z: 0}
+  m_LocalPosition: {x: 18.09, y: 3.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

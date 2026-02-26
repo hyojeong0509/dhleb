@@ -18,7 +18,9 @@ public class DialogueChoice
 public class DialogueNode
 {
     public string nodeId;          // 고유 ID (예: "triones_01")
-    public string speakerName;     // 발화자 이름 (빈 문자열 = 나레이션)
+    public string speakerName;     // 발화자 이름 (빈 문자열 = 나레이션, 초상화 로드에도 사용)
+    [Tooltip("체크 시 화면에 ??? 표시 (초상화는 speakerName으로 로드)")]
+    public bool hideSpeakerName;
     [TextArea(2, 5)]
     public string text;           // 대사 내용
     public string nextNodeId;     // 다음 노드 (비어있으면 대화 종료)
