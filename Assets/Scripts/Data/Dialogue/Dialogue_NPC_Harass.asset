@@ -17,41 +17,59 @@ MonoBehaviour:
   - nodeId: start
     speakerName: harass_1
     hideSpeakerName: 1
-    text: "\uB108 \uBB50\uC57C? "
+    text: "\uC18C\uB780\uC2A4\uB7FD\uB2E4 \uD588\uB354\uB2C8 \uC678\uBD80\uC778\uB140\uC11D\uC774
+      \uC228\uC5B4\uB4E4\uC5C8\uC5C8\uAD70"
     nextNodeId: 1
     choices: []
   - nodeId: 1
     speakerName: harass_2
     hideSpeakerName: 1
-    text: "\uC5B8\uC81C\uBD80\uD130 \uC5EC\uAE30\uC5D0 \uC228\uC5B4\uB4E4\uC5C8\uB0D0,
-      \uC678\uBD80\uC778 \uB140\uC11D"
+    text: "\uAE30\uB85D\uC5D0 \uC5C6\uB294 \uC874\uC7AC\uB2E4."
     nextNodeId: 2
     choices: []
   - nodeId: 2
     speakerName: harass_3
     hideSpeakerName: 1
-    text: "\uC5EC\uAE30\uC5D0 \uC528\uC557 \uC2EC\uC5B4\uB3C4 \uB41C\uB2E4\uACE0
-      \uB204\uAC00 \uD5C8\uB77D\uC744\uD588\uC5B4? "
+    text: "\uD06C\uD06C\u2026 \uBD88\uAE38\uD55C \uB0C4\uC0C8\uAC00 \uB09C\uB2E4."
     nextNodeId: 3
     choices: []
   - nodeId: 3
     speakerName: '{PlayerName}'
     hideSpeakerName: 0
-    text: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uD558\uB77C\uACE0 \uD588\uB294\uB370..?"
+    text: "??? \uC544 \uC800\uB294"
     nextNodeId: 4
     choices: []
   - nodeId: 4
-    speakerName: harass_3
+    speakerName: harass_1
     hideSpeakerName: 1
-    text: "\uD2B8\uB9AC\uC624\uB124\uC2A4\uAC00 \uBB54\uB370? \uB09C \uADF8\uB7F0\uAC70
-      \uBAB0\uB77C"
+    text: "\uC544\uB2C8 \uC678\uBD80\uC778\uB140\uC11D\uC758 \uC815\uCCB4\uB294 \uAD00\uC2EC\uC5C6\uB2E4.
+      \uC6B0\uC8FC \uC18D\uB2F4\uC5D0\uB294 \uCC98\uC74C\uBCF4\uB294 \uB140\uC11D\uC5D0\uAC8C
+      \uCE5C\uC808\uC744 \uBC30\uD480\uC9C0\uB9D0\uB77C\uB294 \uC18D\uB2F4\uC774\uC788\uC9C0"
     nextNodeId: 5
     choices: []
   - nodeId: 5
     speakerName: harass_2
     hideSpeakerName: 1
-    text: "\uC6B0\uB9AC\uB4E4\uC740 \uADF8\uB7F0 \uAC70 \uBAA8\uB974\uB294\uB370?
-      \uB2F9\uC7A5 \uC5EC\uAE30\uC11C \uB098\uAC00.  \uB2E4\uC2DC\uB294 \uB208\uC5D0
-      \uB744\uC9C0 \uB9C8. "
+    text: "\uADF8\uB7F0\uAC8C \uC788\uC5C8\uC5C8\uB098?"
     nextNodeId: 6
+    choices: []
+  - nodeId: 6
+    speakerName: harass_3
+    hideSpeakerName: 1
+    text: "\uB300\uC7A5\uC774 \uC788\uB2E4\uBA74 \uC788\uB294\uAC70\uC57C!"
+    nextNodeId: 7
+    choices: []
+  - nodeId: 7
+    speakerName: '{PlayerName}'
+    hideSpeakerName: 0
+    text: "(\uBC29\uAE08 \uC9C0\uC5B4\uB0B8 \uB9D0\uAC19\uC740\uB370)\u2026"
+    nextNodeId: 8
+    choices: []
+  - nodeId: 8
+    speakerName: harass_1
+    hideSpeakerName: 1
+    text: "\uAE34 \uB9D0 \uD558\uC9C0 \uC54A\uACA0\uB2E4 \uB2F9\uC7A5 \uC774 \uD589\uC131\uC5D0\uC11C
+      \uB098\uAC00 \uADF8\uB9AC\uACE0 \uB2E4\uC2DC\uB294 \uB208\uC5D0 \uB744\uC9C0
+      \uB9C8\uB77C"
+    nextNodeId: 9
     choices: []

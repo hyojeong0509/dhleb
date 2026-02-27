@@ -17,20 +17,46 @@ MonoBehaviour:
   - nodeId: start
     speakerName: '{PlayerName}'
     hideSpeakerName: 0
-    text: "\uC5EC\uAE34 \uC5B4\uB514\uC57C? \uB108\uB294 \uB204\uAD6C\uACE0?"
-    nextNodeId: node2
+    text: "\uC5EC\uAE34 \uC5B4\uB514\uC9C0...? \uB108\uB294 \uB204\uAD6C ...?"
+    nextNodeId: 1
     choices: []
-  - nodeId: node2
+  - nodeId: 1
+    speakerName: Triones
+    hideSpeakerName: 1
+    text: "\uC5EC\uAE30\uB294 \uB8E8\uBA58\uC2DC\uC544 \uD589\uC131\uC785\uB2C8\uB2E4."
+    nextNodeId: 2
+    choices: []
+  - nodeId: 2
+    speakerName: Triones
+    hideSpeakerName: 1
+    text: "\u2026\uC0DD\uCCB4 \uBC18\uC751 \uC548\uC815\uD654 \uC644\uB8CC."
+    nextNodeId: 3
+    choices: []
+  - nodeId: 3
+    speakerName: Triones
+    hideSpeakerName: 1
+    text: "\uD604\uC7AC \uC2DC\uAC04\uC740 \uB0AE... \uC774 \uD589\uC131\uC740 \uB18D\uC5C5\uACFC
+      \uD0D0\uD5D8\uC774 \uAC00\uB2A5\uD55C \uD658\uACBD\uC73C\uB85C \uBD84\uC11D\uB429\uB2C8\uB2E4."
+    nextNodeId: 4
+    choices: []
+  - nodeId: 4
     speakerName: Triones
     hideSpeakerName: 0
-    text: "\uC5EC\uAE30\uB294 \uB8E8\uBA58\uC2DC\uC544 \uD589\uC131\uC774\uACE0,
-      \uB098\uB294 AI \uC778\uACF5\uBE44\uC11C \uD2B8\uB9AC\uC624\uB124\uC2A4\uC57C."
-    nextNodeId: node3
+    text: "\uADF8\uB9AC\uACE0 \uC800\uB294 \uB2F9\uC2E0\uC758 ai \uC778\uACF5\uBE44\uC11C
+      \uD2B8\uB9AC\uC624\uB124\uC2A4\uC785\uB2C8\uB2E4."
+    nextNodeId: 5
     choices: []
-  - nodeId: node3
+  - nodeId: 5
+    speakerName: '{PlayerName}'
+    hideSpeakerName: 0
+    text: "\uB098\uB294 \uC774 \uACF3\uC5D0\uC11C \uBB34\uC5C7\uC744 \uD558\uBA74
+      \uB418\uC9C0?"
+    nextNodeId: 6
+    choices: []
+  - nodeId: 6
     speakerName: Triones
     hideSpeakerName: 0
-    text: "\uC77C\uB2E8 \uB18D\uC0AC\uBD80\uD130 \uC2DC\uC791\uD574\uBD10. \uB18D\uAE30\uAD6C\uC640
-      \uC528\uC557\uC744 \uC904\uD14C\uB2C8 \uC528\uC557\uBD80\uD130 \uC2EC\uC5B4\uBD10."
+    text: "\uC6B0\uC120 \uB18D\uC5C5\uC774 \uAC00\uB2A5\uD574\uBCF4\uC774\uB2C8 \uC528\uC557\uC744
+      \uC2EC\uB294 \uAC74 \uC5B4\uB5A8\uAE4C\uC694?"
     nextNodeId: 
     choices: []
