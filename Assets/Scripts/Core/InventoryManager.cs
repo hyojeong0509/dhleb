@@ -445,4 +445,43 @@ public class InventoryManager : MonoBehaviour
         RefreshAll();
         return false;
     }
+
+    /// <summary>
+    /// 인벤토리에서 아이템 제거 (상점 판매 등)
+    /// </summary>
+    /// <returns>실제로 제거한 수량</returns>
+    public int RemoveItem(ItemData item, int count)
+    {
+        if (item == null || count <= 0) return 0;
+        int removed = 0;
+
+        for (int i = 0; i < TOTAL_SLOT_COUNT && removed < count; i++)
+        {
+            if (slots[i].IsEmpty || slots[i].item != item) continue;
+
+            int toRemove = Mathf.Min(slots[i].count, count - removed);
+            slots[i].count -= toRemove;
+            if (slots[i].count <= 0)
+                slots[i].Clear();
+            removed += toRemove;
+        }
+
+        RefreshAll();
+        return removed;
+    }
+
+    /// <summary>
+    /// 특정 아이템 보유 수량
+    /// </summary>
+    public int GetItemCount(ItemData item)
+    {
+        if (item == null) return 0;
+        int total = 0;
+        for (int i = 0; i < TOTAL_SLOT_COUNT; i++)
+        {
+            if (!slots[i].IsEmpty && slots[i].item == item)
+                total += slots[i].count;
+        }
+        return total;
+    }
 }

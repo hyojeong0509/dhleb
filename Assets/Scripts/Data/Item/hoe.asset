@@ -18,5 +18,7 @@ MonoBehaviour:
   itemType: 1
   description: "\uB545\uC744 \uD314 \uC218 \uC788\uB294 \uAD2D\uC774 \uC785\uB2C8\uB2E4.
     \uB3C4\uB07C \uC544\uB2C8\uC5D0\uC694..."
+  buyPrice: 500
+  sellPrice: 250
   toolType: 0
   range: 1

@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c39cbdac336388547bf04dd0f61ae341, type: 3}
-  m_Name: Strawberry
+  m_Name: Wood
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\uB538\uAE30"
-  icon: {fileID: 1513276259, guid: b1de09a395063f14a9583ea26d7d26eb, type: 3}
+  itemName: "\uB098\uBB34"
+  icon: {fileID: 1530789770, guid: 9c8b376f2f8842545a9edd6d73625765, type: 3}
   maxStackSize: 99
-  itemType: 3
-  description: "\uC544\uC8FC \uC798 \uC775\uC740 \uB538\uAE30!"
-  buyPrice: 80
-  sellPrice: 40
+  itemType: 4
+  description: "\uCC44\uC9D1\uD55C \uB098\uBB34."
+  buyPrice: 20
+  sellPrice: 10

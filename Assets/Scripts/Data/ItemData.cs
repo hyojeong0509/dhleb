@@ -13,10 +13,16 @@ public class ItemData : ScriptableObject
     public int maxStackSize = 99;   // 최대 스택 수량
 
     [Header("아이템 종류")]
-    public ItemType itemType;       // 아이템 타입 (향후 사용)
+    public ItemType itemType;       // 아이템 타입
 
     [TextArea]
-    public string description;      // 아이템 설명 (향후 사용)
+    public string description;      // 아이템 설명
+
+    [Header("거래 가격")]
+    [Tooltip("상점 구매 가격 (0 = 구매 불가)")]
+    public int buyPrice;
+    [Tooltip("상점 판매 가격 (0 = 판매 불가)")]
+    public int sellPrice;
 }
 
 // 아이템 종류 (확장 가능)
@@ -25,8 +31,9 @@ public enum ItemType
     None,
     Tool,       // 도구 (괭이, 물뿌리개 등)
     Seed,       // 씨앗
-    Crop,       // 작물
+    Crop,       // 작물 (수확물)
     Material,   // 재료
+    Consumable, // 소비품 (음식 등)
     Etc         // 기타
 }
 

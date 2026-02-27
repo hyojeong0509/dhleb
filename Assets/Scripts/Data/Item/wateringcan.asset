@@ -17,5 +17,7 @@ MonoBehaviour:
   maxStackSize: 1
   itemType: 1
   description: "\uBB3C\uC744 \uC904 \uC218 \uC788\uC744 \uAC83 \uAC19\uC740 \uB3C4\uAD6C\uB124\uC694."
+  buyPrice: 300
+  sellPrice: 150
   toolType: 1
   range: 1

@@ -29,8 +29,13 @@ public class PlayerAction : MonoBehaviour
 
     void Update()
     {
-        // 인벤토리 열려있으면 하이라이트 숨기고 모든 게임 액션 차단
+        // 인벤토리/상점 열려있으면 하이라이트 숨기고 모든 게임 액션 차단
         if (InventoryManager.Instance != null && InventoryManager.Instance.IsInventoryOpen)
+        {
+            TileHighlight.Instance?.Hide();
+            return;
+        }
+        if (ShopManager.Instance != null && ShopManager.Instance.IsShopOpen)
         {
             TileHighlight.Instance?.Hide();
             return;
@@ -135,6 +140,15 @@ public class PlayerAction : MonoBehaviour
         mouseWorld.z = 0f;
 
         var hits = Physics2D.OverlapPointAll(mouseWorld);
+        foreach (var h in hits)
+        {
+            var shop = h.GetComponentInParent<ShopInteract>();
+            if (shop != null && shop.IsPlayerInRange() && shop.shopData != null)
+            {
+                shop.OpenShop();
+                return true;
+            }
+        }
         foreach (var h in hits)
         {
             var npc = h.GetComponentInParent<NPCInteract>();

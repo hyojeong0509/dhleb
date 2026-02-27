@@ -27,7 +27,7 @@ public class NPCWander : MonoBehaviour
     [Tooltip("NPC 레이어 (겹침 방지용, 비어있으면 NPCWander 있는 오브젝트만 검사)")]
     public LayerMask npcLayer;
 
-    [Tooltip("플레이어 레이어 (겹침 방지, 비우면 무시)")]
+    [Tooltip("플레이어 레이어 (겹침 방지, 비우면 Player 태그로 자동 검사)")]
     public LayerMask playerLayer;
 
     private Rigidbody2D rb;
@@ -152,6 +152,11 @@ public class NPCWander : MonoBehaviour
         float dist = move.magnitude + 0.05f;
         Vector2 dir = move.normalized;
         RaycastHit2D[] hits = new RaycastHit2D[5];
+        var myCol = GetComponent<Collider2D>();
+
+        // 플레이어 (겹침 방지) - OverlapCircle으로 이미 겹친 상태도 감지
+        if (IsOverlappingWithPlayer(myCol))
+            return true;
 
         // 벽 등
         if (collisionMask != 0)
@@ -171,18 +176,38 @@ public class NPCWander : MonoBehaviour
             }
         }
 
-        // 플레이어 (겹침 방지)
+        // 플레이어 (이동 방향 전방 체크)
         if (playerLayer != 0)
         {
             int c = rb.Cast(dir, playerContactFilter, hits, dist);
             if (c > 0) return true;
         }
 
+        // playerLayer 비어있으면 Player 태그로 수동 검사
+        if (playerLayer == 0)
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                var playerCol = player.GetComponent<Collider2D>();
+                if (playerCol != null && myCol != null)
+                {
+                    if (myCol.Distance(playerCol).distance < 0.01f)
+                        return true;
+                    var playerHits = Physics2D.RaycastAll(rb.position, dir, dist);
+                    foreach (var h in playerHits)
+                    {
+                        if (h.collider != null && h.collider != myCol && h.collider.gameObject.CompareTag("Player"))
+                            return true;
+                    }
+                }
+            }
+        }
+
         if (npcLayer == 0)
         {
             // npcLayer 비어있으면 NPCWander 있는 오브젝트 수동 검사
             var allHits = Physics2D.RaycastAll(rb.position, dir, dist);
-            var myCol = GetComponent<Collider2D>();
             foreach (var h in allHits)
             {
                 if (h.collider == null || h.collider == myCol) continue;
@@ -192,6 +217,15 @@ public class NPCWander : MonoBehaviour
         }
 
         return false;
+    }
+
+    bool IsOverlappingWithPlayer(Collider2D myCol)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return false;
+        var playerCol = player.GetComponent<Collider2D>();
+        if (playerCol == null || myCol == null) return false;
+        return myCol.Distance(playerCol).distance < 0.01f;
     }
 
     void OnDrawGizmosSelected()

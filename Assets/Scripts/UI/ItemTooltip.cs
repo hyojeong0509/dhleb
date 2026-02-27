@@ -10,6 +10,10 @@ public class ItemTooltip : MonoBehaviour
     public TMP_Text txtName;
     public TMP_Text txtType;
     public TMP_Text txtDescription;
+    [Tooltip("구매 가격")]
+    public TMP_Text txtBuyPrice;
+    [Tooltip("판매 가격")]
+    public TMP_Text txtSellPrice;
 
     private RectTransform rt;
     private RectTransform canvasRt;
@@ -61,6 +65,17 @@ public class ItemTooltip : MonoBehaviour
         if (txtName != null) txtName.text = item.itemName;
         if (txtType != null) txtType.text = item.itemType.ToString();
         if (txtDescription != null) txtDescription.text = item.description;
+
+        if (txtBuyPrice != null)
+        {
+            txtBuyPrice.gameObject.SetActive(item.buyPrice > 0);
+            txtBuyPrice.text = item.buyPrice > 0 ? $"{item.buyPrice:N0}G" : "";
+        }
+        if (txtSellPrice != null)
+        {
+            txtSellPrice.gameObject.SetActive(item.sellPrice > 0);
+            txtSellPrice.text = item.sellPrice > 0 ? $"{item.sellPrice:N0}G" : "";
+        }
     }
 
     public void Hide()

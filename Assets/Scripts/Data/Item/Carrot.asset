@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c39cbdac336388547bf04dd0f61ae341, type: 3}
-  m_Name: Strawberry
+  m_Name: Carrot
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\uB538\uAE30"
-  icon: {fileID: 1513276259, guid: b1de09a395063f14a9583ea26d7d26eb, type: 3}
+  itemName: "\uB2F9\uADFC"
+  icon: {fileID: -1863186954, guid: b1de09a395063f14a9583ea26d7d26eb, type: 3}
   maxStackSize: 99
   itemType: 3
-  description: "\uC544\uC8FC \uC798 \uC775\uC740 \uB538\uAE30!"
-  buyPrice: 80
-  sellPrice: 40
+  description: "\uD06C\uACE0 \uC2F1\uC2F1\uD55C \uB2F9\uADFC!"
+  buyPrice: 45
+  sellPrice: 22
