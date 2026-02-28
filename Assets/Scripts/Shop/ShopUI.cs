@@ -110,6 +110,12 @@ public class ShopUI : MonoBehaviour
 
     void OnShopOpened(ShopData shop)
     {
+        ShowShopPanel(shop);
+    }
+
+    public void ShowShopPanel(ShopData shop)
+    {
+        if (shop == null) return;
         if (shopPanel != null) shopPanel.SetActive(true);
         if (txtShopName != null) txtShopName.text = shop.shopName;
         GameInputBlocker.Block();

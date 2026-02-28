@@ -1,9 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// 상점에서 판매하는 아이템 1개
-/// </summary>
+// 상점에서 판매하는 아이템 1개
 [System.Serializable]
 public class ShopItemEntry
 {
@@ -17,10 +15,8 @@ public class ShopItemEntry
     public int BuyPrice => priceOverride > 0 ? priceOverride : (item != null ? item.buyPrice : 0);
 }
 
-/// <summary>
-/// 상점 데이터 (ScriptableObject)
-/// Project 창에서 우클릭 → Create → Shop → Shop Data
-/// </summary>
+// 상점 데이터 (ScriptableObject)
+// Project 창에서 우클릭 → Create → Shop → Shop Data
 [CreateAssetMenu(fileName = "NewShop", menuName = "Shop/Shop Data")]
 public class ShopData : ScriptableObject
 {

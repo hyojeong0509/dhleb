@@ -41,6 +41,7 @@ public class NPCWander : MonoBehaviour
     private Vector2 targetPosition;
     private float idleTimer;
     private bool isMoving;
+    private bool isPausedByDialogue;
 
     void Awake()
     {
@@ -63,11 +64,56 @@ public class NPCWander : MonoBehaviour
     {
         homePosition = transform.position;
         PickNewTarget();
+
+        if (DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.OnDialogueStarted += OnDialogueStarted;
+            DialogueManager.Instance.OnDialogueEnded += OnDialogueEnded;
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.OnDialogueStarted -= OnDialogueStarted;
+            DialogueManager.Instance.OnDialogueEnded -= OnDialogueEnded;
+        }
+    }
+
+    void OnDialogueStarted(DialogueData _)
+    {
+        if (!enableWandering) return;
+        var npcInteract = GetComponent<NPCInteract>();
+        if (npcInteract == null || npcInteract.npcData == null) return;
+        string myId = npcInteract.npcData.npcId;
+        if (string.IsNullOrEmpty(myId)) return;
+        if (DialogueManager.Instance != null && DialogueManager.Instance.CurrentNpcIdForPortrait == myId)
+        {
+            isPausedByDialogue = true;
+            isMoving = false;
+            SetAnimSpeed(0f);
+        }
+    }
+
+    void OnDialogueEnded(DialogueData _, bool __)
+    {
+        if (isPausedByDialogue)
+        {
+            isPausedByDialogue = false;
+            idleTimer = Random.Range(idleTimeRange.x, idleTimeRange.y);
+        }
     }
 
     void Update()
     {
         if (!enableWandering)
+        {
+            SetAnimSpeed(0f);
+            return;
+        }
+
+        if (isPausedByDialogue)
         {
             SetAnimSpeed(0f);
             return;
@@ -98,7 +144,7 @@ public class NPCWander : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!enableWandering || !isMoving) return;
+        if (!enableWandering || !isMoving || isPausedByDialogue) return;
 
         Vector2 dir = (targetPosition - (Vector2)transform.position).normalized;
 

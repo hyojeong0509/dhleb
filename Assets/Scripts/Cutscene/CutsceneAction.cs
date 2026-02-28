@@ -31,6 +31,7 @@ public enum CutsceneActionType
     AddAffection,   // NPC 호감도 추가
     NpcGroupMove,   // NPC 여러 명이 동시에 목표 위치로 걸어감
     NpcGroupReturnToStart, // NpcGroupMove로 온 NPC들을 원래 자리로 돌려보냄
+    NpcGroupMoveToPosition, // NPC들을 지정 좌표로 이동 (복귀 저장 없음, Return 이후 재배치용)
     ShowNotification, // 하단 팝업 표시 (호감도 +5 등)
     AcceptQuest,    // 퀘스트 수락
     PlayerMoveOffScreen, // 플레이어가 카메라 밖 왼쪽으로 걸어가며 사라짐

@@ -41,4 +41,4 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 13c44ae4cf72993488aca6598a8a4e71, type: 2}
     priceOverride: 0
     stock: -1
-  sellableTypes: 03000000040000000500000006000000
+  sellableTypes: 0200000003000000040000000500000006000000

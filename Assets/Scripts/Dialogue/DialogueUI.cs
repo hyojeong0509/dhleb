@@ -12,6 +12,8 @@ public class DialogueUI : MonoBehaviour
     [Header("타이핑 효과")]
     [Tooltip("한 글자당 대기 시간 (초). 0이면 효과 없음")]
     public float typewriterDelay = 0.05f;
+    [Tooltip("Resources 경로 (예: TypingSound 또는 Sounds/TypingSound). 비우면 타이핑 효과음 없음")]
+    public string typingSoundPath = "Sounds/TypingSound";
 
     [Header("UI 참조")]
     public GameObject panel;
@@ -34,10 +36,13 @@ public class DialogueUI : MonoBehaviour
     private System.Collections.Generic.Dictionary<string, Sprite> _portraitCache = new System.Collections.Generic.Dictionary<string, Sprite>();
     private Coroutine typewriterRoutine;
     private bool isTyping;
+    private AudioClip _typingSoundClip;
+    private AudioSource _typingAudioSource;
 
     void Start()
     {
         CachePortraits();
+        LoadTypingSound();
 
         if (DialogueManager.Instance == null) return;
 
@@ -78,7 +83,7 @@ public class DialogueUI : MonoBehaviour
         UpdateNodeDisplay(node);
     }
 
-    /// <summary>노드 표시 (DialogueManager 폴백용 - 비활성 오브젝트에 있어도 호출됨)</summary>
+    // 노드 표시
     public void ShowAndDisplayNode(DialogueNode node)
     {
         if (node == null) return;
@@ -95,8 +100,11 @@ public class DialogueUI : MonoBehaviour
         UpdatePortrait(node.speakerName);
 
         if (typewriterRoutine != null)
+        {
             StopCoroutine(typewriterRoutine);
-
+            typewriterRoutine = null;
+        }
+        StopTypingSound();
         ClearChoices();
 
         if (txtDialogue != null && !string.IsNullOrEmpty(node.text))
@@ -146,8 +154,43 @@ public class DialogueUI : MonoBehaviour
         DialogueManager.Instance.Advance(node.nextNodeId);
     }
 
+    void LoadTypingSound()
+    {
+        _typingSoundClip = null;
+        if (string.IsNullOrEmpty(typingSoundPath)) return;
+        _typingSoundClip = Resources.Load<AudioClip>(typingSoundPath);
+        if (_typingSoundClip == null)
+            _typingSoundClip = Resources.Load<AudioClip>("Sounds/TypingSound");
+    }
+
+    AudioSource GetTypingAudioSource()
+    {
+        if (_typingAudioSource == null)
+        {
+            _typingAudioSource = gameObject.AddComponent<AudioSource>();
+            _typingAudioSource.playOnAwake = false;
+            _typingAudioSource.loop = false;
+        }
+        if (SoundManager.Instance != null)
+            _typingAudioSource.volume = SoundManager.Instance.GetSFXVolume() * SoundManager.Instance.GetMasterVolume();
+        return _typingAudioSource;
+    }
+
+    void StopTypingSound()
+    {
+        if (_typingAudioSource != null && _typingAudioSource.isPlaying)
+            _typingAudioSource.Stop();
+    }
+
     IEnumerator TypewriterEffect(string fullText, DialogueNode node)
     {
+        if (_typingSoundClip != null && fullText.Length > 0)
+        {
+            var src = GetTypingAudioSource();
+            src.clip = _typingSoundClip;
+            src.Play();
+        }
+
         for (int i = 0; i <= fullText.Length; i++)
         {
             if (txtDialogue == null) yield break;
@@ -155,6 +198,8 @@ public class DialogueUI : MonoBehaviour
             if (i < fullText.Length)
                 yield return new WaitForSecondsRealtime(typewriterDelay);
         }
+
+        StopTypingSound();
         isTyping = false;
         typewriterRoutine = null;
         if (node != null && node.HasChoices)
@@ -182,6 +227,7 @@ public class DialogueUI : MonoBehaviour
             StopCoroutine(typewriterRoutine);
             typewriterRoutine = null;
         }
+        StopTypingSound();
         if (txtDialogue != null && node != null)
             txtDialogue.text = node.text;
         isTyping = false;
@@ -189,7 +235,7 @@ public class DialogueUI : MonoBehaviour
             ShowChoicesForNode(node);
     }
 
-    /// <summary>Resources에서 초상화 로드 후 imgPortrait에 표시</summary>
+    // Resources에서 초상화 로드 후 imgPortrait에 표시
     void UpdatePortrait(string speakerName)
     {
         if (imgPortrait == null) return;
@@ -220,7 +266,7 @@ public class DialogueUI : MonoBehaviour
         }
     }
 
-    /// <summary>시작 시 portraitFolder에서 이미지 전부 로드 (파일명=키)</summary>
+    // 시작 시 portraitFolder에서 이미지 전부 로드 (파일명=키)
     void CachePortraits()
     {
         _portraitCache.Clear();
@@ -243,7 +289,7 @@ public class DialogueUI : MonoBehaviour
         return _portraitCache != null && _portraitCache.TryGetValue(resourceName, out var s) ? s : null;
     }
 
-    /// <summary>speakerName = 파일명 (Resources 로드용)</summary>
+    // speakerName = 파일명
     string GetPortraitResourceName(string raw)
     {
         if (string.IsNullOrEmpty(raw)) return "";
@@ -253,7 +299,7 @@ public class DialogueUI : MonoBehaviour
         return raw;
     }
 
-    /// <summary>발화자 이름 (플레이어는 저장된 이름으로 치환)</summary>
+    // 발화자 이름 (플레이어는 저장된 이름으로 치환)
     string GetDisplaySpeakerName(string raw)
     {
         if (string.IsNullOrEmpty(raw)) return "";
@@ -321,7 +367,7 @@ public class DialogueUI : MonoBehaviour
         HidePanel();
     }
 
-    /// <summary>패널 숨기기 (DialogueManager 폴백용)</summary>
+    // 패널 숨기기
     public void HidePanel()
     {
         if (typewriterRoutine != null)
@@ -329,6 +375,7 @@ public class DialogueUI : MonoBehaviour
             StopCoroutine(typewriterRoutine);
             typewriterRoutine = null;
         }
+        StopTypingSound();
         isTyping = false;
         if (panel != null) panel.SetActive(false);
         if (dialogueBoxToHide != null) dialogueBoxToHide.SetActive(false);

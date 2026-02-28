@@ -69,6 +69,15 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // NPC 대화 중에는 이동 불가
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
+        {
+            input = Vector2.zero;
+            moveDir = Vector2.zero;
+            anim.SetFloat("Speed", 0f);
+            return;
+        }
+
         // 도구 사용 중에는 이동 불가
         if (PlayerToolAnimator.IsUsingTool)
         {
@@ -290,6 +299,23 @@ public class PlayerMovement : MonoBehaviour
             anim.SetFloat("MoveY", 0f);
             anim.SetFloat("Speed", 0f);
         }
+        FacingDirection = left ? Vector2Int.left : Vector2Int.right;
+    }
+
+    /// <summary>
+    /// 컷신 등에서 플레이어를 앞(Idle_Down) 방향으로 설정.
+    /// </summary>
+    public void SetFacingDown()
+    {
+        if (sr != null)
+            sr.flipX = false;
+        if (anim != null)
+        {
+            anim.SetFloat("MoveX", 0f);
+            anim.SetFloat("MoveY", -1f);
+            anim.SetFloat("Speed", 0f);
+        }
+        FacingDirection = Vector2Int.down;
     }
 
     /// <summary>

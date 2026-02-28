@@ -76,6 +76,14 @@ public class CutsceneManager : MonoBehaviour
 
         OnCutsceneStarted?.Invoke(data);
 
+        // 컷신 시작 시 플레이어를 앞(Idle_Down) 방향으로 강제
+        if (player != null)
+        {
+            var movement = player.GetComponent<PlayerMovement>();
+            if (movement != null)
+                movement.SetFacingDown();
+        }
+
         foreach (var action in data.actions)
         {
             if (action == null) continue;
@@ -197,6 +205,10 @@ public class CutsceneManager : MonoBehaviour
 
             case CutsceneActionType.NpcGroupReturnToStart:
                 yield return RunNpcGroupReturnToStart(action);
+                break;
+
+            case CutsceneActionType.NpcGroupMoveToPosition:
+                yield return RunNpcGroupMoveToPosition(action);
                 break;
 
             case CutsceneActionType.ShowNotification:
@@ -666,6 +678,100 @@ public class CutsceneManager : MonoBehaviour
             if (wander != null) wander.enabled = true;
         }
         yield return new WaitForSecondsRealtime(1f);
+    }
+
+    /// <summary>NPC들을 지정 좌표로 이동 (복귀 저장 없음, NpcGroupReturnToStart 이후 재배치용)</summary>
+    IEnumerator RunNpcGroupMoveToPosition(CutsceneAction action)
+    {
+        if (action.npcIds == null || action.npcIds.Count == 0 ||
+            action.npcTargetPositions == null || action.npcTargetPositions.Count == 0)
+        {
+            yield break;
+        }
+
+        Vector3 origin = Vector3.zero;
+        if (action.usePlayerPositionAsOrigin)
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                origin = player.transform.position;
+        }
+
+        var refs = FindObjectsOfType<CutsceneNpcRef>(true);
+        var npcMap = new Dictionary<string, Transform>();
+        foreach (var r in refs)
+        {
+            if (!string.IsNullOrEmpty(r.npcId) && !npcMap.ContainsKey(r.npcId))
+                npcMap[r.npcId] = r.transform;
+        }
+
+        var npcs = new List<(Transform tr, Vector3 target, Rigidbody2D rb, SpriteRenderer sr, Animator anim, NPCWander wander)>();
+        for (int i = 0; i < action.npcIds.Count && i < action.npcTargetPositions.Count; i++)
+        {
+            if (!npcMap.TryGetValue(action.npcIds[i], out Transform tr)) continue;
+            Vector3 target = action.usePlayerPositionAsOrigin
+                ? origin + action.npcTargetPositions[i]
+                : action.npcTargetPositions[i];
+            var rb = tr.GetComponent<Rigidbody2D>();
+            var sr = tr.GetComponentInChildren<SpriteRenderer>();
+            var anim = tr.GetComponentInChildren<Animator>();
+            var wander = tr.GetComponent<NPCWander>();
+            npcs.Add((tr, target, rb, sr, anim, wander));
+        }
+        if (npcs.Count == 0) yield break;
+
+        float duration = Mathf.Max(0.1f, action.npcMoveDuration);
+
+        foreach (var (_, _, _, _, _, wander) in npcs)
+        {
+            if (wander != null) wander.enabled = false;
+        }
+
+        var startPositions = new List<Vector3>();
+        foreach (var (tr, _, _, _, _, _) in npcs)
+            startPositions.Add(tr.position);
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            for (int i = 0; i < npcs.Count; i++)
+            {
+                var (tr, target, rb, sr, anim, _) = npcs[i];
+                Vector3 start = startPositions[i];
+                target.z = start.z;
+                Vector3 pos = Vector3.Lerp(start, target, t);
+
+                if (rb != null)
+                    rb.MovePosition(pos);
+                else
+                    tr.position = pos;
+
+                if (sr != null)
+                {
+                    float dirX = (target - start).x;
+                    sr.flipX = dirX < 0;
+                }
+                if (anim != null) SetAnimSpeed(anim, 1f);
+            }
+            yield return null;
+        }
+
+        for (int i = 0; i < npcs.Count; i++)
+        {
+            var (tr, target, rb, sr, anim, _) = npcs[i];
+            target.z = tr.position.z;
+            if (rb != null) rb.MovePosition(target);
+            else tr.position = target;
+            if (anim != null) SetAnimSpeed(anim, 0f);
+        }
+
+        foreach (var (_, _, _, _, _, wander) in npcs)
+        {
+            if (wander != null) wander.enabled = true;
+        }
     }
 
     IEnumerator RunPlayerMoveOffScreen(CutsceneAction action)

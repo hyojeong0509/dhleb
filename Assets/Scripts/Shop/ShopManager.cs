@@ -41,6 +41,10 @@ public class ShopManager : MonoBehaviour
         CurrentShop = shopData;
         IsShopOpen = true;
         OnShopOpened?.Invoke(shopData);
+
+        var ui = ShopUI.Instance ?? UnityEngine.Object.FindObjectOfType<ShopUI>();
+        if (ui != null)
+            ui.ShowShopPanel(shopData);
     }
 
     /// <summary>

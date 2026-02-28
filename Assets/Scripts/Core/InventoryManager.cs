@@ -87,8 +87,10 @@ public class InventoryManager : MonoBehaviour
 
     void HandleInput()
     {
-        // 컷신 중에는 E키로 인벤토리 열기 차단
+        // 컷신/대화 중에는 E키로 인벤토리 열기 차단
         if (CutsceneManager.Instance != null && CutsceneManager.Instance.IsPlaying)
+            return;
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
             return;
 
         if (Input.GetKeyDown(KeyCode.E))

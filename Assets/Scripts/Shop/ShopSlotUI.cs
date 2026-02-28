@@ -3,9 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-/// <summary>
-/// 상점 슬롯 1개 - 툴팁, 좌클릭(1개), 우클릭(5개) 처리
-/// </summary>
+//             상점 슬롯 1개 - 툴팁, 좌클릭(1개), 우클릭(5개) 처리
 public class ShopSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI 요소 (비워두면 자동 찾음)")]
@@ -54,9 +52,9 @@ public class ShopSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         if (countText != null)
             countText.gameObject.SetActive(false);
     }
-
+ 
     /// <summary>
-    /// 슬롯 루트가 포인터 이벤트를 받도록 설정 (자식 Image raycast 비활성화)
+    /// 슬롯 루트가 포인터 이벤트를 받도록 자식 Image raycast 비활성화
     /// </summary>
     void EnsureSlotReceivesPointerEvents()
     {
@@ -73,9 +71,18 @@ public class ShopSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (Item == null || shopUI == null) return;
+        int count = (eventData.button == PointerEventData.InputButton.Right) ? 5 : 1;
+        PerformClick(count);
+    }
 
-        int count = (eventData.button == PointerEventData.InputButton.Left) ? 1 : 5;
+    public void OnSlotClicked()
+    {
+        PerformClick(1);
+    }
+
+    void PerformClick(int count)
+    {
+        if (Item == null || shopUI == null) return;
 
         if (IsBuyMode)
             shopUI.TryBuy(Item, count);

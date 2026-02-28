@@ -126,6 +126,43 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+  - type: 5
+    dialogue: {fileID: 0}
+    waitDuration: 0.1
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 0.1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
   - type: 0
     dialogue: {fileID: 11400000, guid: a2b3c4d5e6f7890123456789abcdef02, type: 2}
     waitDuration: 0.5

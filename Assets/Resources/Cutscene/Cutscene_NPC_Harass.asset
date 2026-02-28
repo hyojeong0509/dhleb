@@ -42,9 +42,17 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 13
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -76,13 +84,21 @@ MonoBehaviour:
     - harass_3
     npcTargetPositions:
     - {x: 1, y: 0, z: 0}
-    - {x: -1.5, y: -0.5, z: 0}
+    - {x: -1.5, y: -1.5, z: 0}
     - {x: 1.5, y: -1, z: 0}
     usePlayerPositionAsOrigin: 1
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 0
     dialogue: {fileID: 11400000, guid: dfe10e23d44efa24cb8d9d2620514cbe, type: 2}
     waitDuration: 1
@@ -112,9 +128,17 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 1
     dialogue: {fileID: 0}
     waitDuration: 0.5
@@ -144,9 +168,17 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 7
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -176,9 +208,17 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 1
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -208,9 +248,17 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 14
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -240,12 +288,66 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds:
     - harass_1
     - harass_2
     - harass_3
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+  - type: 15
+    dialogue: {fileID: 0}
+    waitDuration: 1
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds:
+    - harass_1
+    - harass_2
+    - harass_3
+    npcTargetPositions:
+    - {x: 5, y: 5, z: 0}
+    - {x: 6, y: 5, z: 0}
+    - {x: 7, y: 5, z: 0}
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 2
+    npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
   - type: 10
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -275,6 +377,14 @@ MonoBehaviour:
     npcTargetPositions: []
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
     npcReturnIds: []
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
+    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}

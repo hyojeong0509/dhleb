@@ -142,15 +142,6 @@ public class PlayerAction : MonoBehaviour
         var hits = Physics2D.OverlapPointAll(mouseWorld);
         foreach (var h in hits)
         {
-            var shop = h.GetComponentInParent<ShopInteract>();
-            if (shop != null && shop.IsPlayerInRange() && shop.shopData != null)
-            {
-                shop.OpenShop();
-                return true;
-            }
-        }
-        foreach (var h in hits)
-        {
             var npc = h.GetComponentInParent<NPCInteract>();
             if (npc != null && npc.IsPlayerInRange())
             {
