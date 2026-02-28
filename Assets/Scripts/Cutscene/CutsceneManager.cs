@@ -391,6 +391,14 @@ public class CutsceneManager : MonoBehaviour
             // NPCWander는 NpcGroupReturnToStart에서 다시 활성화됨
         }
 
+        // 플레이어 Hurt 애니메이션 (Any State → Hurt)
+        if (!string.IsNullOrEmpty(action.pushPlayerTrigger))
+        {
+            var anim = player.GetComponent<Animator>();
+            if (anim != null)
+                anim.SetTrigger(action.pushPlayerTrigger);
+        }
+
         Vector2 dir = action.pushDirection.normalized;
         float distance = action.pushDistance;
         float duration = action.pushDuration > 0 ? action.pushDuration : 0.3f;

@@ -19,12 +19,15 @@ public class PlayerCustomizationApplier : MonoBehaviour
     [Header("설정")]
     [Tooltip("시작 시 자동으로 커스터마이징 적용")]
     public bool applyOnStart = true;
-    
+    [Tooltip("Hurt 애니메이션 상태일 때 피부색 미적용 (그레이스케일만). Animator State 이름")]
+    public string hurtStateName = "Hurt";
+
     [Header("디버그")]
     [Tooltip("적용된 색상 정보를 로그로 출력")]
     public bool showDebugLogs = true;
 
     private SpriteRenderer mainRenderer;
+    private Animator _animator;
 
     void Start()
     {
@@ -85,6 +88,42 @@ public class PlayerCustomizationApplier : MonoBehaviour
                 Debug.Log($"[PlayerCustomizationApplier] Multi-Layer 커스터마이징 적용 완료 - {data.playerName}");
             }
         }
+    }
+
+    void LateUpdate()
+    {
+        RefreshSkinColorForHurt();
+    }
+
+    void RefreshSkinColorForHurt()
+    {
+        if (string.IsNullOrEmpty(hurtStateName)) return;
+
+        var targetRenderer = skinRenderer != null ? skinRenderer : mainRenderer;
+        if (targetRenderer == null) return;
+
+        bool inHurt = IsInHurtState();
+        Color targetColor;
+        if (inHurt)
+        {
+            targetColor = Color.white;
+        }
+        else
+        {
+            var data = GameDataManager.Instance?.currentCustomization;
+            targetColor = data != null ? data.skinColor : PlayerCustomizationData.SKIN_TONE_MEDIUM;
+        }
+
+        if (targetRenderer.color != targetColor)
+            targetRenderer.color = targetColor;
+    }
+
+    bool IsInHurtState()
+    {
+        if (_animator == null) _animator = GetComponentInChildren<Animator>();
+        if (_animator == null) return false;
+        var info = _animator.GetCurrentAnimatorStateInfo(0);
+        return info.IsName(hurtStateName);
     }
 
     void ApplyColor(Color color, SpriteRenderer renderer)

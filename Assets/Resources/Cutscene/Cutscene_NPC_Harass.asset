@@ -28,6 +28,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -68,6 +69,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -114,6 +116,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -154,6 +157,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -194,6 +198,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1.5
     pushDuration: 0.35
+    pushPlayerTrigger: Hurt
     pushNpcId: harass_1
     pushNpcTrigger: Push
     pushNpcStateName: 
@@ -234,6 +239,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -274,6 +280,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -317,6 +324,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -332,9 +340,9 @@ MonoBehaviour:
     - harass_2
     - harass_3
     npcTargetPositions:
-    - {x: 5, y: 5, z: 0}
-    - {x: 6, y: 5, z: 0}
-    - {x: 7, y: 5, z: 0}
+    - {x: 90, y: -8.5, z: 0}
+    - {x: 91, y: -8.5, z: 0}
+    - {x: 92, y: -8.5, z: 0}
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
     npcSpawnAtCameraEdge: 0
@@ -363,6 +371,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 

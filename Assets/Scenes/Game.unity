@@ -36499,6 +36499,7 @@ MonoBehaviour:
   hairRenderer: {fileID: 0}
   outfitRenderer: {fileID: 0}
   applyOnStart: 1
+  hurtStateName: Hurt
   showDebugLogs: 1
 --- !u!70 &667691862
 CapsuleCollider2D:
@@ -95789,6 +95790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueUI
   typewriterDelay: 0.05
+  typingSoundPath: TypingSound
   panel: {fileID: 1756549209}
   txtSpeaker: {fileID: 809976303}
   txtDialogue: {fileID: 1983636127}

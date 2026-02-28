@@ -81,6 +81,8 @@ public class CutsceneAction
     public float pushDistance = 1f;
     [Tooltip("밀리는 애니메이션 시간 (0이면 기본 0.3초)")]
     public float pushDuration = 0.3f;
+    [Tooltip("밀칠 때 플레이어 Animator 트리거 (Any State → Hurt 등)")]
+    public string pushPlayerTrigger;
     [Tooltip("밀치는 NPC ID (CutsceneNpcRef, 비우면 애니 없이 밀기만)")]
     public string pushNpcId;
     [Tooltip("밀치는 NPC Animator 트리거 (Any State 전환용, pushNpcStateName보다 우선)")]
