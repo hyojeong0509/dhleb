@@ -60,10 +60,17 @@ public class GameSceneManager : MonoBehaviour
         LoadScene(titleSceneName);
     }
 
-    // Game 씬으로 이동
+    // Game 씬으로 이동 (로딩 씬 사용)
     public void LoadGameScene()
     {
         LoadScene(gameSceneName);
+    }
+
+    /// <summary>로딩 씬 없이 Game 씬 직접 로드 (세이브 로드 시 매니저 초기화 문제 회피)</summary>
+    public void LoadGameSceneDirect()
+    {
+        if (isLoading) return;
+        UnityEngine.SceneManagement.SceneManager.LoadScene(gameSceneName);
     }
 
     // 특정 씬으로 이동 (로딩 씬 사용)

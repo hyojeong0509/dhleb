@@ -41,27 +41,89 @@ public class SaveManager : MonoBehaviour
         return Path.Combine(SaveFolderPath, $"{SAVE_FILE_PREFIX}{slotIndex}{SAVE_FILE_EXT}");
     }
 
+    // 퀘스트 전용 파일 경로 (JsonUtility 중첩/이스케이프 버그 완전 회피)
+    private string GetQuestFilePath(int slotIndex)
+    {
+        return Path.Combine(SaveFolderPath, $"{SAVE_FILE_PREFIX}{slotIndex}_quest{SAVE_FILE_EXT}");
+    }
+
+    // 인벤토리 전용 파일 경로
+    private string GetInventoryFilePath(int slotIndex)
+    {
+        return Path.Combine(SaveFolderPath, $"{SAVE_FILE_PREFIX}{slotIndex}_inventory{SAVE_FILE_EXT}");
+    }
+
     // ================================================================
     // 저장
     // ================================================================
+
+    /// <summary>
+    /// 인벤토리 데이터를 별도 파일에 저장 (JsonUtility 중첩 직렬화 이슈 회피)
+    /// </summary>
+    public void SaveInventoryData(int slotIndex, InventorySlotSaveData[] slots)
+    {
+        if (slots == null || slots.Length < 27) return;
+        if (!Directory.Exists(SaveFolderPath))
+            Directory.CreateDirectory(SaveFolderPath);
+
+        var wrapper = new InventorySaveWrapper { slots = slots };
+        string path = GetInventoryFilePath(slotIndex);
+        string json = JsonUtility.ToJson(wrapper, prettyPrint: false);
+        File.WriteAllText(path, json);
+    }
+
+    /// <summary>
+    /// 인벤토리 데이터를 별도 파일에서 로드
+    /// </summary>
+    public InventorySlotSaveData[] LoadInventoryData(int slotIndex)
+    {
+        string path = GetInventoryFilePath(slotIndex);
+        if (!File.Exists(path)) return null;
+
+        string json = File.ReadAllText(path);
+        var wrapper = JsonUtility.FromJson<InventorySaveWrapper>(json);
+        if (wrapper?.slots == null || wrapper.slots.Length < 27) return null;
+        return wrapper.slots;
+    }
+
+    /// <summary>
+    /// 퀘스트 데이터를 별도 파일에 저장 (메인 SaveData 직렬화 이슈 회피)
+    /// </summary>
+    public void SaveQuestData(int slotIndex, QuestSaveData questData)
+    {
+        if (questData == null) return;
+        if (!Directory.Exists(SaveFolderPath))
+            Directory.CreateDirectory(SaveFolderPath);
+
+        string path = GetQuestFilePath(slotIndex);
+        string json = JsonUtility.ToJson(questData, prettyPrint: false);
+        File.WriteAllText(path, json);
+    }
+
+    /// <summary>
+    /// 퀘스트 데이터를 별도 파일에서 로드
+    /// </summary>
+    public QuestSaveData LoadQuestData(int slotIndex)
+    {
+        string path = GetQuestFilePath(slotIndex);
+        if (!File.Exists(path)) return null;
+        string json = File.ReadAllText(path);
+        return JsonUtility.FromJson<QuestSaveData>(json);
+    }
 
     /// <summary>
     /// 특정 슬롯에 SaveData를 JSON으로 저장
     /// </summary>
     public void Save(SaveData data)
     {
-        // 폴더 없으면 생성
         if (!Directory.Exists(SaveFolderPath))
             Directory.CreateDirectory(SaveFolderPath);
 
-        // 저장 시각 갱신
         data.lastSaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
         string json = JsonUtility.ToJson(data, prettyPrint: true);
         string path = GetFilePath(data.slotIndex);
         File.WriteAllText(path, json);
-
-        Debug.Log($"[SaveManager] 저장 완료 → {path}");
     }
 
     // ================================================================
@@ -74,17 +136,9 @@ public class SaveManager : MonoBehaviour
     public SaveData Load(int slotIndex)
     {
         string path = GetFilePath(slotIndex);
-
-        if (!File.Exists(path))
-        {
-            Debug.Log($"[SaveManager] 슬롯 {slotIndex} 파일 없음");
-            return null;
-        }
-
+        if (!File.Exists(path)) return null;
         string json = File.ReadAllText(path);
-        SaveData data = JsonUtility.FromJson<SaveData>(json);
-        Debug.Log($"[SaveManager] 로드 완료 ← {path}");
-        return data;
+        return JsonUtility.FromJson<SaveData>(json);
     }
 
     /// <summary>
@@ -105,21 +159,21 @@ public class SaveManager : MonoBehaviour
     // ================================================================
 
     /// <summary>
-    /// 특정 슬롯 파일 삭제
+    /// 특정 슬롯 파일 삭제 (메인 + 퀘스트 + 인벤토리)
     /// </summary>
     public void Delete(int slotIndex)
     {
         string path = GetFilePath(slotIndex);
+        string questPath = GetQuestFilePath(slotIndex);
+        string inventoryPath = GetInventoryFilePath(slotIndex);
 
-        if (File.Exists(path))
-        {
-            File.Delete(path);
-            Debug.Log($"[SaveManager] 슬롯 {slotIndex} 삭제 완료");
-        }
-        else
-        {
+        bool deleted = false;
+        if (File.Exists(path)) { File.Delete(path); deleted = true; }
+        if (File.Exists(questPath)) { File.Delete(questPath); deleted = true; }
+        if (File.Exists(inventoryPath)) { File.Delete(inventoryPath); deleted = true; }
+
+        if (!deleted)
             Debug.LogWarning($"[SaveManager] 슬롯 {slotIndex} 파일이 없어 삭제 불가");
-        }
     }
 
     // ================================================================

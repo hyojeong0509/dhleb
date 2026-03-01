@@ -390,13 +390,14 @@ public class InventoryManager : MonoBehaviour
         {
             slots[i].Clear();
 
-            if (string.IsNullOrEmpty(arr[i].itemName) || arr[i].count <= 0) continue;
+            var entry = arr[i];
+            if (entry == null || string.IsNullOrEmpty(entry.itemName) || entry.count <= 0) continue;
 
-            ItemData item = ItemDatabase.Instance?.GetItemByName(arr[i].itemName);
+            ItemData item = ItemDatabase.Instance?.GetItemByName(entry.itemName);
             if (item != null)
             {
                 slots[i].item = item;
-                slots[i].count = arr[i].count;
+                slots[i].count = entry.count;
             }
         }
 

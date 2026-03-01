@@ -11,6 +11,13 @@ public class InventorySlotSaveData
     public int count;
 }
 
+// 인벤토리 별도 파일 저장용 래퍼 (JsonUtility 배열 루트 제한 회피)
+[System.Serializable]
+public class InventorySaveWrapper
+{
+    public InventorySlotSaveData[] slots;
+}
+
 // ============================================================
 // 타일 셀 좌표 저장용 (Vector3Int 대체)
 // ============================================================
@@ -92,6 +99,9 @@ public class SaveData
     public PlayerData playerData;
     public FarmData farmData;
     public GameProgressData gameProgressData;
+
+    /// <summary>퀘스트 데이터 JSON (JsonUtility 중첩 직렬화 이슈 회피용)</summary>
+    public string questDataJson;
 
     public SaveData()
     {

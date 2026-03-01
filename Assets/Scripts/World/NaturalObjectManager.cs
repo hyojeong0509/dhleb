@@ -43,8 +43,8 @@ public class NaturalObjectManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(Instance.gameObject);
+            Instance = null;
         }
         Instance = this;
 
@@ -60,10 +60,12 @@ public class NaturalObjectManager : MonoBehaviour
 
     void Start()
     {
-        if (_objects.Count == 0 && GetTilemap() != null)
+        var tm = GetTilemap();
+        if (_objects.Count == 0 && tm != null)
         {
             SpawnInitialNaturalObjects();
         }
+        else if (_objects.Count == 0 && tm == null) { }
     }
 
     Tilemap GetTilemap()
@@ -163,6 +165,7 @@ public class NaturalObjectManager : MonoBehaviour
         var tm = GetTilemap();
         if (tm == null) return;
 
+        int loaded = 0;
         foreach (var save in data.naturalObjects)
         {
             var cellPos = new Vector3Int(save.cellX, save.cellY, save.cellZ);
@@ -181,6 +184,7 @@ public class NaturalObjectManager : MonoBehaviour
             if (natural == null) continue;
 
             _objects[cellPos] = natural;
+            loaded++;
 
             if (natural is TreeObject tree)
                 tree.Initialize(true, save.hitsRemaining);
@@ -251,8 +255,6 @@ public class NaturalObjectManager : MonoBehaviour
             }
         }
 
-        int totalSpawned = _objects.Count;
-        Debug.Log($"[NaturalObjectManager] 첫날 자연물 스폰 완료: {totalSpawned}개 (영역: {farmBoundsMin}~{farmBoundsMax}, requireGroundTile={requireGroundTile})");
     }
 
     bool IsFarEnoughFromTreeStone(Vector3Int cell, HashSet<Vector3Int> existing)
@@ -310,7 +312,6 @@ public class NaturalObjectManager : MonoBehaviour
         var bounds = groundTm.cellBounds;
         farmBoundsMin = bounds.min;
         farmBoundsMax = bounds.max;
-        Debug.Log($"[NaturalObjectManager] 농장 영역 설정: Min={farmBoundsMin}, Max={farmBoundsMax}");
     }
 #endif
 }

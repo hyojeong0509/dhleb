@@ -31,6 +31,8 @@ public static class GameSaveHelper
             if (data.playerData.inventorySlots == null || data.playerData.inventorySlots.Length != 27)
                 data.playerData.inventorySlots = new InventorySlotSaveData[27];
             InventoryManager.Instance.FillSaveData(data.playerData.inventorySlots);
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.SaveInventoryData(data.slotIndex, data.playerData.inventorySlots);
         }
 
         if (StaminaManager.Instance != null)
@@ -55,12 +57,14 @@ public static class GameSaveHelper
             GameProgressManager.Instance.FillSaveData(data.gameProgressData);
         }
 
-        // 퀘스트
+        // 퀘스트 (별도 파일 저장)
         if (QuestManager.Instance != null && data.gameProgressData != null)
         {
             if (data.gameProgressData.questData == null)
                 data.gameProgressData.questData = new QuestSaveData();
             QuestManager.Instance.FillSaveData(data.gameProgressData.questData);
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.SaveQuestData(data.slotIndex, data.gameProgressData.questData);
         }
     }
 
@@ -92,9 +96,24 @@ public static class GameSaveHelper
             );
         }
 
-        // 인벤토리
-        if (InventoryManager.Instance != null && data.playerData.inventorySlots != null)
-            InventoryManager.Instance.LoadFromSaveData(data.playerData.inventorySlots);
+        // 인벤토리 (별도 파일 우선 → playerData.inventorySlots)
+        if (InventoryManager.Instance != null)
+        {
+            var slots = SaveManager.Instance != null
+                ? SaveManager.Instance.LoadInventoryData(data.slotIndex)
+                : null;
+            if (slots == null || slots.Length != 27)
+            {
+                slots = data.playerData.inventorySlots;
+                if (slots == null || slots.Length != 27)
+                {
+                    slots = new InventorySlotSaveData[27];
+                    for (int i = 0; i < 27; i++)
+                        slots[i] = new InventorySlotSaveData { itemName = "", count = 0 };
+                }
+            }
+            InventoryManager.Instance.LoadFromSaveData(slots);
+        }
 
         // 스테미나 (구버전 세이브는 currentStamina가 0일 수 있음 → 최대치로)
         if (StaminaManager.Instance != null)
@@ -122,10 +141,18 @@ public static class GameSaveHelper
             GameProgressManager.Instance.LoadFromSaveData(progressData);
         }
 
-        // 퀘스트
-        if (QuestManager.Instance != null && data.gameProgressData?.questData != null)
-            QuestManager.Instance.LoadFromSaveData(data.gameProgressData.questData);
-
-        Debug.Log("[GameSaveHelper] 로드 적용 완료");
+        // 퀘스트 (별도 파일 우선 → questDataJson → gameProgressData.questData)
+        if (QuestManager.Instance != null)
+        {
+            QuestSaveData questDataToLoad = SaveManager.Instance != null
+                ? SaveManager.Instance.LoadQuestData(data.slotIndex)
+                : null;
+            if (questDataToLoad == null && !string.IsNullOrEmpty(data.questDataJson))
+                questDataToLoad = JsonUtility.FromJson<QuestSaveData>(data.questDataJson);
+            if (questDataToLoad == null && data.gameProgressData?.questData != null)
+                questDataToLoad = data.gameProgressData.questData;
+            if (questDataToLoad != null)
+                QuestManager.Instance.LoadFromSaveData(questDataToLoad);
+        }
     }
 }

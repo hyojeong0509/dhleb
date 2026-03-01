@@ -23,8 +23,8 @@ public class DialogueManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(Instance.gameObject);
+            Instance = null;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);

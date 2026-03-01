@@ -81,9 +81,37 @@ public class GameSceneInitializer : MonoBehaviour
         }
 
         if (GameDataManager.Instance != null && GameDataManager.Instance.currentSaveData != null)
-            GameSaveHelper.ApplyLoadData(GameDataManager.Instance.currentSaveData, player?.transform);
+            StartCoroutine(ApplyLoadDataDelayed(player?.transform));
+    }
 
-        // 눈 뜨는 컷신 (한 번도 안 봤으면)
+    /// <summary>
+    /// 1프레임 대기 후 로드 적용 (씬 내 모든 Awake/Start 완료 보장)
+    /// </summary>
+    IEnumerator ApplyLoadDataDelayed(Transform player)
+    {
+        yield return null;
+
+        var gdm = GameDataManager.Instance;
+        if (gdm == null || gdm.currentSaveData == null) yield break;
+
+        int slotIndex = gdm.currentSaveData.slotIndex;
+        if (SaveManager.Instance != null)
+        {
+            var freshData = SaveManager.Instance.Load(slotIndex);
+            if (freshData != null) gdm.currentSaveData = freshData;
+        }
+
+        int waitCount = 0;
+        while (waitCount < 60)
+        {
+            if (InventoryManager.Instance != null && TileManager.Instance != null &&
+                NaturalObjectManager.Instance != null && QuestManager.Instance != null)
+                break;
+            yield return null;
+            waitCount++;
+        }
+
+        GameSaveHelper.ApplyLoadData(gdm.currentSaveData, player);
         TryPlayWakeUpCutscene();
     }
 

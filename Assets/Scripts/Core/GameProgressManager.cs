@@ -108,10 +108,11 @@ public class GameProgressManager : MonoBehaviour
 
     void Awake()
     {
+        // Game씬 재로드 시: 구 인스턴스(씬 참조 파괴됨) 제거 후 새 인스턴스로 교체
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(Instance.gameObject);
+            Instance = null;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);

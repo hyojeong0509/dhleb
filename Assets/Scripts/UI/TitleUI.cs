@@ -216,9 +216,8 @@ public class TitleUI : MonoBehaviour
         Debug.Log($"[TitleUI] 새 게임 생성 완료 → 슬롯 {targetSlotIndex}: {farmName}");
         pnNewGame.SetActive(false);
 
-        // 게임 씬으로 이동
-        if (GameSceneManager.Instance != null)
-            GameSceneManager.Instance.LoadGameScene();
+        if (GameDataManager.Instance != null)
+            GameDataManager.Instance.LoadGameScene();
     }
 
     /// <summary>
@@ -304,19 +303,16 @@ public class TitleUI : MonoBehaviour
         SaveData data = SaveManager.Instance.Load(slotIndex);
         if (data == null) return;
 
-        // GameDataManager에 등록
         if (GameDataManager.Instance != null)
         {
             GameDataManager.Instance.currentSaveData = data;
             GameDataManager.Instance.SaveCustomization(data.playerData.ToCustomizationData());
         }
 
-        Debug.Log($"[TitleUI] 슬롯 {slotIndex} 로드: {data.farmName}");
         pnSlotSelect.SetActive(false);
 
-        // 게임 씬으로 이동
-        if (GameSceneManager.Instance != null)
-            GameSceneManager.Instance.LoadGameScene();
+        if (GameDataManager.Instance != null)
+            GameDataManager.Instance.LoadGameScene();
     }
 
     void OnClickSlotDelete(int slotIndex)

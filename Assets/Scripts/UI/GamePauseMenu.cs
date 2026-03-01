@@ -93,10 +93,8 @@ public class GamePauseMenu : MonoBehaviour
         if (GameDataManager.Instance != null && GameDataManager.Instance.currentSaveData != null)
             GameDataManager.Instance.SaveGame();
 
-        if (GameSceneManager.Instance != null)
-            GameSceneManager.Instance.LoadTitleScene();
-        else
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
+        GameDataManager.CleanupGameManagersBeforeTitle();
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
     }
 
     void OnClickExit()

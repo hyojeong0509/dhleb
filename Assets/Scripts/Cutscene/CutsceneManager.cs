@@ -27,8 +27,8 @@ public class CutsceneManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(Instance.gameObject);
+            Instance = null;
         }
         Instance = this;
     }
@@ -214,6 +214,8 @@ public class CutsceneManager : MonoBehaviour
             case CutsceneActionType.ShowNotification:
                 if (NotificationPopupManager.Instance != null && !string.IsNullOrEmpty(action.notificationText))
                     NotificationPopupManager.Instance.Show(action.notificationText, action.notificationDuration > 0 ? action.notificationDuration : 2.5f);
+                if (!string.IsNullOrEmpty(action.questId) && QuestManager.Instance != null)
+                    QuestManager.Instance.AcceptQuest(action.questId);
                 break;
 
             case CutsceneActionType.AcceptQuest:

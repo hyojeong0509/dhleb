@@ -34,8 +34,14 @@ public class QuestListUI : MonoBehaviour
         {
             QuestManager.Instance.OnQuestAccepted += OnQuestChanged;
             QuestManager.Instance.OnQuestCompleted += OnQuestChanged;
+            QuestManager.Instance.OnQuestDataLoaded += OnQuestDataLoadedHandler;
         }
 
+        RefreshList();
+    }
+
+    void OnEnable()
+    {
         RefreshList();
     }
 
@@ -45,10 +51,12 @@ public class QuestListUI : MonoBehaviour
         {
             QuestManager.Instance.OnQuestAccepted -= OnQuestChanged;
             QuestManager.Instance.OnQuestCompleted -= OnQuestChanged;
+            QuestManager.Instance.OnQuestDataLoaded -= OnQuestDataLoadedHandler;
         }
     }
 
     void OnQuestChanged(QuestData _) => RefreshList();
+    void OnQuestDataLoadedHandler() => RefreshList();
 
     public void RefreshList()
     {

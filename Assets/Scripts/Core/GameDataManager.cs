@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 // 씬 간 데이터 전달 및 저장을 담당하는 싱글톤 매니저
 public class GameDataManager : MonoBehaviour
@@ -49,10 +50,11 @@ public class GameDataManager : MonoBehaviour
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
-            
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
             // 커스터마이징 데이터 초기화
             currentCustomization = new PlayerCustomizationData();
-            
+
             if (autoLoadOnStart)
             {
                 LoadCustomization();
@@ -62,6 +64,66 @@ public class GameDataManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    /// <summary>ESC→타이틀 전에 호출. Game씬 전용 DontDestroyOnLoad 매니저 제거 → 재로드 시 깨끗한 상태로 시작</summary>
+    public static void CleanupGameManagersBeforeTitle()
+    {
+        if (QuestManager.Instance != null) { Destroy(QuestManager.Instance.gameObject); }
+        if (GameProgressManager.Instance != null) { Destroy(GameProgressManager.Instance.gameObject); }
+        if (DialogueManager.Instance != null) { Destroy(DialogueManager.Instance.gameObject); }
+        if (EventManager.Instance != null) { Destroy(EventManager.Instance.gameObject); }
+        if (CutsceneManager.Instance != null) { Destroy(CutsceneManager.Instance.gameObject); }
+    }
+
+    /// <summary>
+    /// Game 씬 로드 시 저장 데이터 적용. GameSceneInitializer와 병렬로 실행되며,
+    /// 매니저 준비 후 ApplyLoadData 실행 (GameSceneInitializer 미실행 시 백업)
+    /// </summary>
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name != "Game") return;
+        if (currentSaveData == null) return;
+        StartCoroutine(ApplyLoadDataWhenReady());
+    }
+
+    IEnumerator ApplyLoadDataWhenReady()
+    {
+        yield return new WaitForEndOfFrame();
+        int slotIndex = currentSaveData.slotIndex;
+        if (SaveManager.Instance != null)
+        {
+            var freshData = SaveManager.Instance.Load(slotIndex);
+            if (freshData != null) currentSaveData = freshData;
+        }
+        int waitCount = 0;
+        while (waitCount < 120)
+        {
+            bool inv = InventoryManager.Instance != null;
+            bool tile = TileManager.Instance != null;
+            bool natural = NaturalObjectManager.Instance != null;
+            bool quest = QuestManager.Instance != null;
+            if (inv && tile && natural && quest) break;
+            if (waitCount >= 60 && inv && tile && natural) break;
+            yield return null;
+            waitCount++;
+        }
+        TryActivateInactiveManagers();
+        var player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        GameSaveHelper.ApplyLoadData(currentSaveData, player);
+    }
+
+    void TryActivateInactiveManagers()
+    {
+        if (InventoryManager.Instance != null && TileManager.Instance != null && NaturalObjectManager.Instance != null) return;
+        var inv = FindObjectOfType<InventoryManager>(true);
+        if (inv != null && !inv.gameObject.activeInHierarchy)
+            inv.gameObject.SetActive(true);
     }
 
     // 커스터마이징 데이터를 저장
@@ -157,43 +219,41 @@ public class GameDataManager : MonoBehaviour
         Debug.Log("GameDataManager: 커스터마이징 데이터 삭제 완료");
     }
 
+    void OnApplicationQuit()
+    {
+        if (currentSaveData != null)
+            SaveGame();
+    }
+
     /// <summary>
     /// 현재 게임 상태 저장 (침대 등에서 호출)
     /// </summary>
     public void SaveGame()
     {
-        if (currentSaveData == null)
-        {
-            Debug.LogWarning("[GameDataManager] currentSaveData가 없습니다.");
-            return;
-        }
+        if (currentSaveData == null) return;
 
         Transform player = playerTransform != null ? playerTransform : GameObject.FindGameObjectWithTag("Player")?.transform;
         GameSaveHelper.CollectSaveData(currentSaveData, player);
 
         if (SaveManager.Instance != null)
             SaveManager.Instance.Save(currentSaveData);
-
-        Debug.Log("[GameDataManager] 게임 저장 완료");
     }
 
     // Game 씬으로 이동 (커스터마이징 적용)
     public void LoadGameScene()
     {
-        // 커스터마이징 데이터 저장
         if (currentCustomization != null)
-        {
             SaveCustomization(currentCustomization);
-        }
 
-        // GameSceneManager를 통해 씬 전환 (로딩 씬 사용)
         if (GameSceneManager.Instance != null)
         {
-            GameSceneManager.Instance.LoadGameScene();
+            if (currentSaveData != null)
+                GameSceneManager.Instance.LoadGameSceneDirect();
+            else
+                GameSceneManager.Instance.LoadGameScene();
         }
         else
         {
-            // GameSceneManager가 없으면 직접 전환
             UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
         }
     }

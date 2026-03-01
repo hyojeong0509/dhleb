@@ -21,20 +21,20 @@ public class QuestManager : MonoBehaviour
 
     public event Action<QuestData> OnQuestAccepted;
     public event Action<QuestData> OnQuestCompleted;
+    /// <summary>세이브 데이터 로드 완료 시 (QuestListUI 등에서 목록 갱신용)</summary>
+    public event Action OnQuestDataLoaded;
 
     void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(Instance.gameObject);
+            Instance = null;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    void Start()
-    {
+        // 퀘스트 목록을 Awake에서 로드 (ApplyLoadData보다 먼저 실행되도록)
         if (quests.Count == 0 && registry != null && registry.quests != null)
             quests.AddRange(registry.quests);
         if (quests.Count == 0)
@@ -259,6 +259,8 @@ public class QuestManager : MonoBehaviour
             foreach (var id in data.completedQuestIds)
                 if (!string.IsNullOrEmpty(id))
                     completedQuestIds.Add(id);
+
+        OnQuestDataLoaded?.Invoke();
     }
 
     public void FillSaveData(QuestSaveData data)
