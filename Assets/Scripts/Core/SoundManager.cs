@@ -58,6 +58,8 @@ public class SoundManager : MonoBehaviour
     private AudioClip gameMainBGM;
     private AudioClip clickSound;
     private AudioClip itemPickupSound;
+    private AudioClip hitWoodSound;
+    private AudioClip hitMetalSound;
 
     // PlayerPrefs 키
     private const string MASTER_VOLUME_KEY = "MasterVolume";
@@ -143,6 +145,10 @@ public class SoundManager : MonoBehaviour
         {
             Debug.LogWarning("SoundManager: Resources/Sounds/ItemPickupSound를 찾을 수 없습니다.");
         }
+
+        // 나무/돌 타격 효과음 로드
+        hitWoodSound = Resources.Load<AudioClip>("Sounds/HitWood");
+        hitMetalSound = Resources.Load<AudioClip>("Sounds/HitMetal");
     }
 
     // AudioSource 컴포넌트 초기화
@@ -252,6 +258,20 @@ public class SoundManager : MonoBehaviour
     {
         if (itemPickupSound == null) return;
         PlaySFX(itemPickupSound);
+    }
+
+    // 나무 타격 효과음 재생
+    public void PlayHitWoodSound()
+    {
+        if (hitWoodSound == null) return;
+        PlaySFX(hitWoodSound);
+    }
+
+    // 돌 타격 효과음 재생
+    public void PlayHitMetalSound()
+    {
+        if (hitMetalSound == null) return;
+        PlaySFX(hitMetalSound);
     }
 
     // 배경음악 정지

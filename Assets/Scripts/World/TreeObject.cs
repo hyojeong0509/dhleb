@@ -111,6 +111,8 @@ public class TreeObject : NaturalObject
     {
         if (!CanHitWith(toolType)) return false;
 
+        SoundManager.Instance?.PlayHitWoodSound();
+
         if (_isStump)
         {
             _hitsRemaining--;
@@ -120,8 +122,14 @@ public class TreeObject : NaturalObject
             if (_hitsRemaining <= 0)
             {
                 var item = GetWoodItem();
-                if (item != null && InventoryManager.Instance != null)
-                    InventoryManager.Instance.AddItem(item, woodDropOnStump);
+                if (item != null)
+                {
+                    if (!ItemPickup.SpawnAt(item, woodDropOnStump, transform.position))
+                    {
+                        if (InventoryManager.Instance != null)
+                            InventoryManager.Instance.AddItem(item, woodDropOnStump);
+                    }
+                }
                 if (NaturalObjectManager.Instance != null)
                     NaturalObjectManager.Instance.RemoveNaturalObject(this);
                 Destroy(gameObject);
@@ -141,8 +149,14 @@ public class TreeObject : NaturalObject
             else if (_sr != null && stumpSprite != null)
                 _sr.sprite = stumpSprite; // Animator 없을 때 폴백
             var item = GetWoodItem();
-            if (item != null && InventoryManager.Instance != null)
-                InventoryManager.Instance.AddItem(item, woodDropOnFall);
+            if (item != null)
+            {
+                if (!ItemPickup.SpawnAt(item, woodDropOnFall, transform.position))
+                {
+                    if (InventoryManager.Instance != null)
+                        InventoryManager.Instance.AddItem(item, woodDropOnFall);
+                }
+            }
         }
         return true;
     }

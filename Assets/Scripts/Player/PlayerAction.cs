@@ -33,11 +33,13 @@ public class PlayerAction : MonoBehaviour
         if (InventoryManager.Instance != null && InventoryManager.Instance.IsInventoryOpen)
         {
             TileHighlight.Instance?.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
         if (ShopManager.Instance != null && ShopManager.Instance.IsShopOpen)
         {
             TileHighlight.Instance?.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -45,11 +47,13 @@ public class PlayerAction : MonoBehaviour
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
         {
             TileHighlight.Instance?.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
         if (CutsceneManager.Instance != null && CutsceneManager.Instance.IsPlaying)
         {
             TileHighlight.Instance?.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -57,6 +61,7 @@ public class PlayerAction : MonoBehaviour
         if (GameInputBlocker.IsBlocked)
         {
             TileHighlight.Instance?.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -88,6 +93,15 @@ public class PlayerAction : MonoBehaviour
         if (Vector2.Distance(transform.position, mousePos) > highlightViewRange)
         {
             TileHighlight.Instance.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
+            return;
+        }
+
+        // NPC 위에 마우스가 있으면
+        if (IsMouseOverInteractableNPC())
+        {
+            TileHighlight.Instance.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -103,6 +117,7 @@ public class PlayerAction : MonoBehaviour
                 TileHighlight.Instance.Show(mousePos, true);
             else
                 TileHighlight.Instance.Hide();
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -110,33 +125,44 @@ public class PlayerAction : MonoBehaviour
         ToolData tool = GetEquippedTool();
         if (tool != null)
         {
-            // 도끼, 곡괭이: 타일 하이라이트 표시 안 함 (자연물은 타일 단위가 아님)
             if (tool.toolType == ToolType.Axe || tool.toolType == ToolType.Pickaxe)
-            {
                 TileHighlight.Instance.Hide();
-            }
             else if (IndoorArea.IsPlayerIndoor && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
-            {
                 TileHighlight.Instance.Hide();
-            }
             else
             {
                 bool inRange = IsInRange(mousePos);
                 bool hasStamina = StaminaManager.Instance == null || StaminaManager.Instance.CanUseStamina(1);
-                bool isValid = inRange && hasStamina;
-                TileHighlight.Instance.Show(mousePos, isValid);
+                TileHighlight.Instance.Show(mousePos, inRange && hasStamina);
             }
+            HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
-        // 빈 손 - 다 자란 작물 위에서만 표시
+        // 빈 손 - 다 자란 작물 위에서만 수확 커서
         if (TileManager.Instance != null && TileManager.Instance.IsFullyGrown(mousePos) && IsInRange(mousePos))
         {
             TileHighlight.Instance.Show(mousePos, true);
+            HarvestCursorController.Instance?.SetHarvestCursor();
             return;
         }
 
         TileHighlight.Instance.Hide();
+        HarvestCursorController.Instance?.ResetToDefault();
+    }
+
+    bool IsMouseOverInteractableNPC()
+    {
+        Vector3 mouseWorld = Camera.main != null ? Camera.main.ScreenToWorldPoint(Input.mousePosition) : Vector3.zero;
+        mouseWorld.z = 0f;
+        var hits = Physics2D.OverlapPointAll(mouseWorld);
+        foreach (var h in hits)
+        {
+            var npc = h.GetComponentInParent<NPCInteract>();
+            if (npc != null && npc.IsPlayerInRange())
+                return true;
+        }
+        return false;
     }
 
     bool TryInteractNPC()

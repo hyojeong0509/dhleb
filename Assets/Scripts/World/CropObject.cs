@@ -78,10 +78,17 @@ public class CropObject : MonoBehaviour
 
         ItemData item = seedData.harvestItem;
         int count = seedData.harvestCount;
+        Vector3 position = transform.position;
 
-        // 인벤토리에 수확물 추가
-        if (InventoryManager.Instance != null && item != null)
-            InventoryManager.Instance.AddItem(item, count);
+        // 인벤토리 가득 찬 경우 캔 자리에서 드롭(스타듀밸리처럼)
+        if (item != null)
+        {
+            if (!ItemPickup.SpawnAt(item, count, position))
+            {
+                if (InventoryManager.Instance != null)
+                    InventoryManager.Instance.AddItem(item, count);
+            }
+        }
 
         Debug.Log($"[CropObject] {item?.itemName} x{count} 수확!");
         Destroy(gameObject);

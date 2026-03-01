@@ -45,6 +45,8 @@ public class StoneObject : NaturalObject
 
     IEnumerator HitAndDestroy()
     {
+        SoundManager.Instance?.PlayHitMetalSound();
+
         if (_sr != null && hitSprite != null)
         {
             _sr.sprite = hitSprite;
@@ -62,20 +64,10 @@ public class StoneObject : NaturalObject
 
     void SpawnDroppedItem(ItemData item, int count)
     {
-        var inv = InventoryManager.Instance;
-        if (inv == null || inv.droppedItemPrefab == null || inv.playerTransform == null)
+        if (!ItemPickup.SpawnAt(item, count, transform.position))
         {
-            inv?.AddItem(item, count);
-            return;
-        }
-        Vector3 dropPos = inv.playerTransform.position + (Vector3)Random.insideUnitCircle.normalized * 1.5f;
-        var go = Instantiate(inv.droppedItemPrefab, dropPos, Quaternion.identity);
-        var pickup = go.GetComponent<ItemPickup>();
-        if (pickup != null)
-        {
-            pickup.itemData = item;
-            pickup.count = count;
-            pickup.SetupVisual();
+            var inv = InventoryManager.Instance;
+            if (inv != null) inv.AddItem(item, count);
         }
     }
 
