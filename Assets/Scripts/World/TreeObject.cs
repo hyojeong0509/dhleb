@@ -29,10 +29,19 @@ public class TreeObject : NaturalObject
     [Tooltip("밑동 여부 Bool 파라미터 (Animator에서 Idle↔StumpIdle 전환용)")]
     public string isStumpParam = "IsStump";
 
+    [Header("플레이어 지나갈 때 반투명")]
+    [Range(0.1f, 1f)]
+    [Tooltip("플레이어가 나무 뒤로 들어왔을 때 알파값 (Polygon Collider Is Trigger 체크 필요)")]
+    public float fadeAlpha = 0.4f;
+    public string playerTag = "Player";
+
     private int _hitsRemaining; // 10~4 나무, 3~1 밑동
     private bool _isStump;
     private SpriteRenderer _sr;
     private Animator _anim;
+    private SpriteRenderer[] _allSprites;
+    private Color[] _originalColors;
+    private int _playerOverlapCount;
 
     public override string ObjectType => "Tree";
     public override int HitsRemaining => _hitsRemaining;
@@ -41,6 +50,49 @@ public class TreeObject : NaturalObject
     {
         _sr = GetComponent<SpriteRenderer>();
         _anim = GetComponent<Animator>();
+        _allSprites = GetComponentsInChildren<SpriteRenderer>(true);
+        _originalColors = new Color[_allSprites.Length];
+        for (int i = 0; i < _allSprites.Length; i++)
+        {
+            if (_allSprites[i] != null)
+                _originalColors[i] = _allSprites[i].color;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag(playerTag)) return;
+        _playerOverlapCount++;
+        SetAlpha(fadeAlpha);
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.CompareTag(playerTag)) return;
+        _playerOverlapCount = Mathf.Max(0, _playerOverlapCount - 1);
+        if (_playerOverlapCount == 0)
+            RestoreAlpha();
+    }
+
+    void SetAlpha(float alpha)
+    {
+        if (_allSprites == null || _originalColors == null) return;
+        for (int i = 0; i < _allSprites.Length; i++)
+        {
+            if (_allSprites[i] == null) continue;
+            var c = _originalColors[i];
+            _allSprites[i].color = new Color(c.r, c.g, c.b, alpha);
+        }
+    }
+
+    void RestoreAlpha()
+    {
+        if (_allSprites == null || _originalColors == null) return;
+        for (int i = 0; i < _allSprites.Length; i++)
+        {
+            if (_allSprites[i] == null) continue;
+            _allSprites[i].color = _originalColors[i];
+        }
     }
 
     public void Initialize(bool fromSave, int savedHitsRemaining = 10)

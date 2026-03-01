@@ -87,17 +87,24 @@ public class NaturalObjectManager : MonoBehaviour
 
     /// <summary>
     /// 마우스 위치(월드)에 있는 자연물 반환.
-    /// 나무/돌처럼 여러 셀에 걸친 오브젝트는 인접 셀(y±1)도 검사.
+    /// 나무: 등록 셀은 나무 중간, 밑둥은 그 아래 셀. 밑둥 셀 클릭 시에만 hit.
+    /// 잔디/돌: 클릭한 셀에서만 hit.
     /// </summary>
     public NaturalObject GetNaturalObjectAt(Vector3 worldPos)
     {
         var cell = WorldToCell(worldPos);
-        if (_objects.TryGetValue(cell, out var obj)) return obj;
-        // 나무 등이 여러 셀에 걸쳐 있을 수 있음 → 위/아래 셀도 검사
-        var up = cell + new Vector3Int(0, 1, 0);
-        if (_objects.TryGetValue(up, out obj)) return obj;
-        var down = cell + new Vector3Int(0, -1, 0);
-        if (_objects.TryGetValue(down, out obj)) return obj;
+
+        // 나무: 위쪽 셀(y+1)에 나무가 있으면 → 지금 클릭한 셀은 밑둥 → hit 허용
+        var cellAbove = cell + new Vector3Int(0, 1, 0);
+        if (_objects.TryGetValue(cellAbove, out var obj) && obj is TreeObject)
+            return obj;
+
+        // 잔디/돌: 클릭한 셀에서 hit
+        if (_objects.TryGetValue(cell, out obj))
+        {
+            if (obj is TreeObject) return null; // 나무는 밑둥에서만 (위에서 처리)
+            return obj;
+        }
         return null;
     }
 

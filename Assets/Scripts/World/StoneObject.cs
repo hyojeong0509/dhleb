@@ -52,12 +52,31 @@ public class StoneObject : NaturalObject
         }
 
         var item = dropItem != null ? dropItem : ItemDatabase.Instance?.GetItemByName("돌");
-        if (item != null && InventoryManager.Instance != null)
-            InventoryManager.Instance.AddItem(item, dropCount);
+        if (item != null)
+            SpawnDroppedItem(item, dropCount);
 
         if (NaturalObjectManager.Instance != null)
             NaturalObjectManager.Instance.RemoveNaturalObject(this);
         Destroy(gameObject);
+    }
+
+    void SpawnDroppedItem(ItemData item, int count)
+    {
+        var inv = InventoryManager.Instance;
+        if (inv == null || inv.droppedItemPrefab == null || inv.playerTransform == null)
+        {
+            inv?.AddItem(item, count);
+            return;
+        }
+        Vector3 dropPos = inv.playerTransform.position + (Vector3)Random.insideUnitCircle.normalized * 1.5f;
+        var go = Instantiate(inv.droppedItemPrefab, dropPos, Quaternion.identity);
+        var pickup = go.GetComponent<ItemPickup>();
+        if (pickup != null)
+        {
+            pickup.itemData = item;
+            pickup.count = count;
+            pickup.SetupVisual();
+        }
     }
 
     public override NaturalObjectSaveData ToSaveData(Vector3Int cellPos)
