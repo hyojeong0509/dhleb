@@ -131,6 +131,27 @@ public class NaturalObjectManager : MonoBehaviour
         consumed = false;
         var obj = GetNaturalObjectAt(worldPos);
         if (obj == null || !obj.CanHitWith(toolType)) return false;
+
+        // 괭이로 잔디 클릭 시 주변 1셀(3x3) 잔디도 함께 제거
+        if (obj is GrassObject && toolType == ToolType.Hoe)
+        {
+            var centerCell = WorldToCell(worldPos);
+            var toHit = new List<GrassObject>();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    var cell = centerCell + new Vector3Int(dx, dy, 0);
+                    if (_objects.TryGetValue(cell, out var o) && o is GrassObject g)
+                        toHit.Add(g);
+                }
+            }
+            foreach (var g in toHit)
+                g.OnHit(toolType);
+            consumed = toHit.Count > 0;
+            return consumed;
+        }
+
         consumed = obj.OnHit(toolType);
         return consumed;
     }

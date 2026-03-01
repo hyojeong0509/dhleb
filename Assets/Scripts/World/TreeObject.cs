@@ -62,6 +62,7 @@ public class TreeObject : NaturalObject
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag(playerTag)) return;
+        if (_isStump) return; // 밑둥만 있을 때는 반투명 적용 안 함
         _playerOverlapCount++;
         SetAlpha(fadeAlpha);
     }
@@ -144,6 +145,8 @@ public class TreeObject : NaturalObject
         if (_hitsRemaining <= hitsToBreakStump)
         {
             _isStump = true;
+            _playerOverlapCount = 0; // 밑둥 전환 시 반투명 해제
+            RestoreAlpha();
             if (_anim != null && !string.IsNullOrEmpty(isStumpParam))
                 _anim.SetBool(isStumpParam, true);
             else if (_sr != null && stumpSprite != null)

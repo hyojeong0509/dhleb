@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1dc53d308ee57a45a4ef25daa7ff832, type: 3}
-  m_Name: Cutscene_NPC_Harass
+  m_Name: Cutscene_NeriaHouse
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneData
   actions:
-  - type: 1
+  - type: 6
     dialogue: {fileID: 0}
     waitDuration: 0.5
     fadeInDuration: 1.5
     zoomedInSize: 2
     zoomOutDuration: 1.5
-    lookDuration: 1
+    lookDuration: 0.8
     targetPosition: {x: 0, y: 0, z: 0}
     targetZoomedSize: 2
     zoomInDuration: 0.5
@@ -46,57 +46,9 @@ MonoBehaviour:
     npcSpawnAtCameraEdge: 0
     npcSpawnMargin: 2
     npcReturnIds: []
-    npcReturnDuration: 2
+    npcReturnDuration: 0
     npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
-    notificationDuration: 2.5
-    questId: 
-    playerWalkOffDuration: 2
-    playerWalkOffMargin: 3
-    teleportPosition: {x: 0, y: 0, z: 0}
-    giveItems: []
-  - type: 14
-    dialogue: {fileID: 0}
-    waitDuration: 1
-    fadeInDuration: 1.5
-    zoomedInSize: 2
-    zoomOutDuration: 1.5
-    lookDuration: 1
-    targetPosition: {x: 0, y: 0, z: 0}
-    targetZoomedSize: 2
-    zoomInDuration: 0.5
-    holdDuration: 1
-    zoomOutDurationTarget: 1
-    pushDirection: {x: -1, y: 0}
-    pushDistance: 1
-    pushDuration: 0.3
-    pushPlayerTrigger: 
-    pushNpcId: 
-    pushNpcTrigger: 
-    pushNpcStateName: 
-    triggerName: 
-    targetObject: {fileID: 0}
-    setActive: 1
-    flagName: 
-    storyAmount: 1
-    npcId: 
-    affectionAmount: 5
-    npcIds:
-    - harass_1
-    - harass_2
-    - harass_3
-    npcTargetPositions:
-    - {x: 1, y: 0, z: 0}
-    - {x: -1.5, y: -1.5, z: 0}
-    - {x: 1.5, y: -1, z: 0}
-    usePlayerPositionAsOrigin: 1
-    npcMoveDuration: 2
-    npcSpawnAtCameraEdge: 0
-    npcSpawnMargin: 2
-    npcReturnIds: []
-    npcReturnDuration: 2
-    npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationText: 
     notificationDuration: 2.5
     questId: 
     playerWalkOffDuration: 2
@@ -104,49 +56,7 @@ MonoBehaviour:
     teleportPosition: {x: 0, y: 0, z: 0}
     giveItems: []
   - type: 0
-    dialogue: {fileID: 11400000, guid: dfe10e23d44efa24cb8d9d2620514cbe, type: 2}
-    waitDuration: 1
-    fadeInDuration: 1.5
-    zoomedInSize: 2
-    zoomOutDuration: 1.5
-    lookDuration: 1
-    targetPosition: {x: 0, y: 0, z: 0}
-    targetZoomedSize: 2
-    zoomInDuration: 0.5
-    holdDuration: 1
-    zoomOutDurationTarget: 1
-    pushDirection: {x: -1, y: 0}
-    pushDistance: 1
-    pushDuration: 0.3
-    pushPlayerTrigger: 
-    pushNpcId: 
-    pushNpcTrigger: 
-    pushNpcStateName: 
-    triggerName: 
-    targetObject: {fileID: 0}
-    setActive: 1
-    flagName: planted_first_seed
-    storyAmount: 1
-    npcId: 
-    affectionAmount: 5
-    npcIds: []
-    npcTargetPositions: []
-    usePlayerPositionAsOrigin: 0
-    npcMoveDuration: 2
-    npcSpawnAtCameraEdge: 0
-    npcSpawnMargin: 2
-    npcReturnIds: []
-    npcReturnDuration: 2
-    npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
-    notificationDuration: 2.5
-    questId: 
-    playerWalkOffDuration: 2
-    playerWalkOffMargin: 3
-    teleportPosition: {x: 0, y: 0, z: 0}
-    giveItems: []
-  - type: 1
-    dialogue: {fileID: 0}
+    dialogue: {fileID: 11400000, guid: 6346e3b87bfd9064cb0d351ce17563ff, type: 2}
     waitDuration: 0.5
     fadeInDuration: 1.5
     zoomedInSize: 2
@@ -178,93 +88,9 @@ MonoBehaviour:
     npcSpawnAtCameraEdge: 0
     npcSpawnMargin: 2
     npcReturnIds: []
-    npcReturnDuration: 2
+    npcReturnDuration: 0
     npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
-    notificationDuration: 2.5
-    questId: 
-    playerWalkOffDuration: 2
-    playerWalkOffMargin: 3
-    teleportPosition: {x: 0, y: 0, z: 0}
-    giveItems: []
-  - type: 8
-    dialogue: {fileID: 0}
-    waitDuration: 1
-    fadeInDuration: 1.5
-    zoomedInSize: 2
-    zoomOutDuration: 1.5
-    lookDuration: 1
-    targetPosition: {x: 0, y: 0, z: 0}
-    targetZoomedSize: 2
-    zoomInDuration: 0.5
-    holdDuration: 1
-    zoomOutDurationTarget: 1
-    pushDirection: {x: -1, y: 0}
-    pushDistance: 1.5
-    pushDuration: 0.35
-    pushPlayerTrigger: Hurt
-    pushNpcId: harass_1
-    pushNpcTrigger: Push
-    pushNpcStateName: 
-    triggerName: 
-    targetObject: {fileID: 0}
-    setActive: 1
-    flagName: 
-    storyAmount: 1
-    npcId: 
-    affectionAmount: 5
-    npcIds: []
-    npcTargetPositions: []
-    usePlayerPositionAsOrigin: 0
-    npcMoveDuration: 2
-    npcSpawnAtCameraEdge: 0
-    npcSpawnMargin: 2
-    npcReturnIds: []
-    npcReturnDuration: 2
-    npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
-    notificationDuration: 2.5
-    questId: 
-    playerWalkOffDuration: 2
-    playerWalkOffMargin: 3
-    teleportPosition: {x: 0, y: 0, z: 0}
-    giveItems: []
-  - type: 1
-    dialogue: {fileID: 0}
-    waitDuration: 1
-    fadeInDuration: 1.5
-    zoomedInSize: 2
-    zoomOutDuration: 1.5
-    lookDuration: 1
-    targetPosition: {x: 0, y: 0, z: 0}
-    targetZoomedSize: 2
-    zoomInDuration: 0.5
-    holdDuration: 1
-    zoomOutDurationTarget: 1
-    pushDirection: {x: -1, y: 0}
-    pushDistance: 1
-    pushDuration: 0.3
-    pushPlayerTrigger: 
-    pushNpcId: 
-    pushNpcTrigger: 
-    pushNpcStateName: 
-    triggerName: 
-    targetObject: {fileID: 0}
-    setActive: 1
-    flagName: planted_first_seed
-    storyAmount: 1
-    npcId: 
-    affectionAmount: 5
-    npcIds: []
-    npcTargetPositions: []
-    usePlayerPositionAsOrigin: 0
-    npcMoveDuration: 2
-    npcSpawnAtCameraEdge: 0
-    npcSpawnMargin: 2
-    npcReturnIds: []
-    npcReturnDuration: 2
-    npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationText: 
     notificationDuration: 2.5
     questId: 
     playerWalkOffDuration: 2
@@ -273,7 +99,7 @@ MonoBehaviour:
     giveItems: []
   - type: 15
     dialogue: {fileID: 0}
-    waitDuration: 1
+    waitDuration: 0.5
     fadeInDuration: 1.5
     zoomedInSize: 2
     zoomOutDuration: 1.5
@@ -293,7 +119,7 @@ MonoBehaviour:
     triggerName: 
     targetObject: {fileID: 0}
     setActive: 1
-    flagName: planted_first_seed
+    flagName: talked_friendly_npc_in_house
     storyAmount: 1
     npcId: 
     affectionAmount: 5
@@ -304,12 +130,10 @@ MonoBehaviour:
     npcSpawnAtCameraEdge: 0
     npcSpawnMargin: 2
     npcReturnIds:
-    - harass_1
-    - harass_2
-    - harass_3
+    - villagehead
     npcReturnDuration: 2
     npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationText: 
     notificationDuration: 2.5
     questId: 
     playerWalkOffDuration: 2
@@ -318,7 +142,7 @@ MonoBehaviour:
     giveItems: []
   - type: 16
     dialogue: {fileID: 0}
-    waitDuration: 1
+    waitDuration: 0.5
     fadeInDuration: 1.5
     zoomedInSize: 2
     zoomOutDuration: 1.5
@@ -343,30 +167,26 @@ MonoBehaviour:
     npcId: 
     affectionAmount: 5
     npcIds:
-    - harass_1
-    - harass_2
-    - harass_3
+    - villagehead
     npcTargetPositions:
-    - {x: 90, y: -8.5, z: 0}
-    - {x: 91, y: -8.5, z: 0}
-    - {x: 92, y: -8.5, z: 0}
+    - {x: 126, y: 5, z: 0}
     usePlayerPositionAsOrigin: 0
     npcMoveDuration: 2
     npcSpawnAtCameraEdge: 0
     npcSpawnMargin: 2
     npcReturnIds: []
-    npcReturnDuration: 2
+    npcReturnDuration: 0
     npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationText: 
     notificationDuration: 2.5
     questId: 
     playerWalkOffDuration: 2
     playerWalkOffMargin: 3
     teleportPosition: {x: 0, y: 0, z: 0}
     giveItems: []
-  - type: 11
-    dialogue: {fileID: 0}
-    waitDuration: 1
+  - type: 0
+    dialogue: {fileID: 11400000, guid: 7ca9c6d17bbb57343a84c189a9747974, type: 2}
+    waitDuration: 0.5
     fadeInDuration: 1.5
     zoomedInSize: 2
     zoomOutDuration: 1.5
@@ -386,7 +206,97 @@ MonoBehaviour:
     triggerName: 
     targetObject: {fileID: 0}
     setActive: 1
-    flagName: planted_first_seed
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds:
+    - friendly_npc
+    npcTargetPositions:
+    - {x: 0.5, y: 0, z: 0}
+    usePlayerPositionAsOrigin: 1
+    npcMoveDuration: 1
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 16
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds:
+    - friendly_npc
+    npcTargetPositions:
+    - {x: 0, y: 0.3, z: 0}
+    usePlayerPositionAsOrigin: 1
+    npcMoveDuration: 0.5
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems:
+    - itemName: "\uB538\uAE30 \uC528\uC557"
+      count: 5
+  - type: 1
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: talked_friendly_npc_in_house
     storyAmount: 1
     npcId: 
     affectionAmount: 5
@@ -397,9 +307,179 @@ MonoBehaviour:
     npcSpawnAtCameraEdge: 0
     npcSpawnMargin: 2
     npcReturnIds: []
-    npcReturnDuration: 2
+    npcReturnDuration: 0
     npcReturnDurationMultiplier: 1
-    notificationText: "\uD638\uAC10\uB3C4 +5"
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 22
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: talked_friendly_npc_in_house
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems:
+    - itemName: "\uB538\uAE30 \uC528\uC557"
+      count: 5
+  - type: 1
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: talked_friendly_npc_in_house
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 0
+    dialogue: {fileID: 11400000, guid: c3d4e5f6789012345678abcdef012345, type: 2}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: 
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
+    notificationDuration: 2.5
+    questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 11
+    dialogue: {fileID: 0}
+    waitDuration: 0.5
+    fadeInDuration: 1.5
+    zoomedInSize: 2
+    zoomOutDuration: 1.5
+    lookDuration: 1
+    targetPosition: {x: 0, y: 0, z: 0}
+    targetZoomedSize: 2
+    zoomInDuration: 0.5
+    holdDuration: 1
+    zoomOutDurationTarget: 1
+    pushDirection: {x: -1, y: 0}
+    pushDistance: 1
+    pushDuration: 0.3
+    pushPlayerTrigger: 
+    pushNpcId: 
+    pushNpcTrigger: 
+    pushNpcStateName: 
+    triggerName: 
+    targetObject: {fileID: 0}
+    setActive: 1
+    flagName: talked_friendly_npc_in_house
+    storyAmount: 1
+    npcId: 
+    affectionAmount: 5
+    npcIds: []
+    npcTargetPositions: []
+    usePlayerPositionAsOrigin: 0
+    npcMoveDuration: 2
+    npcSpawnAtCameraEdge: 0
+    npcSpawnMargin: 2
+    npcReturnIds: []
+    npcReturnDuration: 0
+    npcReturnDurationMultiplier: 1
+    notificationText: 
     notificationDuration: 2.5
     questId: 
     playerWalkOffDuration: 2

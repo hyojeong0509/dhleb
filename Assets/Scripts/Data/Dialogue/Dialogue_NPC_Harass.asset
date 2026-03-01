@@ -18,19 +18,19 @@ MonoBehaviour:
     speakerName: harass_1
     hideSpeakerName: 1
     text: "\uC18C\uB780\uC2A4\uB7FD\uB2E4 \uD588\uB354\uB2C8 \uC678\uBD80\uC778\uB140\uC11D\uC774
-      \uC228\uC5B4\uB4E4\uC5C8\uC5C8\uAD70"
+      \uC228\uC5B4\uB4E4\uC5C8\uC5C8\uAD70."
     nextNodeId: 1
     choices: []
   - nodeId: 1
     speakerName: harass_2
     hideSpeakerName: 1
-    text: "\uAE30\uB85D\uC5D0 \uC5C6\uB294 \uC874\uC7AC\uB2E4."
+    text: "\uC228\uC5B4\uB4E4\uC5C8\uAD70"
     nextNodeId: 2
     choices: []
   - nodeId: 2
     speakerName: harass_3
     hideSpeakerName: 1
-    text: "\uD06C\uD06C\u2026 \uBD88\uAE38\uD55C \uB0C4\uC0C8\uAC00 \uB09C\uB2E4."
+    text: "\uD06C\uD06C\u2026 \uC678\uBD80\uC778 \uB140\uC11D"
     nextNodeId: 3
     choices: []
   - nodeId: 3
@@ -42,9 +42,10 @@ MonoBehaviour:
   - nodeId: 4
     speakerName: harass_1
     hideSpeakerName: 1
-    text: "\uC544\uB2C8 \uC678\uBD80\uC778\uB140\uC11D\uC758 \uC815\uCCB4\uB294 \uAD00\uC2EC\uC5C6\uB2E4.
-      \uC6B0\uC8FC \uC18D\uB2F4\uC5D0\uB294 \uCC98\uC74C\uBCF4\uB294 \uB140\uC11D\uC5D0\uAC8C
-      \uCE5C\uC808\uC744 \uBC30\uD480\uC9C0\uB9D0\uB77C\uB294 \uC18D\uB2F4\uC774\uC788\uC9C0"
+    text: "\uC544\uB2C8 \uC678\uBD80\uC778 \uB140\uC11D\uC758 \uC815\uCCB4\uB294
+      \uAD00\uC2EC\uC5C6\uB2E4. \uC774 \uC6B0\uC8FC\uC5D0\uB294 \uCC98\uC74C\uBCF4\uB294
+      \uB140\uC11D\uC5D0\uAC8C \uCE5C\uC808\uC744 \uBCA0\uD480\uC9C0\uB9D0\uB77C\uB294
+      \uC18D\uB2F4\uC774\uC788\uC9C0."
     nextNodeId: 5
     choices: []
   - nodeId: 5
@@ -68,8 +69,8 @@ MonoBehaviour:
   - nodeId: 8
     speakerName: harass_1
     hideSpeakerName: 1
-    text: "\uAE34 \uB9D0 \uD558\uC9C0 \uC54A\uACA0\uB2E4 \uB2F9\uC7A5 \uC774 \uD589\uC131\uC5D0\uC11C
-      \uB098\uAC00 \uADF8\uB9AC\uACE0 \uB2E4\uC2DC\uB294 \uB208\uC5D0 \uB744\uC9C0
-      \uB9C8\uB77C"
+    text: "\uAE34 \uB9D0 \uD558\uC9C0 \uC54A\uACA0\uB2E4. \uB2F9\uC7A5 \uC774 \uD589\uC131\uC5D0\uC11C
+      \uB098\uAC00. \uADF8\uB9AC\uACE0 \uB2E4\uC2DC\uB294 \uB208\uC5D0 \uB744\uC9C0
+      \uB9C8\uB77C."
     nextNodeId: 
     choices: []

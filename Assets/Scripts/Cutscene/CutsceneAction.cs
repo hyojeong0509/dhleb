@@ -16,27 +16,30 @@ public enum NpcSpawnEdge
 /// </summary>
 public enum CutsceneActionType
 {
-    ShowDialogue,   // 대화 재생 (완료까지 대기)
-    Wait,           // 대기
-    FadeInFromBlack,// 검은 화면 → 페이드 인 (눈 뜨는 연출)
-    CameraZoomOut,  // 줌 인 상태 → 기본 줌으로 (눈 뜨는 연출)
-    PlayerLookLeft, // 플레이어 왼쪽 바라보기
-    PlayerLookRight,// 플레이어 오른쪽 바라보기
-    CameraZoomToTarget, // 특정 위치 줌인 → 홀드 → 줌아웃
-    PushPlayer,     // 플레이어 밀치기
-    SetAnimatorTrigger, // 플레이어 Animator 트리거 (눈 뜨는 애니 등)
-    SetActive,      // GameObject 활성/비활성
-    SetFlag,        // 이벤트 플래그 설정
-    AdvanceStory,   // 스토리 진행도 +1
-    AddAffection,   // NPC 호감도 추가
-    NpcGroupMove,   // NPC 여러 명이 동시에 목표 위치로 걸어감
-    NpcGroupReturnToStart, // NpcGroupMove로 온 NPC들을 원래 자리로 돌려보냄
-    NpcGroupMoveToPosition, // NPC들을 지정 좌표로 이동 (복귀 저장 없음, Return 이후 재배치용)
-    ShowNotification, // 하단 팝업 표시 (호감도 +5 등)
-    AcceptQuest,    // 퀘스트 수락
-    PlayerMoveOffScreen, // 플레이어가 카메라 밖 왼쪽으로 걸어가며 사라짐
-    TeleportPlayer, // 플레이어를 지정 좌표로 텔레포트
-    Custom          // (확장용)
+    ShowDialogue = 0,       // 대화 재생 (완료까지 대기)
+    Wait = 1,               // 대기
+    FadeInFromBlack = 2,    // 검은 화면 → 페이드 인 (눈 뜨는 연출)
+    CameraZoomOut = 3,      // 줌 인 상태 → 기본 줌으로 (눈 뜨는 연출)
+    PlayerLookLeft = 4,     // 플레이어 왼쪽 바라보기
+    PlayerLookRight = 5,    // 플레이어 오른쪽 바라보기
+    PlayerLookUp = 6,       // 플레이어 위쪽 바라보기 (Idle_Up)
+    CameraZoomToTarget = 7, // 특정 위치 줌인 → 홀드 → 줌아웃
+    PushPlayer = 8,         // 플레이어 밀치기
+    SetAnimatorTrigger = 9, // 플레이어 Animator 트리거 (눈 뜨는 애니 등)
+    SetActive = 10,         // GameObject 활성/비활성
+    SetFlag = 11,           // 이벤트 플래그 설정
+    AdvanceStory = 12,      // 스토리 진행도 +1
+    AddAffection = 13,      // NPC 호감도 추가
+    NpcGroupMove = 14,      // NPC 여러 명이 동시에 목표 위치로 걸어감
+    NpcGroupReturnToStart = 15,   // NpcGroupMove로 온 NPC들을 원래 자리로 돌려보냄
+    NpcGroupMoveToPosition = 16,  // NPC들을 지정 좌표로 이동 (복귀 저장 없음, Return 이후 재배치용)
+    NpcTeleportToPosition = 17,   // NPC를 즉시 지정 좌표로 텔레포트 (퇴장 후 스폰 지점)
+    ShowNotification = 18,  // 하단 팝업 표시 (호감도 +5 등)
+    AcceptQuest = 19,       // 퀘스트 수락
+    PlayerMoveOffScreen = 20,     // 플레이어가 카메라 밖 왼쪽으로 걸어가며 사라짐
+    TeleportPlayer = 21,    // 플레이어를 지정 좌표로 텔레포트
+    GiveItems = 22,         // 아이템 지급
+    Custom = 99             // (확장용) 새 타입은 23, 24, 25... 사용
 }
 
 /// <summary>
@@ -62,7 +65,7 @@ public class CutsceneAction
     [Tooltip("줌 아웃 시간")]
     public float zoomOutDuration = 1.5f;
 
-    [Header("PlayerLookLeft / PlayerLookRight")]
+    [Header("PlayerLookLeft / PlayerLookRight / PlayerLookUp")]
     public float lookDuration = 1f;
 
     [Header("CameraZoomToTarget")]
@@ -149,4 +152,8 @@ public class CutsceneAction
     [Header("TeleportPlayer")]
     [Tooltip("텔레포트할 월드 좌표 (Inspector에서 설정)")]
     public Vector3 teleportPosition;
+
+    [Header("GiveItems")]
+    [Tooltip("지급할 아이템 (itemName, count). ItemDatabase에서 조회")]
+    public List<GiveItemEntry> giveItems = new List<GiveItemEntry>();
 }

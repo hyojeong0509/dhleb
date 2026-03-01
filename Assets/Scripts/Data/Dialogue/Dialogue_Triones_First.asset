@@ -49,14 +49,13 @@ MonoBehaviour:
   - nodeId: 5
     speakerName: '{PlayerName}'
     hideSpeakerName: 0
-    text: "\uB098\uB294 \uC774 \uACF3\uC5D0\uC11C \uBB34\uC5C7\uC744 \uD558\uBA74
-      \uB418\uC9C0?"
+    text: "\uC5EC\uAE30\uC11C \uBB58 \uD558\uBA74 \uB418\uB294\uB370?"
     nextNodeId: 6
     choices: []
   - nodeId: 6
     speakerName: Triones
     hideSpeakerName: 0
-    text: "\uC6B0\uC120 \uB18D\uC5C5\uC774 \uAC00\uB2A5\uD574\uBCF4\uC774\uB2C8 \uC528\uC557\uC744
-      \uC2EC\uB294 \uAC74 \uC5B4\uB5A8\uAE4C\uC694?"
+    text: "\uC6B0\uC120 \uB18D\uC5C5\uC774 \uAC00\uB2A5\uD574 \uBCF4\uC774\uB2C8
+      \uC528\uC557\uC744 \uC2EC\uB294 \uAC74 \uC5B4\uB5A8\uAE4C\uC694?"
     nextNodeId: 
     choices: []

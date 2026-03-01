@@ -319,6 +319,22 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
+    /// 컷신 등에서 플레이어를 위(Idle_Up) 방향으로 설정.
+    /// </summary>
+    public void SetFacingUp()
+    {
+        if (sr != null)
+            sr.flipX = false;
+        if (anim != null)
+        {
+            anim.SetFloat("MoveX", 0f);
+            anim.SetFloat("MoveY", 1f);
+            anim.SetFloat("Speed", 0f);
+        }
+        FacingDirection = Vector2Int.up;
+    }
+
+    /// <summary>
     /// 컷신 등에서 플레이어를 지정 방향/거리만큼 밀어냄.
     /// </summary>
     public void PushBack(Vector2 offset)

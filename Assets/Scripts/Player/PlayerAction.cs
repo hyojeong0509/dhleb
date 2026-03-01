@@ -88,6 +88,7 @@ public class PlayerAction : MonoBehaviour
         if (TileHighlight.Instance == null) return;
 
         Vector3 mousePos = GetMouseWorldPosition();
+        bool isOverHarvestable = TileManager.Instance != null && TileManager.Instance.IsFullyGrown(mousePos) && IsInRange(mousePos);
 
         // 플레이어 중심 5칸 밖이면 하이라이트 숨김
         if (Vector2.Distance(transform.position, mousePos) > highlightViewRange)
@@ -105,6 +106,12 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
+        // 수확 가능한 작물 위면 어떤 아이템을 들고 있어도 Harvest Cursor
+        if (isOverHarvestable)
+        {
+            HarvestCursorController.Instance?.SetHarvestCursor();
+        }
+
         // 씨앗을 들고 있을 때 - 갈린 흙/물 준 흙에서만 표시
         SeedData seed = GetEquippedSeed();
         if (seed != null)
@@ -117,7 +124,8 @@ public class PlayerAction : MonoBehaviour
                 TileHighlight.Instance.Show(mousePos, true);
             else
                 TileHighlight.Instance.Hide();
-            HarvestCursorController.Instance?.ResetToDefault();
+            if (!isOverHarvestable)
+                HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
@@ -135,15 +143,15 @@ public class PlayerAction : MonoBehaviour
                 bool hasStamina = StaminaManager.Instance == null || StaminaManager.Instance.CanUseStamina(1);
                 TileHighlight.Instance.Show(mousePos, inRange && hasStamina);
             }
-            HarvestCursorController.Instance?.ResetToDefault();
+            if (!isOverHarvestable)
+                HarvestCursorController.Instance?.ResetToDefault();
             return;
         }
 
-        // 빈 손 - 다 자란 작물 위에서만 수확 커서
-        if (TileManager.Instance != null && TileManager.Instance.IsFullyGrown(mousePos) && IsInRange(mousePos))
+        // 빈 손 - 다 자란 작물 위에서 수확 하이라이트
+        if (isOverHarvestable)
         {
             TileHighlight.Instance.Show(mousePos, true);
-            HarvestCursorController.Instance?.SetHarvestCursor();
             return;
         }
 

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7054b6327caa2174da691ccb29d07b69, type: 3}
-  m_Name: Dialogue_FriendlyNPC_InHouse
+  m_Name: Dialogue_NeriaHouse_Chonjang
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   startNodeId: start
   nodes:
@@ -22,10 +22,10 @@ MonoBehaviour:
     nextNodeId: 1
     choices: []
   - nodeId: 1
-    speakerName: Belkar
+    speakerName: Ocul
     hideSpeakerName: 0
     text: "\uC544 \uC774\uBD84\uC774\uC2DC\uAD70\uC694. \uC548\uB155\uD558\uC138\uC694.
-      \uC800\uB294 \uC774 \uB9C8\uC744\uC758 \uCD0C\uC7A5 \uBCA8\uCE74\uB974\uC785\uB2C8\uB2E4.
+      \uC800\uB294 \uC774 \uB9C8\uC744\uC758 \uCD0C\uC7A5 \uC624\uCFE8 \uC785\uB2C8\uB2E4.
       \uC774\uB984\uC774 \uC5B4\uB5BB\uAC8C \uB418\uC2DC\uB098\uC694?"
     nextNodeId: 2
     choices: []
@@ -36,14 +36,14 @@ MonoBehaviour:
     nextNodeId: 3
     choices: []
   - nodeId: 3
-    speakerName: ???
+    speakerName: Ocul
     hideSpeakerName: 0
     text: "\uBA4B\uC9C4 \uC774\uB984\uC774\uAD70\uC694. \uC774\uACF3 \uB8E8\uBA58\uC2DC\uC544
       \uD589\uC131\uC5D0 \uC624\uC2E0\uAC78 \uD658\uC601\uD569\uB2C8\uB2E4."
     nextNodeId: 4
     choices: []
   - nodeId: 4
-    speakerName: ???
+    speakerName: Ocul
     hideSpeakerName: 0
     text: "\uB0B4\uC77C \uC8FC\uBBFC\uB4E4\uC744 \uBAA8\uC544 \uC785\uC8FC\uC2DD\uC744
       \uC9C4\uD589\uD558\uB3C4\uB85D \uD558\uC8E0. \uB0B4\uC77C (~~\uC2DC\uAE4C\uC9C0)

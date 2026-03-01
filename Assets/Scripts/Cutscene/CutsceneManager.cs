@@ -166,6 +166,10 @@ public class CutsceneManager : MonoBehaviour
                 yield return RunPlayerLook(false, action.lookDuration);
                 break;
 
+            case CutsceneActionType.PlayerLookUp:
+                yield return RunPlayerLookUp(action.lookDuration);
+                break;
+
             case CutsceneActionType.CameraZoomToTarget:
                 yield return RunCameraZoomToTarget(action.targetPosition, action.targetZoomedSize,
                     action.zoomInDuration, action.holdDuration, action.zoomOutDurationTarget);
@@ -182,6 +186,12 @@ public class CutsceneManager : MonoBehaviour
             case CutsceneActionType.SetActive:
                 if (action.targetObject != null)
                     action.targetObject.SetActive(action.setActive);
+                else if (!string.IsNullOrEmpty(action.npcId))
+                {
+                    var refs = FindObjectsOfType<CutsceneNpcRef>(true);
+                    foreach (var r in refs)
+                        if (r.npcId == action.npcId) { r.gameObject.SetActive(action.setActive); break; }
+                }
                 break;
 
             case CutsceneActionType.SetFlag:
@@ -211,6 +221,10 @@ public class CutsceneManager : MonoBehaviour
                 yield return RunNpcGroupMoveToPosition(action);
                 break;
 
+            case CutsceneActionType.NpcTeleportToPosition:
+                RunNpcTeleportToPosition(action);
+                break;
+
             case CutsceneActionType.ShowNotification:
                 if (NotificationPopupManager.Instance != null && !string.IsNullOrEmpty(action.notificationText))
                     NotificationPopupManager.Instance.Show(action.notificationText, action.notificationDuration > 0 ? action.notificationDuration : 2.5f);
@@ -231,6 +245,10 @@ public class CutsceneManager : MonoBehaviour
                 RunTeleportPlayer(action);
                 break;
 
+            case CutsceneActionType.GiveItems:
+                RunGiveItems(action);
+                break;
+
             default:
                 break;
         }
@@ -249,6 +267,18 @@ public class CutsceneManager : MonoBehaviour
                 movement.SetFacingLeft(lookLeft);
         }
         yield return new WaitForSecondsRealtime(duration);
+    }
+
+    IEnumerator RunPlayerLookUp(float duration)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            var movement = player.GetComponent<PlayerMovement>();
+            if (movement != null)
+                movement.SetFacingUp();
+        }
+        yield return new WaitForSecondsRealtime(duration > 0 ? duration : 0.5f);
     }
 
     IEnumerator RunCameraZoomToTarget(Vector3 targetPos, float zoomedSize, float zoomInDur, float holdDur, float zoomOutDur)
@@ -784,6 +814,45 @@ public class CutsceneManager : MonoBehaviour
         }
     }
 
+    /// <summary>NPC를 즉시 지정 좌표로 텔레포트 (퇴장 후 스폰 지점 배치)</summary>
+    void RunNpcTeleportToPosition(CutsceneAction action)
+    {
+        if (action.npcIds == null || action.npcIds.Count == 0 ||
+            action.npcTargetPositions == null || action.npcTargetPositions.Count == 0)
+            return;
+
+        Vector3 origin = Vector3.zero;
+        if (action.usePlayerPositionAsOrigin)
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                origin = player.transform.position;
+        }
+
+        var refs = FindObjectsOfType<CutsceneNpcRef>(true);
+        var npcMap = new Dictionary<string, Transform>();
+        foreach (var r in refs)
+        {
+            if (!string.IsNullOrEmpty(r.npcId) && !npcMap.ContainsKey(r.npcId))
+                npcMap[r.npcId] = r.transform;
+        }
+
+        for (int i = 0; i < action.npcIds.Count && i < action.npcTargetPositions.Count; i++)
+        {
+            if (!npcMap.TryGetValue(action.npcIds[i], out Transform tr)) continue;
+            Vector3 target = action.usePlayerPositionAsOrigin
+                ? origin + action.npcTargetPositions[i]
+                : action.npcTargetPositions[i];
+            target.z = tr.position.z;
+
+            var rb = tr.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.MovePosition(target);
+            else
+                tr.position = target;
+        }
+    }
+
     IEnumerator RunPlayerMoveOffScreen(CutsceneAction action)
     {
         var player = GameObject.FindGameObjectWithTag("Player");
@@ -831,6 +900,20 @@ public class CutsceneManager : MonoBehaviour
         pos.z = player.transform.position.z;
         if (rb != null) rb.MovePosition(pos);
         else player.transform.position = pos;
+    }
+
+    void RunGiveItems(CutsceneAction action)
+    {
+        if (action.giveItems == null || action.giveItems.Count == 0) return;
+        if (InventoryManager.Instance == null || ItemDatabase.Instance == null) return;
+
+        foreach (var entry in action.giveItems)
+        {
+            if (string.IsNullOrEmpty(entry.itemName) || entry.count <= 0) continue;
+            var item = ItemDatabase.Instance.GetItemByName(entry.itemName);
+            if (item != null)
+                InventoryManager.Instance.AddItem(item, entry.count);
+        }
     }
 
     static bool IsInCameraView(Camera cam, Vector3 worldPos)

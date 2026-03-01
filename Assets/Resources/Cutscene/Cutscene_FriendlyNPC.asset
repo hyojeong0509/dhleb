@@ -28,6 +28,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -50,6 +51,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: quest_find_friendly_npc_house
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 1
     dialogue: {fileID: 0}
     waitDuration: 0.3
@@ -65,6 +70,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -87,7 +93,11 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
-  - type: 13
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 14
     dialogue: {fileID: 0}
     waitDuration: 1
     fadeInDuration: 1.5
@@ -102,6 +112,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -126,6 +137,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 5
     dialogue: {fileID: 0}
     waitDuration: 0.1
@@ -141,6 +156,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -163,6 +179,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 0
     dialogue: {fileID: 11400000, guid: a2b3c4d5e6f7890123456789abcdef02, type: 2}
     waitDuration: 0.5
@@ -178,6 +198,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -200,7 +221,11 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
-  - type: 12
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 13
     dialogue: {fileID: 0}
     waitDuration: 0.5
     fadeInDuration: 1.5
@@ -215,6 +240,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -237,6 +263,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 15
     dialogue: {fileID: 0}
     waitDuration: 0.5
@@ -252,6 +282,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -274,6 +305,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 14
     dialogue: {fileID: 0}
     waitDuration: 1
@@ -289,6 +324,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -312,7 +348,11 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
-  - type: 10
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
+  - type: 11
     dialogue: {fileID: 0}
     waitDuration: 0.5
     fadeInDuration: 1.5
@@ -327,6 +367,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -349,6 +390,10 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: 
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
   - type: 16
     dialogue: {fileID: 0}
     waitDuration: 0.5
@@ -364,6 +409,7 @@ MonoBehaviour:
     pushDirection: {x: -1, y: 0}
     pushDistance: 1
     pushDuration: 0.3
+    pushPlayerTrigger: 
     pushNpcId: 
     pushNpcTrigger: 
     pushNpcStateName: 
@@ -386,3 +432,7 @@ MonoBehaviour:
     notificationText: "\uD638\uAC10\uB3C4 +5"
     notificationDuration: 2.5
     questId: quest_find_friendly_npc_house
+    playerWalkOffDuration: 2
+    playerWalkOffMargin: 3
+    teleportPosition: {x: 0, y: 0, z: 0}
+    giveItems: []
