@@ -63,6 +63,13 @@ public class GameSceneInitializer : MonoBehaviour
             go.AddComponent<DayEndSequenceManager>();
         }
 
+        // 자연물 매니저 (잔디/나무/돌) - 씬에 없으면 자동 생성 (프리팹은 Inspector에서 할당)
+        if (NaturalObjectManager.Instance == null)
+        {
+            var go = new GameObject("NaturalObjectManager");
+            go.AddComponent<NaturalObjectManager>();
+        }
+
         // 플레이어에 FallHandler, ToolAnimator (없으면 추가)
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)

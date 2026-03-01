@@ -44,6 +44,8 @@ public static class GameSaveHelper
 
         if (TileManager.Instance != null)
             data.farmData = TileManager.Instance.ExportFarmData();
+        if (NaturalObjectManager.Instance != null)
+            NaturalObjectManager.Instance.ExportToFarmData(data.farmData);
 
         // 스토리/호감도/이벤트 플래그
         if (GameProgressManager.Instance != null)
@@ -110,6 +112,8 @@ public static class GameSaveHelper
         // 농장
         if (TileManager.Instance != null && data.farmData != null)
             TileManager.Instance.LoadFarmData(data.farmData);
+        if (NaturalObjectManager.Instance != null && data.farmData != null)
+            NaturalObjectManager.Instance.LoadFromFarmData(data.farmData);
 
         // 스토리/호감도/이벤트 플래그 (구버전 호환: gameProgressData 없으면 기본값)
         if (GameProgressManager.Instance != null)

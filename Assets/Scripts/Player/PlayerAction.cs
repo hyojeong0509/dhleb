@@ -106,11 +106,16 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
-        // 도구를 들고 있을 때 - 범위 내 초록, 범위 밖/탈진 빨강 (집 안에서는 표시 안 함)
+        // 도구를 들고 있을 때
         ToolData tool = GetEquippedTool();
         if (tool != null)
         {
-            if (IndoorArea.IsPlayerIndoor && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
+            // 도끼, 곡괭이: 타일 하이라이트 표시 안 함 (자연물은 타일 단위가 아님)
+            if (tool.toolType == ToolType.Axe || tool.toolType == ToolType.Pickaxe)
+            {
+                TileHighlight.Instance.Hide();
+            }
+            else if (IndoorArea.IsPlayerIndoor && (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan))
             {
                 TileHighlight.Instance.Hide();
             }
@@ -178,9 +183,10 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
-        // 스테미나 체크 (괭이, 물뿌리개 - 사전 검사)
-        if ((tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan)
-            && (StaminaManager.Instance == null || !StaminaManager.Instance.CanUseStamina(1)))
+        // 스테미나 체크 (괭이, 물뿌리개, 도끼, 곡괭이)
+        bool needsStamina = tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan
+            || tool.toolType == ToolType.Axe || tool.toolType == ToolType.Pickaxe;
+        if (needsStamina && (StaminaManager.Instance == null || !StaminaManager.Instance.CanUseStamina(1)))
         {
             Debug.Log("[PlayerAction] 스테미나가 부족합니다.");
             return;
@@ -192,10 +198,16 @@ public class PlayerAction : MonoBehaviour
         switch (tool.toolType)
         {
             case ToolType.Hoe:
-                consumed = UsHoe(targetPos);
+                consumed = UseHoe(targetPos);
                 break;
             case ToolType.WateringCan:
                 consumed = UseWateringCan(targetPos);
+                break;
+            case ToolType.Axe:
+                consumed = UseAxe(targetPos);
+                break;
+            case ToolType.Pickaxe:
+                consumed = UsePickaxe(targetPos);
                 break;
             default:
                 Debug.Log($"[PlayerAction] {tool.toolType} 는 아직 구현되지 않았습니다.");
@@ -204,11 +216,9 @@ public class PlayerAction : MonoBehaviour
 
         if (consumed)
         {
-            // 도구 사용 애니메이션 (마우스 방향)
             if (toolAnimator != null)
                 toolAnimator.PlayToolUse(targetPos);
-
-            if (tool.toolType == ToolType.Hoe || tool.toolType == ToolType.WateringCan)
+            if (needsStamina)
                 StaminaManager.Instance?.UseStamina(1);
         }
     }
@@ -283,10 +293,27 @@ public class PlayerAction : MonoBehaviour
         return Vector2.Distance(transform.position, targetPos) <= maxUseDistance;
     }
 
-    bool UsHoe(Vector3 targetPos)
+    bool UseHoe(Vector3 targetPos)
     {
+        if (NaturalObjectManager.Instance != null)
+        {
+            if (NaturalObjectManager.Instance.TryHitNaturalObject(targetPos, ToolType.Hoe, out bool consumed))
+                return consumed;
+        }
         if (TileManager.Instance == null) return false;
         return TileManager.Instance.TryTill(targetPos);
+    }
+
+    bool UseAxe(Vector3 targetPos)
+    {
+        if (NaturalObjectManager.Instance == null) return false;
+        return NaturalObjectManager.Instance.TryHitNaturalObject(targetPos, ToolType.Axe, out _);
+    }
+
+    bool UsePickaxe(Vector3 targetPos)
+    {
+        if (NaturalObjectManager.Instance == null) return false;
+        return NaturalObjectManager.Instance.TryHitNaturalObject(targetPos, ToolType.Pickaxe, out _);
     }
 
     bool UseWateringCan(Vector3 targetPos)

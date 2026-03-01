@@ -7,10 +7,13 @@ public class TileManager : MonoBehaviour
 {
     public static TileManager Instance { get; private set; }
 
-    [Header("타일맵 레퍼런스")]
-    public Tilemap groundTilemap;       // Ground_0 (원본 바닥)
-    public Tilemap farmTilemap;         // Farm_0.5 (갈린 흙)
-    public Tilemap waterOverlayTilemap; // FarmOverlay (물 준 오버레이)
+    [Header("타일맵 레퍼런스 (FarmGrid 자식)")]
+    [Tooltip("Ground_0 - 잔디/흙이 깔린 원본 바닥. 여기에 타일이 있어야 경작 가능")]
+    public Tilemap groundTilemap;
+    [Tooltip("Farm_0.5 - 갈린 흙이 배치되는 레이어. 괭이로 갈면 이 레이어에 타일 생성")]
+    public Tilemap farmTilemap;
+    [Tooltip("FarmOverlay - 물 준 오버레이. 물뿌리개 사용 시 이 레이어에 표시")]
+    public Tilemap waterOverlayTilemap;
 
     [Header("밭 타일")]
     public TileBase tilledSoilTile;     // 갈린 흙 타일

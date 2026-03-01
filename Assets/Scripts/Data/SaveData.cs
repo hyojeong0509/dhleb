@@ -65,6 +65,17 @@ public class CropSaveData
 }
 
 // ============================================================
+// 자연물 저장용 (잔디, 나무, 돌)
+// ============================================================
+[System.Serializable]
+public class NaturalObjectSaveData
+{
+    public int cellX, cellY, cellZ;
+    public string objectType;   // "Grass", "Tree", "Stone"
+    public int hitsRemaining;   // 나무: 0~10 (7=밑동, 11=제거), 잔디/돌: 0 or 1
+}
+
+// ============================================================
 // 슬롯 전체 저장 데이터 (JSON 1개 = 이 클래스 1개)
 // ============================================================
 [System.Serializable]
@@ -202,4 +213,7 @@ public class FarmData
 
     [Header("작물")]
     public List<CropSaveData> crops = new List<CropSaveData>();
+
+    [Header("자연물 (잔디, 나무, 돌)")]
+    public List<NaturalObjectSaveData> naturalObjects = new List<NaturalObjectSaveData>();
 }
