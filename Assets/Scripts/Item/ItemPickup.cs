@@ -52,6 +52,8 @@ public class ItemPickup : MonoBehaviour
             pickup.count = count;
             pickup.SetupVisual();
             pickup.SetArcSpawn(position);
+            if (go.GetComponent<DepthSortUpdater>() == null)
+                go.AddComponent<DepthSortUpdater>();
         }
         return true;
     }

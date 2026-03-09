@@ -34,10 +34,21 @@ public class NaturalObjectManager : MonoBehaviour
     public float stoneSpawnChance = 0.05f;
     [Tooltip("나무/돌 최소 간격 (칸)")]
     public int treeStoneMinSpacing = 2;
+    [Tooltip("나무-나무 최소 간격 (나무 스프라이트가 커서 겹침 방지, treeStoneMinSpacing보다 크게)")]
+    public int treeMinSpacing = 4;
+    [Tooltip("나무 스폰 시 주변 제거할 잔디 반경 (나무 foliage가 잔디와 겹치지 않도록)")]
+    public int treeGrassClearRadius = 2;
     [Tooltip("플레이어 스폰 주변 비울 반경 (칸)")]
     public int playerSpawnClearRadius = 3;
 
+    [Header("오브젝트 풀")]
+    [Tooltip("잔디/나무/돌 풀 초기 크기 (0이면 풀링 비활성화)")]
+    public int poolInitialSize = 50;
+
     private Dictionary<Vector3Int, NaturalObject> _objects = new Dictionary<Vector3Int, NaturalObject>();
+    private ObjectPool<GrassObject> _grassPool;
+    private ObjectPool<TreeObject> _treePool;
+    private ObjectPool<StoneObject> _stonePool;
 
     void Awake()
     {
@@ -50,6 +61,16 @@ public class NaturalObjectManager : MonoBehaviour
 
         if (referenceTilemap == null && TileManager.Instance != null)
             referenceTilemap = TileManager.Instance.farmTilemap;
+
+        if (poolInitialSize > 0)
+        {
+            if (grassPrefab != null)
+                _grassPool = new ObjectPool<GrassObject>(grassPrefab.GetComponent<GrassObject>(), poolInitialSize, transform);
+            if (treePrefab != null)
+                _treePool = new ObjectPool<TreeObject>(treePrefab.GetComponent<TreeObject>(), Mathf.Min(poolInitialSize / 4, 20), transform);
+            if (stonePrefab != null)
+                _stonePool = new ObjectPool<StoneObject>(stonePrefab.GetComponent<StoneObject>(), Mathf.Min(poolInitialSize / 4, 15), transform);
+        }
     }
 
     void OnDestroy()
@@ -126,6 +147,22 @@ public class NaturalObjectManager : MonoBehaviour
         _objects.Remove(cell);
     }
 
+    /// <summary>자연물 제거 후 풀에 반환 (풀링 사용 시). 풀링 비활성화 시 Destroy</summary>
+    public void ReturnToPool(NaturalObject obj)
+    {
+        var cell = WorldToCell(obj.transform.position);
+        _objects.Remove(cell);
+
+        if (obj is GrassObject g && _grassPool != null)
+            _grassPool.Return(g);
+        else if (obj is TreeObject t && _treePool != null)
+            _treePool.Return(t);
+        else if (obj is StoneObject s && _stonePool != null)
+            _stonePool.Return(s);
+        else
+            Destroy(obj.gameObject);
+    }
+
     public bool TryHitNaturalObject(Vector3 worldPos, ToolType toolType, out bool consumed)
     {
         consumed = false;
@@ -171,11 +208,12 @@ public class NaturalObjectManager : MonoBehaviour
     {
         if (data == null) return;
 
-        foreach (var obj in _objects.Values)
-        {
-            if (obj != null) Destroy(obj.gameObject);
-        }
+        var toReturn = new List<NaturalObject>(_objects.Values);
         _objects.Clear();
+        foreach (var obj in toReturn)
+        {
+            if (obj != null) ReturnToPool(obj);
+        }
 
         if (data.naturalObjects == null || data.naturalObjects.Count == 0)
         {
@@ -200,11 +238,39 @@ public class NaturalObjectManager : MonoBehaviour
             if (prefab == null) continue;
 
             var spawnPos = tm.GetCellCenterWorld(cellPos);
-            var go = Instantiate(prefab, spawnPos, Quaternion.identity);
-            var natural = go.GetComponent<NaturalObject>();
+            NaturalObject natural = null;
+
+            if (save.objectType == "Grass" && _grassPool != null)
+            {
+                var g = _grassPool.Get();
+                g.transform.position = spawnPos;
+                natural = g;
+            }
+            else if (save.objectType == "Tree" && _treePool != null)
+            {
+                var t = _treePool.Get();
+                t.transform.position = spawnPos;
+                natural = t;
+            }
+            else if (save.objectType == "Stone" && _stonePool != null)
+            {
+                var s = _stonePool.Get();
+                s.transform.position = spawnPos;
+                natural = s;
+            }
+            else
+            {
+                var go = Instantiate(prefab, spawnPos, Quaternion.identity);
+                natural = go.GetComponent<NaturalObject>();
+            }
+
             if (natural == null) continue;
 
+            if (save.objectType == "Tree")
+                RemoveGrassAroundCell(cellPos);
+
             _objects[cellPos] = natural;
+            DepthSortByY.Apply(natural.transform);
             loaded++;
 
             if (natural is TreeObject tree)
@@ -229,7 +295,8 @@ public class NaturalObjectManager : MonoBehaviour
         var player = GameObject.FindGameObjectWithTag("Player");
         var playerCell = player != null ? WorldToCell(player.transform.position) : Vector3Int.zero;
 
-        var treeStoneCells = new HashSet<Vector3Int>();
+        var treeCells = new HashSet<Vector3Int>();
+        var stoneCells = new HashSet<Vector3Int>();
 
         for (int x = farmBoundsMin.x; x <= farmBoundsMax.x; x++)
         {
@@ -255,22 +322,23 @@ public class NaturalObjectManager : MonoBehaviour
                 }
                 else if (r < grassSpawnChance + treeSpawnChance && treePrefab != null)
                 {
-                    if (IsFarEnoughFromTreeStone(cell, treeStoneCells))
+                    if (IsFarEnoughFrom(cell, treeCells, treeMinSpacing) && IsFarEnoughFrom(cell, stoneCells, treeStoneMinSpacing))
                     {
+                        RemoveGrassAroundCell(cell);
                         SpawnAtCell(treePrefab, cell, go =>
                         {
                             var t = go.GetComponent<TreeObject>();
                             if (t != null) t.Initialize(false);
                         });
-                        treeStoneCells.Add(cell);
+                        treeCells.Add(cell);
                     }
                 }
                 else if (r < grassSpawnChance + treeSpawnChance + stoneSpawnChance && stonePrefab != null)
                 {
-                    if (IsFarEnoughFromTreeStone(cell, treeStoneCells))
+                    if (IsFarEnoughFrom(cell, treeCells, treeStoneMinSpacing) && IsFarEnoughFrom(cell, stoneCells, treeStoneMinSpacing))
                     {
                         SpawnAtCell(stonePrefab, cell, null);
-                        treeStoneCells.Add(cell);
+                        stoneCells.Add(cell);
                     }
                 }
             }
@@ -278,11 +346,28 @@ public class NaturalObjectManager : MonoBehaviour
 
     }
 
-    bool IsFarEnoughFromTreeStone(Vector3Int cell, HashSet<Vector3Int> existing)
+    /// <summary>나무 주변 잔디 제거 (나무 foliage가 잔디와 겹치지 않도록)</summary>
+    void RemoveGrassAroundCell(Vector3Int centerCell)
+    {
+        if (treeGrassClearRadius <= 0) return;
+        for (int dx = -treeGrassClearRadius; dx <= treeGrassClearRadius; dx++)
+        {
+            for (int dy = -treeGrassClearRadius; dy <= treeGrassClearRadius; dy++)
+            {
+                var cell = centerCell + new Vector3Int(dx, dy, 0);
+                if (_objects.TryGetValue(cell, out var obj) && obj is GrassObject g)
+                {
+                    ReturnToPool(g);
+                }
+            }
+        }
+    }
+
+    bool IsFarEnoughFrom(Vector3Int cell, HashSet<Vector3Int> existing, int minDistance)
     {
         foreach (var c in existing)
         {
-            if (Vector3Int.Distance(cell, c) < treeStoneMinSpacing)
+            if (Vector3Int.Distance(cell, c) < minDistance)
                 return false;
         }
         return true;
@@ -294,11 +379,40 @@ public class NaturalObjectManager : MonoBehaviour
 
         var tm = GetTilemap();
         var spawnPos = tm.GetCellCenterWorld(cellPos);
-        var go = Instantiate(prefab, spawnPos, Quaternion.identity);
-        var natural = go.GetComponent<NaturalObject>();
+        GameObject go = null;
+        NaturalObject natural = null;
+
+        if (prefab == grassPrefab && _grassPool != null)
+        {
+            var g = _grassPool.Get();
+            g.transform.position = spawnPos;
+            go = g.gameObject;
+            natural = g;
+        }
+        else if (prefab == treePrefab && _treePool != null)
+        {
+            var t = _treePool.Get();
+            t.transform.position = spawnPos;
+            go = t.gameObject;
+            natural = t;
+        }
+        else if (prefab == stonePrefab && _stonePool != null)
+        {
+            var s = _stonePool.Get();
+            s.transform.position = spawnPos;
+            go = s.gameObject;
+            natural = s;
+        }
+        else
+        {
+            go = Instantiate(prefab, spawnPos, Quaternion.identity);
+            natural = go.GetComponent<NaturalObject>();
+        }
+
         if (natural != null)
         {
             _objects[cellPos] = natural;
+            DepthSortByY.Apply(natural.transform);
             onSpawned?.Invoke(go);
         }
     }

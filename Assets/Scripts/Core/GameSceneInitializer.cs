@@ -70,7 +70,14 @@ public class GameSceneInitializer : MonoBehaviour
             go.AddComponent<NaturalObjectManager>();
         }
 
-        // 플레이어에 FallHandler, ToolAnimator (없으면 추가)
+        // DepthSortConfig (없으면 자동 생성 - baseOrderOffset 설정용)
+        if (FindObjectOfType<DepthSortConfig>() == null)
+        {
+            var configGo = new GameObject("DepthSortConfig");
+            configGo.AddComponent<DepthSortConfig>();
+        }
+
+        // 플레이어에 FallHandler, ToolAnimator, DepthSortUpdater (없으면 추가)
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -78,6 +85,15 @@ public class GameSceneInitializer : MonoBehaviour
                 player.AddComponent<PlayerFallHandler>();
             if (player.GetComponent<PlayerToolAnimator>() == null)
                 player.AddComponent<PlayerToolAnimator>();
+            if (player.GetComponent<DepthSortUpdater>() == null)
+                player.AddComponent<DepthSortUpdater>();
+        }
+
+        // NPC에 DepthSortUpdater (이동 시 Y 기반 정렬)
+        foreach (var npc in FindObjectsOfType<NPCWander>(true))
+        {
+            if (npc.GetComponent<DepthSortUpdater>() == null)
+                npc.gameObject.AddComponent<DepthSortUpdater>();
         }
 
         if (GameDataManager.Instance != null && GameDataManager.Instance.currentSaveData != null)

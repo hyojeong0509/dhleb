@@ -150,6 +150,7 @@ public class TileManager : MonoBehaviour
         GameObject cropGo = Instantiate(cropPrefab, spawnPos, Quaternion.identity);
         CropObject crop = cropGo.GetComponent<CropObject>();
         crop.Initialize(seed, currentDay);
+        DepthSortByY.Apply(crop.transform);
 
         crops[cellPos] = crop;
         QuestManager.Instance?.NotifyObjectiveProgress(QuestObjectiveType.PlantSeed, seed.itemName, 1);
@@ -341,6 +342,7 @@ public class TileManager : MonoBehaviour
                 GameObject cropGo = Instantiate(cropPrefab, spawnPos, Quaternion.identity);
                 CropObject crop = cropGo.GetComponent<CropObject>();
                 crop.LoadFromSave(seed, c.wateredDays, c.currentStage);
+                DepthSortByY.Apply(crop.transform);
 
                 crops[cellPos] = crop;
             }

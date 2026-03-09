@@ -100,6 +100,8 @@ public class TreeObject : NaturalObject
     {
         _hitsRemaining = fromSave ? savedHitsRemaining : 10;
         _isStump = _hitsRemaining <= hitsToBreakStump && _hitsRemaining > 0;
+        _playerOverlapCount = 0;
+        RestoreAlpha();
         if (_anim != null && !string.IsNullOrEmpty(isStumpParam))
             _anim.SetBool(isStumpParam, _isStump);
         else if (_isStump && _sr != null && stumpSprite != null)
@@ -132,8 +134,7 @@ public class TreeObject : NaturalObject
                     }
                 }
                 if (NaturalObjectManager.Instance != null)
-                    NaturalObjectManager.Instance.RemoveNaturalObject(this);
-                Destroy(gameObject);
+                    NaturalObjectManager.Instance.ReturnToPool(this);
             }
             return true;
         }

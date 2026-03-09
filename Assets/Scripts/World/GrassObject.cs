@@ -16,8 +16,7 @@ public class GrassObject : NaturalObject
     {
         if (!CanHitWith(toolType)) return false;
         if (NaturalObjectManager.Instance != null)
-            NaturalObjectManager.Instance.RemoveNaturalObject(this);
-        Destroy(gameObject);
+            NaturalObjectManager.Instance.ReturnToPool(this);
         return true;
     }
 

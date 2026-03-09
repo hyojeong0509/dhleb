@@ -320,6 +320,8 @@ public class InventoryManager : MonoBehaviour
                 pickup.itemData = heldItem;
                 pickup.count = heldCount;
                 pickup.SetupVisual();
+                if (dropped.GetComponent<DepthSortUpdater>() == null)
+                    dropped.AddComponent<DepthSortUpdater>();
             }
         }
 

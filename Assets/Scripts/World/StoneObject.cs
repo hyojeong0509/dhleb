@@ -58,8 +58,14 @@ public class StoneObject : NaturalObject
             SpawnDroppedItem(item, dropCount);
 
         if (NaturalObjectManager.Instance != null)
-            NaturalObjectManager.Instance.RemoveNaturalObject(this);
-        Destroy(gameObject);
+            NaturalObjectManager.Instance.ReturnToPool(this);
+    }
+
+    void OnEnable()
+    {
+        _isBeingDestroyed = false;
+        if (_sr != null && normalSprite != null)
+            _sr.sprite = normalSprite;
     }
 
     void SpawnDroppedItem(ItemData item, int count)
