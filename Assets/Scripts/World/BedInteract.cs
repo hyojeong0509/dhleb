@@ -5,7 +5,7 @@ using System.Collections;
 
 // 침대 상호작용
 // 흐름: 침대 접근 → "하루 마무리?" 팝업 → [예] → Sleep → 저장 → 정산 표시 → (꿈 시퀀스 분기) → 다음날
-// 꿈 시스템(Dream-Link)은 ShouldPlayDreamSequence()에서 분기. 확장 시 여기만 수정.
+// 꿈 시퀀스는 DreamSequenceRegistry에서 조건별로 지정. Inspector에서 설정 가능.
 [RequireComponent(typeof(Collider2D))]
 public class BedInteract : MonoBehaviour
 {
@@ -29,8 +29,13 @@ public class BedInteract : MonoBehaviour
     [Tooltip("첫날 잠 시 재생할 대화 (튜토리얼 중)")]
     public DialogueData firstDaySleepDialogue;
 
+    [Header("꿈 시퀀스 (Dream-Link)")]
+    [Tooltip("꿈 시퀀스 목록. 비우면 Resources/DreamSequenceRegistry 로드")]
+    public DreamSequenceRegistry dreamRegistry;
+
     private bool playerInRange;
     private bool isProcessing;
+    private DreamSequenceData pendingDream;
 
     void Start()
     {
@@ -142,7 +147,7 @@ public class BedInteract : MonoBehaviour
         ShowSaveComplete();
 
         // 7. 꿈 시퀀스 분기 (Dream-Link)
-        if (ShouldPlayDreamSequence())
+        if (ShouldPlayDreamSequence(dayBeforeSleep))
         {
             StartDreamSequence();
         }
@@ -200,25 +205,43 @@ public class BedInteract : MonoBehaviour
         GameInputBlocker.Unblock();
     }
 
-    // 꿈 시퀀스 재생 여부.
-    // 확장: 특정 날짜, 랜덤 확률, EP 진행도 등으로 분기.
-    bool ShouldPlayDreamSequence()
+    // 꿈 시퀀스 재생 여부. dayBeforeSleep = 잠 자기 직전 날짜 (1일차 잠 = 1).
+    bool ShouldPlayDreamSequence(int dayBeforeSleep)
     {
-        // TODO: Dream-Link 시스템 연동
-        // 예: 특정 날짜에만, 랜덤 확률, 스토리 EP 조건 등
-        return false;
+        var registry = dreamRegistry != null ? dreamRegistry : Resources.Load<DreamSequenceRegistry>("DreamSequenceRegistry");
+        if (registry == null || registry.dreams == null || registry.dreams.Count == 0)
+            return false;
+
+        pendingDream = registry.GetDreamToPlay(dayBeforeSleep);
+        return pendingDream != null;
     }
 
-    // 꿈 시퀀스 시작.
-    // 확장: Dream 씬 로드, 꿈 맵 전환 등.
-    // 꿈 종료 시 OnDreamSequenceEnd() 호출.
+    // 꿈 시퀀스 시작. 컷신 또는 대화 재생.
     void StartDreamSequence()
     {
-        // TODO: Dream-Link 씬 로드 또는 꿈 맵 전환
-        // 예: SceneManager.LoadScene("DreamScene");
-        // 꿈 씬/시퀀스 끝나면 OnDreamSequenceEnd() 호출
-        Debug.Log("[BedInteract] 꿈 시퀀스 (미구현)");
-        isProcessing = false;
+        if (pendingDream == null) return;
+
+        var dream = pendingDream;
+
+        void OnDreamComplete()
+        {
+            if (!string.IsNullOrEmpty(dream.setFlagWhenDone) && GameProgressManager.Instance != null)
+                GameProgressManager.Instance.SetFlag(dream.setFlagWhenDone);
+            pendingDream = null;
+        }
+
+        if (dream.cutscene != null && CutsceneManager.Instance != null)
+        {
+            CutsceneManager.Instance.Play(dream.cutscene, OnDreamComplete);
+        }
+        else if (dream.dialogue != null && DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.Play(dream.dialogue, OnDreamComplete);
+        }
+        else
+        {
+            OnDreamComplete();
+        }
     }
 
     // 꿈 시퀀스 종료 시 호출 (꿈 씬/시퀀스 스크립트에서 호출)
