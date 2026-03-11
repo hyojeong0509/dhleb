@@ -31,6 +31,8 @@ public class DreamReturnPortal : MonoBehaviour
     public Vector3 returnPosition;
     [Tooltip("귀환 완료 후 설정할 플래그. 예: saw_dream_1")]
     public string setFlagWhenDone;
+    [Tooltip("'네' 선택 후 페이드 아웃 시간 (초)")]
+    public float fadeOutDuration = 0.4f;
 
     [Header("BedInteract 연결")]
     [Tooltip("저장/패널 호출용. 비우면 씬에서 자동 검색.")]
@@ -84,8 +86,21 @@ public class DreamReturnPortal : MonoBehaviour
 
     void DoReturn()
     {
-        TeleportPlayerBack();
-        OnReturnComplete();
+        if (fadeOutDuration > 0f && ScreenFadeManager.Instance != null)
+        {
+            // 페이드 아웃 → 검은 화면에서 플레이어 이동 + 저장 패널 활성화
+            // 페이드 인은 [다음] 버튼 클릭 시 BedInteract에서 처리
+            ScreenFadeManager.Instance.FadeOut(fadeOutDuration, () =>
+            {
+                TeleportPlayerBack();
+                OnReturnComplete();
+            });
+        }
+        else
+        {
+            TeleportPlayerBack();
+            OnReturnComplete();
+        }
     }
 
     void TeleportPlayerBack()

@@ -38,6 +38,7 @@ public class BedInteract : MonoBehaviour
     private DreamSequenceData pendingDream;
     private int dayBeforeSleep;
     private float sleepTimeRecord;
+    private bool returnedFromDream; // 꿈에서 복귀했으면 true → [다음]에서 FadeIn만
 
     void Start()
     {
@@ -184,6 +185,7 @@ public class BedInteract : MonoBehaviour
     /// </summary>
     public void OnDreamReturnComplete()
     {
+        returnedFromDream = true;
         GameInputBlocker.Block();
         SaveAndShowPanel();
     }
@@ -248,10 +250,23 @@ public class BedInteract : MonoBehaviour
     {
         if (saveCompletePanel != null) saveCompletePanel.SetActive(false);
 
-        if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
-            ScreenFadeManager.Instance.FadeOutIn(FinishSleep, fadeDuration, fadeDuration);
+        if (returnedFromDream)
+        {
+            // 꿈 복귀 케이스: 이미 검은 화면 → 페이드 인만
+            returnedFromDream = false;
+            if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
+                ScreenFadeManager.Instance.FadeInFromBlack(fadeDuration, FinishSleep);
+            else
+                FinishSleep();
+        }
         else
-            FinishSleep();
+        {
+            // 일반 케이스: 페이드 아웃 → 페이드 인
+            if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
+                ScreenFadeManager.Instance.FadeOutIn(FinishSleep, fadeDuration, fadeDuration);
+            else
+                FinishSleep();
+        }
     }
 
     void AutoFinish()

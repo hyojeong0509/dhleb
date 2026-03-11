@@ -107,6 +107,31 @@ public class ScreenFadeManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 페이드 아웃만 (검은 화면에서 멈춤). onComplete에서 텔레포트 등 처리 후 FadeInFromBlack 호출.
+    /// </summary>
+    public void FadeOut(float duration = -1f, System.Action onComplete = null)
+    {
+        if (isFading) return;
+        float dur = duration > 0 ? duration : defaultFadeDuration;
+        StartCoroutine(FadeOutRoutine(dur, onComplete));
+    }
+
+    IEnumerator FadeOutRoutine(float duration, System.Action onComplete)
+    {
+        isFading = true;
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            canvasGroup.alpha = Mathf.Clamp01(t);
+            yield return null;
+        }
+        canvasGroup.alpha = 1f;
+        isFading = false;
+        onComplete?.Invoke();
+    }
+
+    /// <summary>
     /// 페이드 아웃 → 중간 콜백 → 페이드 인 (스타듀밸리 스타일)
     /// onMid: 화면이 완전히 검은 상태에서 호출 (텔레포트 등)
     /// onComplete: 페이드 인이 완전히 끝난 뒤 호출
