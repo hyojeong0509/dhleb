@@ -1,22 +1,28 @@
 using UnityEngine;
 
 /// <summary>
-/// 꿈 시퀀스 조건 + 재생할 컷신/대화.
-/// BedInteract에서 침대 Sleep 시 조건을 검사해 재생.
+/// 꿈 시퀀스 조건 + 재생 방식 설정.
+/// - 맵 이동형: dreamEntryPosition을 설정 → 플레이어를 해당 좌표로 텔레포트
+/// - 컷신형: cutscene 설정
+/// - 대화형: dialogue 설정
 /// </summary>
 [CreateAssetMenu(fileName = "NewDreamSequence", menuName = "Dream/Dream Sequence Data")]
 public class DreamSequenceData : ScriptableObject
 {
-    [Header("재생할 콘텐츠")]
-    [Tooltip("재생할 컷신 (우선)")]
+    [Header("맵 이동형 꿈 (자유 탐색)")]
+    [Tooltip("플레이어가 이동할 꿈맵 좌표. (0,0,0)이면 맵 이동 없음.")]
+    public Vector3 dreamEntryPosition;
+
+    [Header("컷신/대화형 꿈")]
+    [Tooltip("재생할 컷신 (맵 이동형이 아닐 때 사용)")]
     public CutsceneData cutscene;
-    [Tooltip("컷신이 없을 때 재생할 대화")]
+    [Tooltip("재생할 대화 (컷신도 없을 때 사용)")]
     public DialogueData dialogue;
 
     [Header("날짜 조건")]
-    [Tooltip("최소 일차 (-1 = 무시). 예: 1이면 1일차 이후")]
+    [Tooltip("최소 일차 (-1 = 무시). 예: 1이면 1일차 이상")]
     public int minDay = -1;
-    [Tooltip("최대 일차 (-1 = 무시). 예: 5이면 5일차 이전")]
+    [Tooltip("최대 일차 (-1 = 무시). 예: 1이면 1일차 이하")]
     public int maxDay = -1;
 
     [Header("확률")]
@@ -25,12 +31,18 @@ public class DreamSequenceData : ScriptableObject
     public float probability = 1f;
 
     [Header("선행 조건")]
-    [Tooltip("이 꿈을 보려면 필요한 플래그 (모두 있어야 함). 예: saw_dream_1, saw_dream_2")]
+    [Tooltip("이 꿈을 보려면 모두 있어야 하는 플래그. 예: saw_dream_1")]
     public string[] requiredFlags;
 
     [Header("한 번만 보기")]
-    [Tooltip("재생 후 설정할 플래그 (중복 재생 방지). 예: saw_dream_1")]
+    [Tooltip("재생 후 설정할 플래그 (중복 재생 방지). 맵 이동형은 DreamReturnPortal에서 설정.")]
     public string setFlagWhenDone;
+
+    /// <summary>맵 이동형 꿈인지 (dreamEntryPosition이 설정되어 있으면 맵 이동형)</summary>
+    public bool IsMapWalk => dreamEntryPosition != Vector3.zero;
+
+    /// <summary>재생할 콘텐츠가 있는지</summary>
+    public bool HasContent => IsMapWalk || cutscene != null || dialogue != null;
 
     /// <summary>
     /// 조건 만족 여부. dayBeforeSleep = 잠 자기 직전 날짜 (1일차 잠 = 1).
@@ -63,12 +75,9 @@ public class DreamSequenceData : ScriptableObject
             return false;
 
         // 재생할 콘텐츠가 있어야 함
-        if (cutscene == null && dialogue == null)
+        if (!HasContent)
             return false;
 
         return true;
     }
-
-    /// <summary>재생할 콘텐츠가 있는지</summary>
-    public bool HasContent => cutscene != null || dialogue != null;
 }

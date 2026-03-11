@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 
 // 침대 상호작용
-// 흐름: 침대 접근 → "하루 마무리?" 팝업 → [예] → Sleep → 저장 → 정산 표시 → (꿈 시퀀스 분기) → 다음날
-// 꿈 시퀀스는 DreamSequenceRegistry에서 조건별로 지정. Inspector에서 설정 가능.
+// 흐름 (꿈 있을 때): 확인 → 페이드 아웃 → 텔레포트 to 꿈맵 → 페이드 인 → 탐색
+//                  → 포탈 "네" → 페이드 아웃 → 복귀 → 저장 → 저장 완료 패널 → [다음] → 다음날
+// 흐름 (꿈 없을 때): 확인 → 페이드 아웃 → 페이드 인 → 저장 → 저장 완료 패널 → [다음] → 다음날
 [RequireComponent(typeof(Collider2D))]
 public class BedInteract : MonoBehaviour
 {
@@ -26,7 +26,7 @@ public class BedInteract : MonoBehaviour
     public float btnNextEnableDelay = 1f;
 
     [Header("첫날 스토리")]
-    [Tooltip("첫날 잠 시 재생할 대화 (튜토리얼 중)")]
+    [Tooltip("(레거시) 꿈 시퀀스로 대체됨. 꿈이 없을 때만 동작.")]
     public DialogueData firstDaySleepDialogue;
 
     [Header("꿈 시퀀스 (Dream-Link)")]
@@ -36,6 +36,8 @@ public class BedInteract : MonoBehaviour
     private bool playerInRange;
     private bool isProcessing;
     private DreamSequenceData pendingDream;
+    private int dayBeforeSleep;
+    private float sleepTimeRecord;
 
     void Start()
     {
@@ -96,61 +98,116 @@ public class BedInteract : MonoBehaviour
 
         if (popupPanel != null) popupPanel.SetActive(false);
 
-        // 페이드 아웃 → Sleep/저장/패널 표시 → 페이드 인
+        // 페이드 아웃 → (검은 화면 중) 수면 처리 + 필요시 텔레포트 → 페이드 인
         if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
+            ScreenFadeManager.Instance.FadeOutIn(
+                onMid: DoSleepLogic,
+                fadeOutDuration: fadeDuration,
+                fadeInDuration: fadeDuration,
+                onComplete: AfterSleepFadeIn
+            );
+        else
         {
-            ScreenFadeManager.Instance.FadeOutIn(DoSleepAndSave, fadeDuration, fadeDuration);
+            DoSleepLogic();
+            AfterSleepFadeIn();
+        }
+    }
+
+    // 검은 화면 상태에서 실행. 시간 동결 + 꿈 체크 + 텔레포트.
+    // 날짜 전환/저장은 꿈이 끝난 뒤 SaveAndShowPanel()에서 처리.
+    void DoSleepLogic()
+    {
+        sleepTimeRecord = TimeManager.Instance != null ? TimeManager.Instance.CurrentGameMinutes : 0f;
+        dayBeforeSleep  = TimeManager.Instance != null ? TimeManager.Instance.CurrentDay : 1;
+
+        // 꿈 중 시간이 흐르지 않도록 정지 (날짜는 아직 바꾸지 않음)
+        if (TimeManager.Instance != null)
+            TimeManager.Instance.SetPause(true);
+
+        // 꿈 시퀀스 사전 체크
+        CheckDreamSequence(dayBeforeSleep);
+
+        // 맵 이동형 꿈: 검은 화면 중 텔레포트 (페이드 인 시 꿈맵이 보임)
+        if (pendingDream != null && pendingDream.IsMapWalk)
+            TeleportPlayerTo(pendingDream.dreamEntryPosition);
+    }
+
+    // 페이드 인 완료 후 호출. 꿈 or 저장패널 분기.
+    void AfterSleepFadeIn()
+    {
+        if (pendingDream != null && pendingDream.IsMapWalk)
+        {
+            // 꿈맵으로 이동 완료. 플레이어 자유 탐색 허용.
+            // pendingDream은 null로 초기화 (flag/저장은 DreamReturnPortal이 처리)
+            pendingDream = null;
+            GameInputBlocker.Unblock();
+            // isProcessing은 OnDreamReturnComplete()에서 저장 후 패널이 닫힐 때까지 유지
+        }
+        else if (pendingDream != null)
+        {
+            // 컷신/대화형 꿈: 재생 후 저장
+            StartNonMapDream();
         }
         else
         {
-            DoSleepAndSave();
+            // 꿈 없음: 바로 저장
+            SaveAndShowPanel();
         }
     }
 
-    void DoSleepAndSave()
+    // 컷신/대화형 꿈 재생. 종료 후 저장.
+    void StartNonMapDream()
     {
-        StartCoroutine(DoSleepAndSaveRoutine());
-    }
+        var dream = pendingDream;
+        pendingDream = null;
 
-    IEnumerator DoSleepAndSaveRoutine()
-    {
-        // 1. Sleep 전 현재 시각 저장 (Sleep()이 날짜를 바꾸므로)
-        float sleepTime = TimeManager.Instance != null ? TimeManager.Instance.CurrentGameMinutes : 0f;
-        int dayBeforeSleep = TimeManager.Instance != null ? TimeManager.Instance.CurrentDay : 1;
-
-        // 2. 하루 종료 (다음날로)
-        if (TimeManager.Instance != null)
-            TimeManager.Instance.Sleep();
-
-        // 3. 스테미나 회복 (시각별: 02:00 이전 100%, 03:00까지 60%, 04:00까지 40%, 05:00~ 20%)
-        if (StaminaManager.Instance != null)
-            StaminaManager.Instance.RestoreOnSleep(sleepTime);
-
-        // 4. 첫날 잠 시 "스트레스" 대화 (저장 전)
-        if (dayBeforeSleep == 1 && firstDaySleepDialogue != null
-            && GameProgressManager.Instance != null && GameProgressManager.Instance.IsBeforeTutorialEnd)
+        void OnDreamComplete()
         {
-            if (DialogueManager.Instance != null)
-            {
-                bool done = false;
-                DialogueManager.Instance.Play(firstDaySleepDialogue, () => done = true);
-                while (!done)
-                    yield return null;
-            }
+            if (!string.IsNullOrEmpty(dream.setFlagWhenDone) && GameProgressManager.Instance != null)
+                GameProgressManager.Instance.SetFlag(dream.setFlagWhenDone);
+            SaveAndShowPanel();
         }
 
-        // 5. 저장
+        if (dream.cutscene != null && CutsceneManager.Instance != null)
+            CutsceneManager.Instance.Play(dream.cutscene, OnDreamComplete);
+        else if (dream.dialogue != null && DialogueManager.Instance != null)
+            DialogueManager.Instance.Play(dream.dialogue, OnDreamComplete);
+        else
+            OnDreamComplete();
+    }
+
+    // ── 꿈 복귀 후 처리 (DreamReturnPortal에서 호출) ─────────────
+
+    /// <summary>
+    /// 꿈맵 포탈에서 귀환 완료 시 DreamReturnPortal이 호출.
+    /// 저장 → 저장 완료 패널 표시.
+    /// </summary>
+    public void OnDreamReturnComplete()
+    {
+        GameInputBlocker.Block();
+        SaveAndShowPanel();
+    }
+
+    // ── 저장 및 패널 ──────────────────────────────────────────────
+
+    void SaveAndShowPanel()
+    {
+        // 시간 재개 → 날짜 전환 (Sleep()이 isDayRunning=true일 때만 동작하므로 먼저 해제)
+        if (TimeManager.Instance != null)
+        {
+            TimeManager.Instance.SetPause(false);
+            TimeManager.Instance.Sleep(); // 다음날로 전환, 시간 06:00으로 초기화
+        }
+
+        // 수면 시각 기반 스테미나 회복
+        if (StaminaManager.Instance != null)
+            StaminaManager.Instance.RestoreOnSleep(sleepTimeRecord);
+
+        // 저장 (다음날 데이터로 저장됨)
         if (GameDataManager.Instance != null)
             GameDataManager.Instance.SaveGame();
 
-        // 6. 저장 완료 표시
         ShowSaveComplete();
-
-        // 7. 꿈 시퀀스 분기 (Dream-Link)
-        if (ShouldPlayDreamSequence(dayBeforeSleep))
-        {
-            StartDreamSequence();
-        }
     }
 
     void OnCancelSleep()
@@ -163,7 +220,7 @@ public class BedInteract : MonoBehaviour
     {
         if (saveCompletePanel == null)
         {
-            isProcessing = false;
+            FinishSleep();
             return;
         }
 
@@ -176,7 +233,7 @@ public class BedInteract : MonoBehaviour
         }
         else
         {
-            Invoke(nameof(HideSaveComplete), 2f);
+            Invoke(nameof(AutoFinish), 2f);
         }
     }
 
@@ -186,67 +243,58 @@ public class BedInteract : MonoBehaviour
             btnNext.gameObject.SetActive(true);
     }
 
+    // [다음] 버튼: 저장 패널 닫고 다음날 시작
     void OnClickNext()
     {
+        if (saveCompletePanel != null) saveCompletePanel.SetActive(false);
+
         if (fadeDuration > 0f && ScreenFadeManager.Instance != null)
-        {
-            ScreenFadeManager.Instance.FadeOutIn(HideSaveComplete, fadeDuration, fadeDuration);
-        }
+            ScreenFadeManager.Instance.FadeOutIn(FinishSleep, fadeDuration, fadeDuration);
         else
-        {
-            HideSaveComplete();
-        }
+            FinishSleep();
     }
 
-    void HideSaveComplete()
+    void AutoFinish()
     {
         if (saveCompletePanel != null) saveCompletePanel.SetActive(false);
+        FinishSleep();
+    }
+
+    void FinishSleep()
+    {
         isProcessing = false;
         GameInputBlocker.Unblock();
     }
 
-    // 꿈 시퀀스 재생 여부. dayBeforeSleep = 잠 자기 직전 날짜 (1일차 잠 = 1).
-    bool ShouldPlayDreamSequence(int dayBeforeSleep)
+    // ── 꿈 체크 ───────────────────────────────────────────────────
+
+    void CheckDreamSequence(int day)
     {
-        var registry = dreamRegistry != null ? dreamRegistry : Resources.Load<DreamSequenceRegistry>("DreamSequenceRegistry");
+        var registry = dreamRegistry != null
+            ? dreamRegistry
+            : Resources.Load<DreamSequenceRegistry>("DreamSequenceRegistry");
+
         if (registry == null || registry.dreams == null || registry.dreams.Count == 0)
-            return false;
-
-        pendingDream = registry.GetDreamToPlay(dayBeforeSleep);
-        return pendingDream != null;
-    }
-
-    // 꿈 시퀀스 시작. 컷신 또는 대화 재생.
-    void StartDreamSequence()
-    {
-        if (pendingDream == null) return;
-
-        var dream = pendingDream;
-
-        void OnDreamComplete()
         {
-            if (!string.IsNullOrEmpty(dream.setFlagWhenDone) && GameProgressManager.Instance != null)
-                GameProgressManager.Instance.SetFlag(dream.setFlagWhenDone);
             pendingDream = null;
+            return;
         }
 
-        if (dream.cutscene != null && CutsceneManager.Instance != null)
-        {
-            CutsceneManager.Instance.Play(dream.cutscene, OnDreamComplete);
-        }
-        else if (dream.dialogue != null && DialogueManager.Instance != null)
-        {
-            DialogueManager.Instance.Play(dream.dialogue, OnDreamComplete);
-        }
-        else
-        {
-            OnDreamComplete();
-        }
+        pendingDream = registry.GetDreamToPlay(day);
     }
 
-    // 꿈 시퀀스 종료 시 호출 (꿈 씬/시퀀스 스크립트에서 호출)
-    public void OnDreamSequenceEnd()
+    // ── 유틸 ─────────────────────────────────────────────────────
+
+    static void TeleportPlayerTo(Vector3 position)
     {
-        isProcessing = false;
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        Vector3 pos = position;
+        pos.z = player.transform.position.z;
+
+        var rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null) rb.MovePosition(pos);
+        else player.transform.position = pos;
     }
 }

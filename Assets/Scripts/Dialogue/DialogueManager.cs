@@ -14,6 +14,8 @@ public class DialogueManager : MonoBehaviour
     /// <param name="completed">true=정상 완료(마지막 노드까지), false=닫기 버튼 등으로 중단</param>
     public event Action<DialogueData, bool> OnDialogueEnded;
     public event Action<DialogueNode> OnNodeDisplayed;
+    /// <summary>Advance 호출 시 이동하려는 nextNodeId를 알려줌 (선택지 감지용)</summary>
+    public event Action<string> OnAdvancing;
 
     private DialogueData currentData;
     private DialogueNode currentNode;
@@ -73,6 +75,9 @@ public class DialogueManager : MonoBehaviour
     public void Advance(string nextNodeId)
     {
         if (!IsPlaying || currentData == null) return;
+
+        // 이동하려는 nextNodeId를 먼저 알림 (선택지 감지용)
+        OnAdvancing?.Invoke(nextNodeId);
 
         if (string.IsNullOrEmpty(nextNodeId))
         {

@@ -107,18 +107,20 @@ public class ScreenFadeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 페이드 아웃 → 콜백 → 페이드 인 (스타듀밸리 스타일)
+    /// 페이드 아웃 → 중간 콜백 → 페이드 인 (스타듀밸리 스타일)
+    /// onMid: 화면이 완전히 검은 상태에서 호출 (텔레포트 등)
+    /// onComplete: 페이드 인이 완전히 끝난 뒤 호출
     /// </summary>
-    public void FadeOutIn(System.Action onMid, float fadeOutDuration = -1f, float fadeInDuration = -1f)
+    public void FadeOutIn(System.Action onMid, float fadeOutDuration = -1f, float fadeInDuration = -1f, System.Action onComplete = null)
     {
         if (isFading) return;
         float outDur = fadeOutDuration > 0 ? fadeOutDuration : defaultFadeDuration;
         float inDur = fadeInDuration > 0 ? fadeInDuration : defaultFadeDuration;
 
-        StartCoroutine(FadeOutInRoutine(onMid, outDur, inDur));
+        StartCoroutine(FadeOutInRoutine(onMid, outDur, inDur, onComplete));
     }
 
-    IEnumerator FadeOutInRoutine(System.Action onMid, float outDur, float inDur)
+    IEnumerator FadeOutInRoutine(System.Action onMid, float outDur, float inDur, System.Action onComplete)
     {
         isFading = true;
 
@@ -148,5 +150,8 @@ public class ScreenFadeManager : MonoBehaviour
         canvasGroup.alpha = 0f;
 
         isFading = false;
+
+        // 페이드 인 완료 콜백
+        onComplete?.Invoke();
     }
 }
