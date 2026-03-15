@@ -720,7 +720,7 @@ public class CutsceneManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(1f);
     }
 
-    /// <summary>NPC들을 지정 좌표로 이동 (복귀 저장 없음, NpcGroupReturnToStart 이후 재배치용)</summary>
+    // NPC들을 지정 좌표로 이동 (복귀 저장 없음, NpcGroupReturnToStart 이후 재배치용)
     IEnumerator RunNpcGroupMoveToPosition(CutsceneAction action)
     {
         if (action.npcIds == null || action.npcIds.Count == 0 ||

@@ -1,16 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 꿈맵 포탈. 플레이어가 F키(또는 클릭)로 상호작용하면:
-///   1. returnDialogue 재생 (독백 + "돌아갈까요?" 선택지)
-///   2. "네" 선택 → 페이드 아웃 → 복귀 좌표 텔레포트 → 페이드 인 → 플래그 설정
-///   3. "아니오" 선택 → 대화 닫힘, 포탈 재상호작용 가능
-///
-/// DialogueData 설정:
-///   - 마지막 선택 노드에서 "네" 선택지의 Next Node Id = "yes" (YES_NODE_ID와 일치)
-///   - "아니오" 선택지의 Next Node Id = (빈칸)
-///   - "yes" 노드는 별도로 추가하지 않아도 됨
-/// </summary>
+
 [RequireComponent(typeof(Collider2D))]
 public class DreamReturnPortal : MonoBehaviour
 {

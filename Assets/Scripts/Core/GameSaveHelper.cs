@@ -1,13 +1,9 @@
 using UnityEngine;
 
-/// <summary>
-/// 저장/로드 시 게임 상태 수집 및 적용
-/// </summary>
+// 저장/로드 시 게임 상태 수집 및 적용
 public static class GameSaveHelper
 {
-    /// <summary>
-    /// 현재 게임 상태를 data에 채움
-    /// </summary>
+    // 현재 게임 상태를 data에 채움
     public static void CollectSaveData(SaveData data, Transform playerTransform)
     {
         if (data == null) return;
@@ -68,9 +64,7 @@ public static class GameSaveHelper
         }
     }
 
-    /// <summary>
-    /// 저장 데이터를 게임에 적용 (로드 시)
-    /// </summary>
+    // 저장 데이터를 게임에 적용 (로드 시)
     public static void ApplyLoadData(SaveData data, Transform playerTransform)
     {
         if (data == null || data.playerData == null) return;

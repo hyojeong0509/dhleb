@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// NPC가 시작 위치 기준 1칸 반경 안에서 자유롭게 배회
-/// Animator: Speed (0=Idle, 1=Walk), Walk 애니메이션은 오른쪽 방향 기준 → flipX로 좌우 전환
-/// </summary>
+// NPC가 시작 위치 기준 1칸 반경 안에서 자유롭게 배회
 [RequireComponent(typeof(Rigidbody2D))]
 public class NPCWander : MonoBehaviour
 {

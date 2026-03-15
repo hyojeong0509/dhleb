@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
-/// <summary>
-/// 상점/아이템 샘플 데이터 생성
-/// 메뉴: Tools → Create Shop Sample Data
-/// </summary>
+// 상점/아이템 샘플 데이터 생성
+// 메뉴: Tools → Create Shop Sample Data
 public static class CreateShopSampleData
 {
     const string ItemPath = "Assets/Scripts/Data/Item";

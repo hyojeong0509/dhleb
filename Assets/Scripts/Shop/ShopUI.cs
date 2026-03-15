@@ -3,9 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-/// <summary>
-/// 상점 UI - 구매/판매 모드 토글, 슬롯 좌클릭(1개)/우클릭(5개)
-/// </summary>
+// 상점 UI - 구매/판매 모드 토글, 슬롯 좌클릭(1개)/우클릭(5개)
 public class ShopUI : MonoBehaviour
 {
     public static ShopUI Instance { get; private set; }
